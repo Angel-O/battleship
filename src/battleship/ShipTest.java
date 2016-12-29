@@ -17,6 +17,8 @@ import org.junit.Test;
  */
 public class ShipTest
 {
+	/** default timeout test duration in milliseconds */
+	private static final int DEFAULT_TIMEOUT = 2000;
 
 	/**
 	 * @throws java.lang.Exception
@@ -46,7 +48,7 @@ public class ShipTest
 	public void tearDown() throws Exception
 	{}
 
-	@Test
+	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test()
 	{
 		fail("Not yet implemented");
