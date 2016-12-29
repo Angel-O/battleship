@@ -9,5 +9,4 @@ public class Destroyer extends Ship
 	{
 		super(destroyerLength);
 	}
-
 }

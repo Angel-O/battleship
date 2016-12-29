@@ -9,5 +9,4 @@ public class Cruiser extends Ship
 	{
 		super(cruiserLength);
 	}
-
 }

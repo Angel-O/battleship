@@ -9,5 +9,4 @@ public class Battleship extends Ship
 	{
 		super(battleshipLength);
 	}
-
 }
