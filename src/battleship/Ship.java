@@ -14,9 +14,4 @@ public abstract class Ship
 	{
 		return length;
 	}
-
-	public void setLength(int length)
-	{
-		this.length = length;
-	}
 }
