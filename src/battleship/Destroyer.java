@@ -9,4 +9,10 @@ public class Destroyer extends Ship
 	{
 		super(destroyerLength);
 	}
+
+	@Override
+	public String getShipType()
+	{
+		return "destroyer";
+	}
 }

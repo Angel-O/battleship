@@ -9,4 +9,10 @@ public class Cruiser extends Ship
 	{
 		super(cruiserLength);
 	}
+
+	@Override
+	public String getShipType()
+	{
+		return "cruiser";
+	}
 }

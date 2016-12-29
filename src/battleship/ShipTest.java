@@ -88,7 +88,7 @@ public class ShipTest
 	public void test_should_return_empty_sea_dummy_lenght()
 	{
 		Ship ship = new EmptySea();
-		int expected = 0;
+		int expected = 1;
 		int actual = ship.getLength();
 		assertEquals("verifying dummy length of empty sea", expected, actual);
 	}
