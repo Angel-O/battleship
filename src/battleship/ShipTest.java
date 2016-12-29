@@ -3,7 +3,7 @@
  */
 package battleship;
 
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertEquals;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -49,9 +49,38 @@ public class ShipTest
 	{}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test()
+	public void test_should_return_battleship_correct_lenght()
 	{
-		fail("Not yet implemented");
+		Ship ship = new Battleship();
+		int expected = 4;
+		int actual = ship.length;
+		assertEquals("verifying battleship length", expected, actual);
 	}
 
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_should_return_cruiser_correct_lenght()
+	{
+		Ship ship = new Cruiser();
+		int expected = 3;
+		int actual = ship.length;
+		assertEquals("verifying cruiser length", expected, actual);
+	}
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_should_return_destroyer_correct_lenght()
+	{
+		Ship ship = new Destroyer();
+		int expected = 2;
+		int actual = ship.length;
+		assertEquals("verifying destroyer length", expected, actual);
+	}
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_should_return_submarine_correct_lenght()
+	{
+		Ship ship = new Submarine();
+		int expected = 1;
+		int actual = ship.length;
+		assertEquals("verifying submarine length", expected, actual);
+	}
 }
