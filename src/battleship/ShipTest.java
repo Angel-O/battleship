@@ -53,7 +53,7 @@ public class ShipTest
 	{
 		Ship ship = new Battleship();
 		int expected = 4;
-		int actual = ship.length;
+		int actual = ship.getLength();
 		assertEquals("verifying battleship length", expected, actual);
 	}
 
@@ -62,7 +62,7 @@ public class ShipTest
 	{
 		Ship ship = new Cruiser();
 		int expected = 3;
-		int actual = ship.length;
+		int actual = ship.getLength();
 		assertEquals("verifying cruiser length", expected, actual);
 	}
 
@@ -71,7 +71,7 @@ public class ShipTest
 	{
 		Ship ship = new Destroyer();
 		int expected = 2;
-		int actual = ship.length;
+		int actual = ship.getLength();
 		assertEquals("verifying destroyer length", expected, actual);
 	}
 
@@ -80,7 +80,7 @@ public class ShipTest
 	{
 		Ship ship = new Submarine();
 		int expected = 1;
-		int actual = ship.length;
+		int actual = ship.getLength();
 		assertEquals("verifying submarine length", expected, actual);
 	}
 }
