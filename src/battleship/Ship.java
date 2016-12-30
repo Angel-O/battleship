@@ -44,23 +44,42 @@ public abstract class Ship
 	 */
 	public boolean shootAt(int row, int column)
 	{
-		if (!isSunk())
+		if (!isSunk() && trajectoryIsRight(row, column))
 		{
-			if (isHorizontal())
-			{
-				return tryShoot(getBowColumn(), column);
-			}
-			else
-			{
-				return tryShoot(getBowRow(), row);
-			}
+			// if the ship is horizontal check the horizontal range and try
+			// and shoot, otherwise check the vertical range. The diagonal
+			// range is equivalent to either the horizontal or the vertical one
+			return isHorizontal() ? checkRangetAndShoot(bowColumn, column) : checkRangetAndShoot(bowRow, row);
 		}
 		return false;
 	}
 
 	/**
-	 * Tries to hit the ship. Marks the part that was hit and returns true in
-	 * case of success, otherwise it returns false.
+	 * Checks that the shot fired has potential to hit the ship, by checking its
+	 * trajectory. A ship can only be hit with a horizontal, vertical or
+	 * diagonal trajectory.
+	 *
+	 * @param row
+	 *            vertical coordinate of the shot
+	 * @param horizontal
+	 *            coordinate of the shot
+	 * @return {@code true} if the trajectory is either horizontal, vertical or
+	 *         diagonal, {@code false} otherwise
+	 */
+	private boolean trajectoryIsRight(int row, int column)
+	{
+		// horizontal trajectory: target row is equal to bow row
+		// vertical trajectory: target column is equal to bow column
+		// diagonal trajectory: if the difference of the target coordinates and
+		// the correspondent bow
+		// coordinates are the same then the shot can be
+		// a candidate for a diagonal hit
+		return row == bowRow || column == bowColumn || row - bowRow == column - bowColumn;
+	}
+
+	/**
+	 * Checks if the ship is in range and if so it will mark the hit point.
+	 * Returns true in case of a successful shot, false otherwise.
 	 *
 	 * @param bowCoordinate
 	 *            coordinate of the bow. If the ship is horizontal the bow
@@ -70,9 +89,9 @@ public abstract class Ship
 	 *            target column coordinate should be used
 	 * @return {@code true} if it's a hit, {@code false} it if's a miss
 	 */
-	private boolean tryShoot(int bowCoordinate, int targetCoordinate)
+	private boolean checkRangetAndShoot(int bowCoordinate, int targetCoordinate)
 	{
-		// Check if the ship was hit. Add the length to the relevant coordinate
+		// Add the length to the relevant coordinate
 		// and subtract one since the ship will stretch from the bow to length -
 		// 1 at most.
 		if (bowCoordinate + length - 1 >= targetCoordinate)

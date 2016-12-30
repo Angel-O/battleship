@@ -1,5 +1,4 @@
 1. provide validation for length fields
 2. check whether or not getters and setters are required for instance vars in ship class
 3. provide validation for bow row and bow col (in subclasses???)
-4. implement shoot at method
-5.
+4. implement shootAt method (add support for diagonal shooting)

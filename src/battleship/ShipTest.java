@@ -135,7 +135,7 @@ public class ShipTest
 	public void test_vertical_ships_should_be_sunk_when_shots_are_fired_across_their_length()
 	{
 		// set the ships bow at position (1,1); by default they will be aligned
-		// vertically
+		// on multiple lines (vertically or diagonally)
 		Ship battleship = new Battleship();
 		battleship.setBowRow(1);
 		battleship.setBowColumn(1);
@@ -165,6 +165,40 @@ public class ShipTest
 		assertTrue("Sinking a vertical submarine", submarine.isSunk());
 	}
 
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_diagonal_ships_should_be_sunk_when_shots_are_fired_across_their_length()
+	{
+		// set the ships bow at position (1,1); by default they will be aligned
+		// on multiple lines (vertically or diagonally)
+		Ship battleship = new Battleship();
+		battleship.setBowRow(1);
+		battleship.setBowColumn(1);
+
+		Ship destroyer = new Destroyer();
+		destroyer.setBowRow(1);
+		destroyer.setBowColumn(1);
+
+		Ship cruiser = new Cruiser();
+		cruiser.setBowRow(1);
+		cruiser.setBowColumn(1);
+
+		Ship submarine = new Submarine();
+		submarine.setBowRow(1);
+		submarine.setBowColumn(1);
+
+		// shoot each part along the length of the ship
+		shootDiagonallyAcrossShipLength(battleship);
+		shootDiagonallyAcrossShipLength(destroyer);
+		shootDiagonallyAcrossShipLength(cruiser);
+		shootDiagonallyAcrossShipLength(submarine);
+
+		// verify that the ships have been actually sunk
+		assertTrue("sinking a diagonal battleship", battleship.isSunk());
+		assertTrue("Sinking a diagonal destroyer", destroyer.isSunk());
+		assertTrue("sinking a diagonal cruiser", cruiser.isSunk());
+		assertTrue("Sinking a diagonal submarine", submarine.isSunk());
+	}
+
 	private void shootHorizontallyAcrossShipLength(Ship ship)
 	{
 		for (int i = ship.getBowColumn(); i < ship.getBowColumn() + ship.getLength(); i++)
@@ -178,6 +212,17 @@ public class ShipTest
 		for (int i = ship.getBowRow(); i < ship.getBowRow() + ship.getLength(); i++)
 		{
 			ship.shootAt(i, ship.getBowColumn());
+		}
+	}
+
+	private void shootDiagonallyAcrossShipLength(Ship ship)
+	{
+		for (int i = ship.getBowRow(); i < ship.getBowRow() + ship.getLength(); i++)
+		{
+			for (int j = ship.getBowColumn(); j < ship.getBowColumn() + ship.getLength(); j++)
+			{
+				ship.shootAt(i, j);
+			}
 		}
 	}
 }
