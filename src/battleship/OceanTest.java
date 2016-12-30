@@ -4,6 +4,7 @@
 package battleship;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -53,6 +54,18 @@ public class OceanTest
 	public void tearDown() throws Exception
 	{
 		ocean = null;
+	}
+
+	@Test
+	public void test_ships_sould_not_overlap_when_placed_randomly_on_the_ocean()
+	{
+		fail("not implemented yet");
+	}
+
+	@Test
+	public void test_ships_sould_not_be_adjacent_when_placed_randomly_on_the_ocean()
+	{
+		fail("not implemented yet");
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
