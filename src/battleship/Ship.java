@@ -47,9 +47,7 @@ public abstract class Ship
 		if (!isSunk() && trajectoryIsRight(row, column))
 		{
 			// if the ship is horizontal check the horizontal range and try
-			// and shoot, otherwise check the vertical range. The diagonal
-			// range is equivalent to either the horizontal or the vertical one,
-			// for simplicity we will take the vertical one
+			// and shoot, otherwise check the vertical range.
 			return isHorizontal() ? checkRangetAndShoot(bowColumn, column) : checkRangetAndShoot(bowRow, row);
 		}
 		return false;
@@ -57,23 +55,21 @@ public abstract class Ship
 
 	/**
 	 * Checks that the shot fired has potential to hit the ship, by checking its
-	 * trajectory. A ship can only be hit with a horizontal, vertical or
-	 * diagonal trajectory.
+	 * trajectory. A ship can only be hit with a horizontal or vertical
+	 * trajectory.
 	 *
 	 * @param row
 	 *            vertical coordinate of the shot
 	 * @param horizontal
 	 *            coordinate of the shot
-	 * @return {@code true} if the trajectory is either horizontal, vertical or
-	 *         diagonal, {@code false} otherwise
+	 * @return {@code true} if the trajectory is either horizontal or vertical,
+	 *         {@code false} otherwise
 	 */
 	private boolean trajectoryIsRight(int row, int column)
 	{
 		// horizontal trajectory: target row is equal to bow row
 		// vertical trajectory: target column is equal to bow column
-		// diagonal trajectory: difference of the target coordinates and
-		// correspondent bow coordinates are equal
-		return row == bowRow || column == bowColumn || row - bowRow == column - bowColumn;
+		return row == bowRow || column == bowColumn;
 	}
 
 	/**
