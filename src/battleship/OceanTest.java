@@ -3,6 +3,7 @@
  */
 package battleship;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -57,6 +58,34 @@ public class OceanTest
 	}
 
 	@Test
+	public void test_exactly_ten_ships_sould_be_placed_randomly_on_the_ocean()
+	{
+		// get the ships in the ocean
+		Ship[][] ships = ocean.getShipArray();
+
+		int totalShips = 0;
+
+		int expected = 0;
+
+		// count them
+		for (int i = 0; i < Ocean.OceanWidth; i++)
+		{
+			for (int j = 0; j < Ocean.OceanHeight; j++)
+			{
+				if (ships[i][j].isRealShip())
+				{
+					totalShips++;
+				}
+			}
+		}
+
+		int actual = totalShips;
+
+		// verify that we get the expected number of ships
+		assertEquals(expected, actual);
+	}
+
+	@Test
 	public void test_ships_sould_not_overlap_when_placed_randomly_on_the_ocean()
 	{
 		// ships can overlap partially (having only one part in common) or
@@ -75,7 +104,7 @@ public class OceanTest
 
 		// verify that when you hit a ship, only one will be hit (if they
 		// overlap that wouldn't be the case)
-		fail("not implemented yet");
+
 	}
 
 	@Test
