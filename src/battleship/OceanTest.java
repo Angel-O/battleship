@@ -4,6 +4,7 @@
 package battleship;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -20,6 +21,8 @@ import org.junit.Test;
 public class OceanTest
 {
 	private Ocean ocean;
+
+	private Ship[][] ships;
 
 	/** default timeout test duration in milliseconds */
 	private static final int DEFAULT_TIMEOUT = 2000;
@@ -46,6 +49,7 @@ public class OceanTest
 	{
 		ocean = new Ocean();
 		ocean.placeAllShipsRandomly();
+		ships = ocean.getShipArray();
 	}
 
 	/**
@@ -60,8 +64,9 @@ public class OceanTest
 	@Test
 	public void test_exactly_ten_ships_sould_be_placed_randomly_on_the_ocean()
 	{
-		// get the ships in the ocean
-		Ship[][] ships = ocean.getShipArray();
+		// verify that you have 10 ships (if you drop a ship where another one
+		// already was, part by part, you will end up with less than 10 ships as
+		// you would basically overwrite the ship) ==> not entirely true!!!
 
 		int totalShips = 0;
 
@@ -94,17 +99,167 @@ public class OceanTest
 		// - they are the same length
 		// - they aren't
 
-		// verify that you have 10 ships (if you drop a ship where another one
-		// already was, part by part, you will end up with less than 10 ships as
-		// you would basically overwrite the ship) ==> not entirely true!!!
 
 		// verify that no ship is in each others range: given length and
 		// orientation
-		// no other ship should e found in across the length on that direction
+		// no other ship should be found across the length on that direction
+
+		boolean foundAdjacent = false;
+
+		for (int i = 0; i < Ocean.OceanWidth; i++)
+		{
+			for (int j = 0; j < Ocean.OceanHeight; j++)
+			{
+				Ship ship = ships[i][j];
+
+				if (ship.isRealShip() && hasAdjacentShips(ship, i, j))
+				{
+					foundAdjacent = true;
+					break;
+				}
+			}
+		}
+
+		assertFalse("checking adjacency", foundAdjacent);
 
 		// verify that when you hit a ship, only one will be hit (if they
-		// overlap that wouldn't be the case)
+		// overlap that wouldn't be the case ==> not always true)
 
+	}
+
+	private boolean hasAdjacentShips(Ship ship, int i, int j)
+	{
+		boolean foundAdjacent = false;
+
+		if (ship.isHorizontal())
+		{
+			// starting from the next one (k==1)
+			for (int k = 1; k < ship.getLength(); k++)
+			{
+				// check that the ship is not on the (top) border
+				if (shipIsOnTheBorder(i))
+				{
+					// checking below us
+					if (ships[i][k].isRealShip() || ships[i + 1][k].isRealShip())
+					{
+						foundAdjacent = true;
+						break;
+					}
+					// check the spot in the same direction for the last ship
+					if (k == ship.getLength() - 1)
+					{
+						if (k == Ocean.OceanWidth - 1)
+						{
+							// if the last part is on the right edge
+							break;
+						}
+						else if (ships[i][k + 1].isRealShip() || ships[i + 1][k + 1].isRealShip())
+						{
+							// checking the next one in line and
+							// below-diagonally; no need to break
+							// since its the last iteration;
+							foundAdjacent = true;
+						}
+					}
+				}
+				else
+				{
+					// checking the next one in line, the one below, the one
+					// above
+					if (ships[i][k].isRealShip() || ships[i + 1][k].isRealShip() || ships[i - 1][k].isRealShip())
+					{
+						foundAdjacent = true;
+						break;
+					}
+					// check the spot in the same direction for the last ship
+					if (k == ship.getLength() - 1)
+					{
+						if (k == Ocean.OceanWidth - 1)
+						{
+							// if the last part is on the right edge
+							break;
+						}
+						else if (ships[i][k + 1].isRealShip() || ships[i + 1][k + 1].isRealShip()
+								|| ships[i - 1][k + 1].isRealShip())
+						{
+							// checking the next one in line,
+							// below-diagonally and above diagonally; no need to
+							// break
+							// since its the last iteration;
+							foundAdjacent = true;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			// starting from the next one (k==1)
+			for (int k = 1; k < ship.getLength(); k++)
+			{
+				// check that the ship is on the (left) border
+				if (shipIsOnTheBorder(j))
+				{
+					// checking to our right
+					if (ships[k][j].isRealShip() || ships[k][j + 1].isRealShip())
+					{
+						foundAdjacent = true;
+						break;
+					}
+					// check the spot in the same direction for the last ship
+					if (k == ship.getLength() - 1)
+					{
+						if (k == Ocean.OceanHeight - 1)
+						{
+							// if the last part is on the bottom edge
+							break;
+						}
+						else if (ships[i + 1][k].isRealShip() || ships[i + 1][k + 1].isRealShip())
+						{
+							// checking the next one ahead and
+							// right-diagonally; no need to break
+							// since its the last iteration;
+							foundAdjacent = true;
+						}
+					}
+				}
+				else
+				{
+					// checking the next one in ahead, the one on the right, the
+					// one on the left
+					if (ships[k][j].isRealShip() || ships[k][j + 1].isRealShip() || ships[k][j - 1].isRealShip())
+					{
+						foundAdjacent = true;
+						break;
+					}
+					// check the spot in the same direction for the last ship
+					if (k == ship.getLength() - 1)
+					{
+						if (k == Ocean.OceanWidth - 1)
+						{
+							// if the last part is on the bottom edge
+							break;
+						}
+						else if (ships[i + 1][k].isRealShip() || ships[i + 1][k + 1].isRealShip()
+								|| ships[i - 1][k + 1].isRealShip())
+						{
+							// checking the next one ahead,
+							// right-diagonally and left diagonally; no need to
+							// break
+							// since its the last iteration;
+							foundAdjacent = true;
+						}
+					}
+				}
+			}
+		}
+
+		return foundAdjacent;
+	}
+
+	private boolean shipIsOnTheBorder(int i)
+	{
+		return i == 0;
 	}
 
 	@Test

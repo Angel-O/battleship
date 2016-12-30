@@ -81,4 +81,16 @@ public class Ocean
 	{
 		return true;
 	}
+
+	public Ship[][] getShipArray()
+	{
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void placeAllShipsRandomly()
+	{
+		// TODO Auto-generated method stub
+
+	}
 }
