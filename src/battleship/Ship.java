@@ -48,7 +48,8 @@ public abstract class Ship
 		{
 			// if the ship is horizontal check the horizontal range and try
 			// and shoot, otherwise check the vertical range. The diagonal
-			// range is equivalent to either the horizontal or the vertical one
+			// range is equivalent to either the horizontal or the vertical one,
+			// for simplicity we will take the vertical one
 			return isHorizontal() ? checkRangetAndShoot(bowColumn, column) : checkRangetAndShoot(bowRow, row);
 		}
 		return false;
@@ -70,10 +71,8 @@ public abstract class Ship
 	{
 		// horizontal trajectory: target row is equal to bow row
 		// vertical trajectory: target column is equal to bow column
-		// diagonal trajectory: if the difference of the target coordinates and
-		// the correspondent bow
-		// coordinates are the same then the shot can be
-		// a candidate for a diagonal hit
+		// diagonal trajectory: difference of the target coordinates and
+		// correspondent bow coordinates are equal
 		return row == bowRow || column == bowColumn || row - bowRow == column - bowColumn;
 	}
 

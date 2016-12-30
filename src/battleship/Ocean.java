@@ -15,10 +15,10 @@ public class Ocean
 	private int shipsSunk;
 
 	/** max height of the Ocean */
-	private static final int OceanHeight = 10;
+	public static final int OceanHeight = 10;
 
 	/** max length of the Ocean */
-	private static final int OceanWidth = 10;
+	public static final int OceanWidth = 10;
 
 	public Ocean()
 	{
