@@ -24,10 +24,10 @@ public abstract class Ship
 		assert length > 0 : "ship length cannot be negative";
 		this.length = length;
 		hit = new boolean[length];
-		setUpParts();
+		setUpShipParts();
 	}
 
-	public boolean checkAround(Ship[][] ships)
+	public boolean hasNotAdjacentShipsAround(Ship[][] ships)
 	{
 		boolean emptyAround = true;
 
@@ -51,20 +51,26 @@ public abstract class Ship
 		return emptyAround;
 	}
 
-	private void setUpParts()
+	private void setUpShipParts()
 	{
 		shipParts = new ShipPart[length];
+
 		if (length == 1)
 		{
-			// empty sea behaves like a MonoPart...
-			shipParts[0] = new MonoPart(getBowRow(), getBowColumn(), horizontal);
+			assembleMonoPartShip();
 			return;
 		}
 
+		assembleMultiPartShip();
+	}
+
+	private void assembleMultiPartShip()
+	{
 		for (int i = 0; i < length; i++)
 		{
 			if (i == 0)
 			{
+				// the first part is the bow
 				shipParts[i] = new Bow(getBowRow(), getBowColumn(), isHorizontal());
 			}
 			else
@@ -73,6 +79,7 @@ public abstract class Ship
 				{
 					if (isHorizontal())
 					{
+						// the mid elements are ordinary ship parts
 						shipParts[i] = new ShipPart(getBowRow(), getBowColumn() + i, isHorizontal());
 					}
 					else
@@ -84,6 +91,7 @@ public abstract class Ship
 				{
 					if (isHorizontal())
 					{
+						// the last element is the stern
 						shipParts[i] = new Stern(getBowRow(), getBowColumn() + i, isHorizontal());
 					}
 					else
@@ -93,6 +101,12 @@ public abstract class Ship
 				}
 			}
 		}
+	}
+
+	private void assembleMonoPartShip()
+	{
+		// empty sea behaves like a MonoPart...
+		shipParts[0] = new MonoPart(getBowRow(), getBowColumn(), isHorizontal());
 	}
 
 	/**
