@@ -4,7 +4,6 @@
 package battleship;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -70,7 +69,7 @@ public class OceanTest
 
 		int totalShips = 0;
 
-		int expected = 0;
+		int expected = 10;
 
 		// count them
 		for (int i = 0; i < Ocean.OceanWidth; i++)
@@ -112,7 +111,7 @@ public class OceanTest
 			{
 				Ship ship = ships[i][j];
 
-				if (ship.isRealShip() && hasAdjacentShips(ship, i, j))
+				if (ship.isRealShip() && !ship.checkAround(ships))
 				{
 					foundAdjacent = true;
 					break;
@@ -120,7 +119,7 @@ public class OceanTest
 			}
 		}
 
-		assertFalse("checking adjacency", foundAdjacent);
+		assertEquals("checking adjacency", foundAdjacent, false);
 
 		// verify that when you hit a ship, only one will be hit (if they
 		// overlap that wouldn't be the case ==> not always true)
