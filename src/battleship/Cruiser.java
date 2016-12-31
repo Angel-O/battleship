@@ -7,12 +7,23 @@ public class Cruiser extends Ship
 
 	public Cruiser()
 	{
-		super(cruiserLength);
+		this(cruiserLength);
+	}
+
+	public Cruiser(int length)
+	{
+		super(length);
 	}
 
 	@Override
 	public String getShipType()
 	{
 		return "cruiser";
+	}
+
+	@Override
+	public String toString()
+	{
+		return "3";
 	}
 }

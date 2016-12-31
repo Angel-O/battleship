@@ -7,12 +7,23 @@ public class Destroyer extends Ship
 
 	public Destroyer()
 	{
-		super(destroyerLength);
+		this(destroyerLength);
+	}
+
+	public Destroyer(int length)
+	{
+		super(length);
 	}
 
 	@Override
 	public String getShipType()
 	{
 		return "destroyer";
+	}
+
+	@Override
+	public String toString()
+	{
+		return "2";
 	}
 }

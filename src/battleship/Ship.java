@@ -21,10 +21,10 @@ public abstract class Ship
 
 	protected Ship(int length)
 	{
-		assert length > 0 : "ship length cannot be negative";
+		assert length >= 0 : "ship length cannot be negative";
 		this.length = length;
 		hit = new boolean[length];
-		setUpShipParts();
+		// setUpShipParts();
 	}
 
 	public boolean hasNotAdjacentShipsAround(Ship[][] ships)
@@ -288,5 +288,11 @@ public abstract class Ship
 	public boolean isRealShip()
 	{
 		return true;
+	}
+
+	@Override
+	public String toString()
+	{
+		return isRealShip() ? "B" : "_";
 	}
 }

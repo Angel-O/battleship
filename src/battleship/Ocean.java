@@ -123,33 +123,45 @@ public class Ocean
 				int bowRow = random.nextInt(OceanWidth - shipLength);
 				int bowColumn = random.nextInt(OceanHeight - shipLength);
 
-				if (ships[bowRow][bowColumn].isRealShip())
+				if (isOccupied(bowRow, bowColumn))
 				{
 					// if there is a ship is already there, try a new position
 					continue;
 				}
 
+				Ship ship = shipList.get(i);
 				// set the bow coordinates for the current ship
-				shipList.get(i).setBowRow(bowRow);
-				shipList.get(i).setBowColumn(bowColumn);
+				ship.setBowRow(bowRow);
+				ship.setBowColumn(bowColumn);
 
 				// set a random orientation for the current ship
-				shipList.get(i).setHorizontal(random.nextBoolean());
+				ship.setHorizontal(random.nextBoolean());
 
-				// place the current ship in the ocean
-				ships[bowRow][bowColumn] = shipList.get(i);
+				// try and place the ship in the ocean
+				int shipsPlaced = tryPlaceShipInTheOcean(ship, shipClass);
 
-				if (ships[bowRow][bowColumn].hasNotAdjacentShipsAround(ships))
+				// if not all of them were placed remove them
+				// and try with new random coordinates
+				if (shipsPlaced < shipLength)
 				{
-					// if there is nothing around it go to the next ship in the
-					// list
+					// otherwise remove the ship parts placed so far and try
+					// again with
+					// new random coordinates
+					removeShipFromTheOcean(ship, shipsPlaced);
+					continue;
+				}
+				else if (!hasShipsAround(ship))
+				{
+					// if the ship was successfully dropped and there is nothing
+					// around it go to the next ship in the list
 					break;
 				}
 				else
 				{
-					// otherwise remove the ship just placed and try again with
-					// new random coordinates
-					ships[bowRow][bowColumn] = new EmptySea();
+					// otherwise remove the (whole) ship just placed and try
+					// again with new random coordinates
+					removeShipFromTheOcean(ship, shipLength);
+
 					continue;
 				}
 			}
@@ -158,27 +170,329 @@ public class Ocean
 		}
 	}
 
-	private <T> ArrayList<T> populateShipList(int amount, Class<T> shipClass)
+	private boolean hasShipsAround(Ship ship)
+	{
+		boolean hasFrontShipsAround = false;
+		boolean hasRearShipsAround = false;
+
+		// get ship coordinates, orientation and data
+		int row = ship.getBowRow();
+		int column = ship.getBowColumn();
+		boolean horizontal = ship.isHorizontal();
+		int length = ship.getLength();
+
+		// used for submarines and ship parts
+		if (length < 1)
+		{
+			// checking corners
+			if (row == 0 && column == 0)
+			{
+				return hasSternShipsAround(row, column) && hasSternShipsAroundVertical(row, column);
+			}
+			else if (row == 0 && column == Ocean.OceanWidth - 1)
+			{
+				return hasBowShipsAround(row, column) && hasSternShipsAroundVertical(row, column);
+			}
+			else if (row == Ocean.OceanHeight - 1 && column == 0)
+			{
+				return hasSternShipsAround(row, column) && hasBowShipsAroundVertical(row, column);
+			}
+			else if (row == Ocean.OceanHeight - 1 && column == Ocean.OceanWidth - 1)
+			{
+				return hasBowShipsAround(row, column) && hasBowShipsAroundVertical(row, column);
+			}
+			// if it's submarine (length == 1) we have to check has if we were
+			// everywhere around us
+			return horizontal
+					? hasBowShipsAround(row, column) && hasSternShipsAround(row, column)
+							&& hasMidPartShipsAround(row, column)
+					: hasBowShipsAroundVertical(row, column) && hasSternShipsAroundVertical(row, column)
+							&& hasMidPartShipsAroundVertical(row, column);
+		}
+
+		// checking adjacent areas across the ship's length
+		for (int i = 0; i < length; i++)
+		{
+			// get the coordinates of the ship part based on the offset from the
+			// bow and the orientation of the ship
+			int shipPartRow = horizontal ? row : row + i;
+			int shipPartColumn = horizontal ? column + i : column;
+
+			if (i == 0)
+			{
+				// if it's horizontal the variable index is the column
+				hasFrontShipsAround = horizontal ? hasBowShipsAround(row, column)
+						: hasBowShipsAroundVertical(row, column);
+			}
+			else if (i == ship.getLength() - 1)
+			{
+				// if it's horizontal the variable index is the column
+				hasRearShipsAround = horizontal ? hasSternShipsAround(shipPartRow, shipPartColumn)
+						: hasSternShipsAroundVertical(shipPartRow, shipPartColumn);
+			}
+			else
+			{
+				// if it's horizontal the variable index is the column
+				if (horizontal)
+				{
+					if (hasMidPartShipsAround(shipPartRow, shipPartColumn))
+					{
+						// return immediately to avoid overwriting its value
+						// since the mid part can be made of multiple blacks
+						return true;
+					}
+				}
+				else
+				{
+					if (hasMidPartShipsAroundVertical(shipPartRow, shipPartColumn))
+					{
+						// return immediately to avoid overwriting its value
+						// since the mid part can be made of multiple blacks
+						return true;
+					}
+				}
+			}
+		}
+
+		return hasFrontShipsAround && hasRearShipsAround;
+	}
+
+	private boolean hasMidPartShipsAround(int row, int column)
+	{
+		if (row == 0)
+		{
+			// check bottom
+			return isOccupied(row + 1, column);
+		}
+		else if (row == Ocean.OceanHeight - 1)
+		{
+			// check top
+			return isOccupied(row - 1, column);
+		}
+		else
+		{
+			// check top & bottom
+			return isOccupied(row - 1, column) || isOccupied(row + 1, column);
+		}
+	}
+
+	private boolean hasMidPartShipsAroundVertical(int row, int column)
+	{
+		if (column == 0)
+		{
+			// check right
+			return isOccupied(row, column + 1);
+		}
+		else if (column == Ocean.OceanWidth - 1)
+		{
+			// check left
+			return isOccupied(row, column - 1);
+		}
+		else
+		{
+			// check right & left
+			return isOccupied(row, column + 1) || isOccupied(row, column - 1);
+		}
+	}
+
+	// ALSO checking right side (column == 9)
+	private boolean hasSternShipsAround(int row, int column)
+	{
+		if (row == 0 && column < Ocean.OceanWidth - 1)
+		{
+			// check right, bottom/right
+			return isOccupied(row, column + 1) || isOccupied(row + 1, column + 1);
+		}
+		else if (row == Ocean.OceanHeight - 1 && column < Ocean.OceanWidth - 1)
+		{
+			// check right, top/right
+			return isOccupied(row, column + 1) || isOccupied(row - 1, column + 1);
+		}
+		else if (column < Ocean.OceanWidth - 1)
+		{
+			// check right, top/right, bottom/right
+			return isOccupied(row, column + 1) || isOccupied(row - 1, column + 1) || isOccupied(row + 1, column + 1);
+		}
+		// if column == 9 we need to check only top and bottom
+		return hasMidPartShipsAround(row, column);
+	}
+
+	// ALSO checking bottom row (row == 9)
+	private boolean hasSternShipsAroundVertical(int row, int column)
+	{
+		if (column == 0 && row < Ocean.OceanHeight - 1)
+		{
+			// check bottom, bottom/right
+			return isOccupied(row + 1, column) || isOccupied(row + 1, column);
+		}
+		else if (column == Ocean.OceanWidth - 1 && row < Ocean.OceanHeight - 1)
+		{
+			// check bottom, bottom/left
+			return isOccupied(row + 1, column) || isOccupied(row + 1, column - 1);
+		}
+		else if (row < Ocean.OceanHeight - 1)
+		{
+			// check bottom, bottom/left, bottom/right
+			return isOccupied(row + 1, column) || isOccupied(row + 1, column - 1) || isOccupied(row + 1, column + 1);
+		}
+		// if row == 9 we only need to check left and right
+		return hasMidPartShipsAroundVertical(row, column);
+	}
+
+	// ALSO checking left side (column == 0)
+	private boolean hasBowShipsAround(int row, int column)
+	{
+		if (row == 0 && column > 0)
+		{
+			// check left, bottom/left
+			return isOccupied(row, column - 1) || isOccupied(row + 1, column - 1);
+		}
+		else if (row == Ocean.OceanHeight - 1 && column > 0)
+		{
+			// check left, top/left
+			return isOccupied(row, column - 1) || isOccupied(row - 1, column - 1);
+		}
+		else if (column > 0)
+		{
+			// check left, top/left, bottom/left
+			return isOccupied(row, column - 1) || isOccupied(row - 1, column - 1) || isOccupied(row + 1, column - 1);
+		}
+		// if column = 0 we only need to check top and bottom
+		return hasMidPartShipsAround(row, column);
+	}
+
+	// ALSO checking top row (row == 0)
+	private boolean hasBowShipsAroundVertical(int row, int column)
+	{
+		if (column == 0 && row > 0)
+		{
+			// check top, top/right
+			return isOccupied(row - 1, column) || isOccupied(row - 1, column + 1);
+		}
+		else if (column == OceanWidth - 1 && row > 0)
+		{
+			// check top, top/left
+			return isOccupied(row - 1, column) || isOccupied(row - 1, column - 1);
+		}
+		else if (column > 0 && row > 0)
+		{
+			// check top, top/left, top/right
+			return isOccupied(row - 1, column) || isOccupied(row - 1, column - 1) || isOccupied(row - 1, column + 1);
+		}
+		// if row == 0 we only need to check left and right
+		return hasMidPartShipsAroundVertical(row, column);
+	}
+
+	private void removeShipFromTheOcean(Ship ship, int length)
+	{
+		int row = ship.getBowRow();
+		int column = ship.getBowColumn();
+
+		for (int i = 0; i < length; i++)
+		{
+			// if the ship is horizontal the variable index (i) is the column,
+			// otherwise it's the row
+			ships[ship.isHorizontal() ? row : row + i][ship.isHorizontal() ? column + i : column] = new EmptySea();
+		}
+	}
+
+	private <T extends Ship> int tryPlaceShipInTheOcean(Ship ship, Class<T> shipClass)
+	{
+		int bowRow = ship.getBowRow();
+		int bowColumn = ship.getBowColumn();
+		// place the bow of the current ship in the ocean
+		ships[bowRow][bowColumn] = ship;
+
+		// starting from 1 as we just placed the bow
+		int shipsPlacedSoFar = 1;
+
+		// start from index one as the bow has already been placed
+		for (int i = 1; i < ship.getLength(); i++)
+		{
+			// create a ship of length zero representing a ship part
+			Ship shipPart = createShipPart(shipClass);
+
+			// set the coordinates and the orientation of the ship part
+			shipPart.setBowRow(ship.isHorizontal() ? ship.getBowRow() : ship.getBowRow() + i);
+			shipPart.setBowColumn(ship.isHorizontal() ? ship.getBowColumn() + i : ship.getBowColumn());
+			shipPart.setHorizontal(ship.isHorizontal());
+
+			// place it in the ocean
+			if (!isOccupied(shipPart.getBowRow(), shipPart.getBowColumn()))
+			{
+				ships[shipPart.getBowRow()][shipPart.getBowColumn()] = shipPart;
+				shipsPlacedSoFar++;
+
+				// check after the part was placed...
+				if (hasShipsAround(shipPart))
+				{
+					removeShipFromTheOcean(shipPart, shipsPlacedSoFar);
+					break;
+				}
+			}
+			else
+			{
+				break;
+			}
+		}
+
+		return shipsPlacedSoFar;
+	}
+
+	private <T extends Ship> ArrayList<T> populateShipList(int amount, Class<T> shipClass)
 	{
 		ArrayList<T> shipList = new ArrayList<>();
 
 		for (int i = 0; i < amount; i++)
 		{
-			try
-			{
-				shipList.add(shipClass.newInstance());
-			}
-			catch (InstantiationException e)
-			{
-				e.printStackTrace();
-			}
-			catch (IllegalAccessException e)
-			{
-				e.printStackTrace();
-			}
+			shipList.add(createShip(shipClass));
 		}
 
 		return shipList;
+	}
+
+	private <T extends Ship> T createShip(Class<T> shipClass)
+	{
+		T ship = null;
+
+		try
+		{
+			ship = shipClass.newInstance();
+		}
+		catch (InstantiationException e)
+		{
+			e.printStackTrace();
+		}
+		catch (IllegalAccessException e)
+		{
+			e.printStackTrace();
+		}
+
+		return ship;
+	}
+
+	private <T> Ship createShipPart(Class<T> shipClass)
+	{
+		Ship shipPart = null;
+
+		if (shipClass == Battleship.class)
+		{
+			shipPart = new Battleship(0);
+		}
+		else if (shipClass == Cruiser.class)
+		{
+			shipPart = new Cruiser(0);
+		}
+		else if (shipClass == Destroyer.class)
+		{
+			shipPart = new Destroyer(0);
+		}
+		else
+		{
+			shipPart = new Submarine(0);
+		}
+
+		return shipPart;
 	}
 
 	public boolean isOccupied(int row, int column)
@@ -190,6 +504,18 @@ public class Ocean
 	{
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	public void print()
+	{
+		for (int i = 0; i < OceanWidth; i++)
+		{
+			for (int j = 0; j < OceanHeight; j++)
+			{
+				System.out.print(ships[i][j] + " ");
+			}
+			System.out.println();
+		}
 	}
 
 }

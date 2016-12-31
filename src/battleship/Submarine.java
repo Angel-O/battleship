@@ -7,13 +7,24 @@ public class Submarine extends Ship
 
 	public Submarine()
 	{
-		super(submarineLength);
+		this(submarineLength);
+	}
+
+	public Submarine(int length)
+	{
+		super(length);
 	}
 
 	@Override
 	public String getShipType()
 	{
 		return "submarine";
+	}
+
+	@Override
+	public String toString()
+	{
+		return "1";
 	}
 
 }

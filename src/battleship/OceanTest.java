@@ -71,22 +71,33 @@ public class OceanTest
 
 		int expected = 10;
 
+		int sea = 0;
+
 		// count them
 		for (int i = 0; i < Ocean.OceanWidth; i++)
 		{
 			for (int j = 0; j < Ocean.OceanHeight; j++)
 			{
-				if (ships[i][j].isRealShip())
+				if (ships[i][j].isRealShip() && ships[i][j].getLength() > 0)
 				{
 					totalShips++;
+				}
+				else if (!ships[i][j].isRealShip())
+				{
+					sea++;
 				}
 			}
 		}
 
 		int actual = totalShips;
 
+		ocean.print();
+
 		// verify that we get the expected number of ships
 		assertEquals(expected, actual);
+
+		// verify that we get the expected number of sea areas
+		assertEquals(80, sea);
 	}
 
 	@Test

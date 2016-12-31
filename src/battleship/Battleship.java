@@ -7,12 +7,23 @@ public class Battleship extends Ship
 
 	public Battleship()
 	{
-		super(battleshipLength);
+		this(battleshipLength);
+	}
+
+	public Battleship(int length)
+	{
+		super(length);
 	}
 
 	@Override
 	public String getShipType()
 	{
 		return "battleship";
+	}
+
+	@Override
+	public String toString()
+	{
+		return "4";
 	}
 }
