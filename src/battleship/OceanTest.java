@@ -4,8 +4,8 @@
 package battleship;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
+import java.util.Random;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -118,51 +118,50 @@ public class OceanTest
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_occupied_ocean_spot_should_be_flagged_accordingly()
+	public void test_occupied_ocean_spots_should_be_flagged_accordingly()
 	{
-		boolean expected;
+		// if we create an empty ocean
+		ocean = new Ocean();
 
-		String emptySeaType = new EmptySea().getShipType();
+		// and create new ships
+		Ship battleship = new Battleship();
+		Ship cruiser = new Cruiser();
+		Ship destroyer = new Destroyer();
+		Ship submarine = new Submarine();
 
-		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
-		{
-			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
-			{
-				if (!ocean.getShipTypeAt(i, j).equals(emptySeaType))
-				{
-					// for each portion of the ocean we expect it will be
-					// occupied if
-					// the ship type is not the same of an empty sea type
-					expected = ocean.isOccupied(i, j);
+		// that we place the ships in the ocean
+		ships = ocean.getShipArray();
+		ships[0][0] = battleship;
+		ships[0][9] = cruiser;
+		ships[9][0] = destroyer;
+		ships[9][9] = submarine;
 
-					assertTrue("checking occupied ocean portion state", expected);
-				}
-			}
-		}
+		// then the ocean spots where they have been placed should be marked as
+		// occupied
+		boolean expected = true;
+		assertEquals(expected, ocean.isOccupied(0, 0));
+		assertEquals(expected, ocean.isOccupied(0, 9));
+		assertEquals(expected, ocean.isOccupied(9, 0));
+		assertEquals(expected, ocean.isOccupied(9, 9));
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_clear_ocean_spot_should_be_flagged_accordingly()
 	{
-		boolean expected;
+		// if we create an empty ocean
+		ocean = new Ocean();
 
-		String emptySeaType = new EmptySea().getShipType();
+		// and check what's on it
+		ships = ocean.getShipArray();
 
-		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
-		{
-			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
-			{
-				if (ocean.getShipTypeAt(i, j).equals(emptySeaType))
-				{
-					// for each portion of the ocean we expect it will be
-					// occupied if
-					// the ship type is not the same of an empty sea type
-					expected = ocean.isOccupied(i, j);
+		// whatever random area that we pick
+		Random random = new Random();
+		int row = random.nextInt(Ocean.OCEAN_HEIGHT);
+		int column = random.nextInt(Ocean.OCEAN_WIDTH);
 
-					assertFalse("checking clear ocean portion state", expected);
-				}
-			}
-		}
+		// it should not be flagged as occupied
+		boolean expected = false;
+		assertEquals(expected, ocean.isOccupied(row, column));
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
