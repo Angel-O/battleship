@@ -65,15 +65,16 @@ public class OceanTest
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_exact_number_of_emptysea_sould_be_placed_randomly_on_the_ocean()
 	{
+		// the total ocean area should be equal to this
 		int totoalOceanSpace = Ocean.OCEAN_WIDTH * Ocean.OCEAN_HEIGHT;
+
+		// and the total area covered by real ships should be equal to this
 		int totalShipSpace = Ocean.BATTLESHIPS * Battleship.BATTLESHIP_LENGTH + Ocean.CRUISERS * Cruiser.CRUISER_LENGTH
 				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
 
-		int expected = totoalOceanSpace - totalShipSpace;
-
+		// if we count the empty ocean areas
 		int actual = 0;
 
-		// count them
 		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
 		{
 			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
@@ -85,37 +86,78 @@ public class OceanTest
 			}
 		}
 
-		// verify that we get the expected number of sea areas
+		// we should get this amount of "empty sea" portions
+		int expected = totoalOceanSpace - totalShipSpace;
+
 		assertEquals(expected, actual);
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_exact_number_of_ships_sould_be_placed_randomly_on_the_ocean()
 	{
-		// verify that you have 10 ships (if you drop a ship where another one
-		// already was, part by part, you will end up with less than 10 ships as
-		// you would basically overwrite the ship) ==> not entirely true!!!
-
-		int expected = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
-
+		// if we count the total number of ships in the ocean
 		int actual = 0;
 
-		// count them
 		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
 		{
 			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
 			{
 				if (ships[i][j].isRealShip() && ships[i][j].getLength() > 0)
 				{
-					// do not count ships with length == 0 as they are
-					// just part of another ship
+					// (not counting ships with length == 0 as they are
+					// just part of another ship)
 					actual++;
 				}
 			}
 		}
 
-		// verify that we get the expected number of ships
+		// we should have this amount of ships
+		int expected = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
+
 		assertEquals(expected, actual);
+	}
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_ships_should_not_overlap_when_placed_randomly_on_the_ocean()
+	{
+		// if ships overlap the total area covered by the ships will be less
+		// than what it would normally be (for the same amount of ships, having
+		// a specific length)
+		int totalShipArea = Ocean.BATTLESHIPS * Battleship.BATTLESHIP_LENGTH + Ocean.CRUISERS * Cruiser.CRUISER_LENGTH
+				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
+
+		int totalShips = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
+
+		// count the areas with real ships and the number of ships
+		int actualShipArea = 0;
+		int actualTotalShips = 0;
+
+		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
+		{
+			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
+			{
+				if (ships[i][j].isRealShip())
+				{
+					// if the area contains a real ship (a bow or a another
+					// part) increment the total area
+					actualShipArea++;
+
+					if (ships[i][j].getLength() > 0)
+					{
+						// if the (real) ship length is greater than zero, we
+						// have a bow: each ship has only one bow
+						actualTotalShips++;
+					}
+				}
+			}
+		}
+
+		// we would expect that the total number of ships and the total area
+		// covered by the ships
+		// is what we would have if there were'n't any ship overlapping
+		boolean expected = totalShipArea == actualShipArea && totalShips == actualTotalShips;
+
+		assertTrue("no overlapping ships in the ocean", expected);
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
@@ -212,6 +254,8 @@ public class OceanTest
 			}
 		}
 
+		ocean.print();
+
 		assertEquals("checking adjacency", foundAdjacent, false);
 
 		// verify that when you hit a ship, only one will be hit (if they
@@ -303,48 +347,5 @@ public class OceanTest
 			}
 		}
 		return true;
-	}
-
-	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_ships_sould_not_overlap_when_placed_randomly_on_the_ocean()
-	{
-		// if ships overlap the total area covered by the ships will be less
-		// than what it would normally be (for the same amount of ships, having
-		// a specific length)
-		int totalShipArea = Ocean.BATTLESHIPS * Battleship.BATTLESHIP_LENGTH + Ocean.CRUISERS * Cruiser.CRUISER_LENGTH
-				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
-
-		int totalShips = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
-
-		// count the areas with real ships and the number of ships
-		int actualShipArea = 0;
-		int actualTotalShips = 0;
-
-		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
-		{
-			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
-			{
-				if (ships[i][j].isRealShip())
-				{
-					// if the area contains a real ship (a bow or a another
-					// part) increment the total area
-					actualShipArea++;
-
-					if (ships[i][j].getLength() > 0)
-					{
-						// if the (real) ship length is greater than zero, we
-						// have a bow: each ship has only one bow
-						actualTotalShips++;
-					}
-				}
-			}
-		}
-
-		// we would expect that the total number of ships and the total area
-		// covered by the ships
-		// is what we would have if there were'n't any ship overlapping
-		boolean expected = totalShipArea == actualShipArea && totalShips == actualTotalShips;
-
-		assertTrue("no overlapping ships in the ocean", expected);
 	}
 }
