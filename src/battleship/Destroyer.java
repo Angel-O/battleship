@@ -3,11 +3,11 @@ package battleship;
 public class Destroyer extends Ship
 {
 	/** length of a destroyer */
-	private static final int destroyerLength = 2;
+	public static final int DESTROYER_LENGTH = 2;
 
 	public Destroyer()
 	{
-		this(destroyerLength);
+		this(DESTROYER_LENGTH);
 	}
 
 	public Destroyer(int length)

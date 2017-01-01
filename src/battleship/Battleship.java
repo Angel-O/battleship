@@ -3,11 +3,11 @@ package battleship;
 public class Battleship extends Ship
 {
 	/** length of a battleship */
-	private static final int battleshipLength = 4;
+	public static final int BATTLESHIP_LENGTH = 4;
 
 	public Battleship()
 	{
-		this(battleshipLength);
+		this(BATTLESHIP_LENGTH);
 	}
 
 	public Battleship(int length)

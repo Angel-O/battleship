@@ -24,22 +24,22 @@ public class Ocean
 	private int shipsSunk;
 
 	/** max height of the {@link Ocean} */
-	public static final int OceanHeight = 10;
+	public static final int OCEAN_HEIGHT = 10;
 
 	/** max length of the {@link Ocean} */
-	public static final int OceanWidth = 10;
+	public static final int OCEAN_WIDTH = 10;
 
 	/** number of {@link Battleship} in the ocean */
-	private static final int Battleships = 1;
+	public static final int BATTLESHIPS = 1;
 
 	/** number of {@link Cruiser} ships in the ocean */
-	private static final int Cruisers = 2;
+	public static final int CRUISERS = 2;
 
 	/** number of {@link Destroyer} ships in the ocean */
-	private static final int Destroyers = 3;
+	public static final int DESTROYERS = 3;
 
 	/** number of {@link Submarine} ships in the ocean */
-	private static final int Submarines = 4;
+	public static final int SUBMARINES = 4;
 
 
 	/**
@@ -61,11 +61,11 @@ public class Ocean
 	 */
 	private static final Ship[][] InitializeOcean()
 	{
-		Ship[][] ships = new Ship[OceanWidth][OceanHeight];
+		Ship[][] ships = new Ship[OCEAN_WIDTH][OCEAN_HEIGHT];
 
-		for (int i = 0; i < OceanWidth; i++)
+		for (int i = 0; i < OCEAN_WIDTH; i++)
 		{
-			for (int j = 0; j < OceanHeight; j++)
+			for (int j = 0; j < OCEAN_HEIGHT; j++)
 			{
 				ships[i][j] = new EmptySea();
 			}
@@ -127,10 +127,10 @@ public class Ocean
 	 */
 	public void placeAllShipsRandomly()
 	{
-		this.<Battleship>placeShips(Battleships, Battleship.class);
-		this.<Cruiser>placeShips(Cruisers, Cruiser.class);
-		this.<Destroyer>placeShips(Destroyers, Destroyer.class);
-		this.<Submarine>placeShips(Submarines, Submarine.class);
+		this.<Battleship>placeShips(BATTLESHIPS, Battleship.class);
+		this.<Cruiser>placeShips(CRUISERS, Cruiser.class);
+		this.<Destroyer>placeShips(DESTROYERS, Destroyer.class);
+		this.<Submarine>placeShips(SUBMARINES, Submarine.class);
 	}
 
 	/**
@@ -171,19 +171,19 @@ public class Ocean
 	 */
 	public void print()
 	{
-		for (int i = 0; i <= OceanHeight; i++)
+		for (int i = 0; i <= OCEAN_HEIGHT; i++)
 		{
-			for (int j = 0; j <= OceanWidth; j++)
+			for (int j = 0; j <= OCEAN_WIDTH; j++)
 			{
 				// if it's the first row or first column
 				if (i == 0 || j == 0)
 				{
-					if (i == 0 && j < OceanWidth)
+					if (i == 0 && j < OCEAN_WIDTH)
 					{
 						// print the first row of numbers
 						System.out.print(j == 0 ? " " + j : j);
 					}
-					else if (i > 0 && j < OceanHeight)
+					else if (i > 0 && j < OCEAN_HEIGHT)
 					{
 						// print the first column of numbers
 						System.out.print(i == 0 ? " " : i - 1);
@@ -228,8 +228,8 @@ public class Ocean
 			// minus the ship length: this avoids the ship to exceed the
 			// ocean's borders. Adding 1 as the higher boundary of the
 			// nextInt method is non inclusive)
-			int bowRow = random.nextInt(OceanWidth - shipLength + 1);
-			int bowColumn = random.nextInt(OceanHeight - shipLength + 1);
+			int bowRow = random.nextInt(OCEAN_WIDTH - shipLength + 1);
+			int bowColumn = random.nextInt(OCEAN_HEIGHT - shipLength + 1);
 
 			if (isOccupied(bowRow, bowColumn) || !sorroundingAreaIsClear(bowRow, bowColumn))
 			{
@@ -337,7 +337,7 @@ public class Ocean
 			// top edge
 			return rightIsClear(row, column) && bottomIsClear(row, column) && bottomRightIsClear(row, column);
 		}
-		else if (row == OceanHeight - 1)
+		else if (row == OCEAN_HEIGHT - 1)
 		{
 			// bottom edge
 			return rightIsClear(row, column) && topIsClear(row, column) && topRightIsClear(row, column);
@@ -357,7 +357,7 @@ public class Ocean
 			// left edge
 			return bottomIsClear(row, column) && bottomRightIsClear(row, column) && rightIsClear(row, column);
 		}
-		else if (column == OceanWidth - 1)
+		else if (column == OCEAN_WIDTH - 1)
 		{
 			// right edge
 			return bottomIsClear(row, column) && bottomLeftIsClear(row, column) && leftIsClear(row, column);
@@ -383,7 +383,7 @@ public class Ocean
 				// left corner
 				return bottomIsClear(row, column) && bottomRightIsClear(row, column) && rightIsClear(row, column);
 			}
-			else if (column == OceanWidth - 1)
+			else if (column == OCEAN_WIDTH - 1)
 			{
 				// right corner
 				return bottomIsClear(row, column) && bottomLeftIsClear(row, column) && leftIsClear(row, column);
@@ -392,7 +392,7 @@ public class Ocean
 			return rightIsClear(row, column) && bottomIsClear(row, column) && bottomRightIsClear(row, column)
 					&& bottomLeftIsClear(row, column) && leftIsClear(row, column);
 		}
-		else if (row == OceanHeight - 1)
+		else if (row == OCEAN_HEIGHT - 1)
 		{
 			// bottom edge
 			if (column == 0)
@@ -400,7 +400,7 @@ public class Ocean
 				// left corner
 				return topIsClear(row, column) && topRightIsClear(row, column) && rightIsClear(row, column);
 			}
-			else if (column == OceanWidth - 1)
+			else if (column == OCEAN_WIDTH - 1)
 			{
 				// right corner
 				return topIsClear(row, column) && topLeftIsClear(row, column) && leftIsClear(row, column);
@@ -417,7 +417,7 @@ public class Ocean
 					&& bottomRightIsClear(row, column) && bottomIsClear(row, column);
 
 		}
-		else if (column == OceanWidth - 1)
+		else if (column == OCEAN_WIDTH - 1)
 		{
 			// right edge (only the mid part as the corners were considered
 			// above)
@@ -436,7 +436,7 @@ public class Ocean
 	// ============= helper CHECKERS ================ //
 	private boolean bottomIsClear(int row, int column)
 	{
-		if (row == OceanHeight - 1)
+		if (row == OCEAN_HEIGHT - 1)
 		{
 			return true;
 		}
@@ -445,7 +445,7 @@ public class Ocean
 
 	private boolean rightIsClear(int row, int column)
 	{
-		if (column == OceanWidth - 1)
+		if (column == OCEAN_WIDTH - 1)
 		{
 			return true;
 		}
@@ -472,7 +472,7 @@ public class Ocean
 
 	private boolean topRightIsClear(int row, int column)
 	{
-		if (row == 0 || column == OceanWidth - 1)
+		if (row == 0 || column == OCEAN_WIDTH - 1)
 		{
 			return true;
 		}
@@ -490,7 +490,7 @@ public class Ocean
 
 	private boolean bottomRightIsClear(int row, int column)
 	{
-		if (row == OceanHeight - 1 || column == OceanWidth - 1)
+		if (row == OCEAN_HEIGHT - 1 || column == OCEAN_WIDTH - 1)
 		{
 			return true;
 		}
@@ -499,7 +499,7 @@ public class Ocean
 
 	private boolean bottomLeftIsClear(int row, int column)
 	{
-		if (row == OceanHeight - 1 || column == 0)
+		if (row == OCEAN_HEIGHT - 1 || column == 0)
 		{
 			return true;
 		}
