@@ -123,9 +123,10 @@ public class Ocean
 				int bowRow = random.nextInt(OceanWidth - shipLength);
 				int bowColumn = random.nextInt(OceanHeight - shipLength);
 
-				if (isOccupied(bowRow, bowColumn))
+				if (isOccupied(bowRow, bowColumn) || !areaIsClear(bowRow, bowColumn))
 				{
-					// if there is a ship is already there, try a new position
+					// if there is a ship is already there or the area around is
+					// not clear, try a new position
 					continue;
 				}
 
@@ -150,23 +151,90 @@ public class Ocean
 					removeShipFromTheOcean(ship, shipsPlaced);
 					continue;
 				}
-				else if (!hasShipsAround(ship))
-				{
-					// if the ship was successfully dropped and there is nothing
-					// around it go to the next ship in the list
-					break;
-				}
 				else
 				{
-					// otherwise remove the (whole) ship just placed and try
-					// again with new random coordinates
-					removeShipFromTheOcean(ship, shipLength);
+					if (!hasShipsAround(ship))
+					{
+						// if the ship was successfully dropped and there is
+						// nothing
+						// around it go to the next ship in the list
+						break;
+					}
+					else
+					{
+						// otherwise remove the (whole) ship just placed and try
+						// again with new random coordinates
+						removeShipFromTheOcean(ship, shipLength);
 
-					continue;
+						continue;
+					}
 				}
 			}
 			while (true);
 
+		}
+	}
+
+	private boolean areaIsClear(int row, int column)
+	{
+		// check edges, corners
+		// check all around the bow...
+
+		// boolean clear = false;
+
+		if (row == 0)
+		{
+			// top edge
+			if (column == 0)
+			{
+				// left corner
+				return bottomIsClear(row, column) && bottomRightIsClear(row, column) && rightIsClear(row, column);
+			}
+			else if (column == Ocean.OceanWidth - 1)
+			{
+				// right corner
+				return bottomIsClear(row, column) && bottomLeftIsClear(row, column) && leftIsClear(row, column);
+			}
+			// mid part
+			return rightIsClear(row, column) && bottomIsClear(row, column) && bottomRightIsClear(row, column)
+					&& bottomLeftIsClear(row, column) && leftIsClear(row, column);
+		}
+		else if (row == Ocean.OceanHeight - 1)
+		{
+			// bottom edge
+			if (column == 0)
+			{
+				// left corner
+				return topIsClear(row, column) && topRightIsClear(row, column) && rightIsClear(row, column);
+			}
+			else if (column == Ocean.OceanWidth - 1)
+			{
+				// right corner
+				return topIsClear(row, column) && topLeftIsClear(row, column) && leftIsClear(row, column);
+			}
+			// mid part
+			return rightIsClear(row, column) && topIsClear(row, column) && topRightIsClear(row, column)
+					&& leftIsClear(row, column) && topLeftIsClear(row, column);
+		}
+		else if (column == 0)
+		{
+			// left edge
+			return topIsClear(row, column) && topRightIsClear(row, column) && rightIsClear(row, column)
+					&& bottomRightIsClear(row, column) && bottomIsClear(row, column);
+
+		}
+		else if (column == Ocean.OceanWidth - 1)
+		{
+			// right edge
+			return topIsClear(row, column) && topLeftIsClear(row, column) && leftIsClear(row, column)
+					&& bottomLeftIsClear(row, column) && bottomIsClear(row, column);
+		}
+		else
+		{
+			// mid area
+			return rightIsClear(row, column) && bottomRightIsClear(row, column) && bottomIsClear(row, column)
+					&& bottomLeftIsClear(row, column) && leftIsClear(row, column) && topLeftIsClear(row, column)
+					&& topIsClear(row, column) && topRightIsClear(row, column);
 		}
 	}
 
@@ -420,8 +488,12 @@ public class Ocean
 			// place it in the ocean
 			if (!isOccupied(shipPart.getBowRow(), shipPart.getBowColumn()))
 			{
-				ships[shipPart.getBowRow()][shipPart.getBowColumn()] = shipPart;
-				shipsPlacedSoFar++;
+				// check as you place parts
+				if (checkAhead(shipPart))
+				{
+					ships[shipPart.getBowRow()][shipPart.getBowColumn()] = shipPart;
+					shipsPlacedSoFar++;
+				}
 
 				// check after the part was placed...
 				if (hasShipsAround(shipPart))
@@ -437,6 +509,125 @@ public class Ocean
 		}
 
 		return shipsPlacedSoFar;
+	}
+
+	private boolean checkAhead(Ship shipPart)
+	{
+		int row = shipPart.getBowRow();
+
+		int column = shipPart.getBowColumn();
+
+		// check corners....
+		if (shipPart.isHorizontal())
+		{
+			if (row == 0)
+			{
+				// top edge
+				return rightIsClear(row, column) && bottomIsClear(row, column) && bottomRightIsClear(row, column);
+			}
+			else if (row == Ocean.OceanHeight - 1)
+			{
+				// bottom edge
+				return rightIsClear(row, column) && topIsClear(row, column) && topRightIsClear(row, column);
+			}
+			else
+			{
+				// mid area
+				return rightIsClear(row, column) && topIsClear(row, column) && topRightIsClear(row, column)
+						&& bottomRightIsClear(row, column) && bottomIsClear(row, column);
+			}
+		}
+		else
+		{
+			if (column == 0)
+			{
+				// left edge
+				return bottomIsClear(row, column) && bottomRightIsClear(row, column) && rightIsClear(row, column);
+			}
+			else if (column == Ocean.OceanWidth - 1)
+			{
+				// right edge
+				return bottomIsClear(row, column) && bottomLeftIsClear(row, column) && leftIsClear(row, column);
+			}
+			else
+			{
+				// mid area
+				return bottomIsClear(row, column) && leftIsClear(row, column) && bottomLeftIsClear(row, column)
+						&& bottomRightIsClear(row, column) && rightIsClear(row, column);
+			}
+		}
+	}
+
+	private boolean bottomIsClear(int row, int column)
+	{
+		if (row == Ocean.OceanHeight - 1)
+		{
+			return false;
+		}
+		return !isOccupied(row + 1, column);
+	}
+
+	private boolean rightIsClear(int row, int column)
+	{
+		if (column == Ocean.OceanWidth - 1)
+		{
+			return false;
+		}
+		return !isOccupied(row, column + 1);
+	}
+
+	private boolean topIsClear(int row, int column)
+	{
+		if (row == 0)
+		{
+			return false;
+		}
+		return !isOccupied(row - 1, column);
+	}
+
+	private boolean leftIsClear(int row, int column)
+	{
+		if (column == 0)
+		{
+			return false;
+		}
+		return !isOccupied(row, column - 1);
+	}
+
+	private boolean topRightIsClear(int row, int column)
+	{
+		if (row == 0 || column == Ocean.OceanWidth - 1)
+		{
+			return false;
+		}
+		return !isOccupied(row - 1, column + 1);
+	}
+
+	private boolean topLeftIsClear(int row, int column)
+	{
+		if (row == 0 || column == 0)
+		{
+			return false;
+		}
+		return !isOccupied(row - 1, column - 1);
+	}
+
+	private boolean bottomRightIsClear(int row, int column)
+	{
+		if (row == Ocean.OceanHeight - 1 || column == Ocean.OceanWidth - 1)
+		{
+			return false;
+		}
+		return !isOccupied(row + 1, column + 1);
+	}
+
+	private boolean bottomLeftIsClear(int row, int column)
+	{
+		if (row == Ocean.OceanHeight - 1 || column == 0)
+		{
+			return false;
+		}
+		return !isOccupied(row + 1, column - 1);
 	}
 
 	private <T extends Ship> ArrayList<T> populateShipList(int amount, Class<T> shipClass)
