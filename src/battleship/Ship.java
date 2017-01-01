@@ -293,6 +293,6 @@ public abstract class Ship
 	@Override
 	public String toString()
 	{
-		return isRealShip() ? "B" : "_";
+		return isRealShip() ? "B" : ".";
 	}
 }
