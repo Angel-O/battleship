@@ -6,7 +6,6 @@ package battleship;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -176,6 +175,10 @@ public class OceanTest
 		// - they aren't
 
 
+		// each ship part has 9 cells around it unless the ship is on the border
+		// verify that each part of each ship has nothing around it apart from
+		// empty sea portions or another ship part belonging to he same ship
+
 		// verify that no ship is in each others range: given length and
 		// orientation
 		// no other ship should be found across the length on that direction
@@ -305,10 +308,48 @@ public class OceanTest
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_ships_sould_not_overlap_when_placed_randomly_on_the_ocean()
 	{
-		// each ship part has 9 cells around it unless the ship is on the border
-		// verify that each part of each ship has nothing around it apart from
-		// empty sea portions or another ship part belonging to he same ship
-		fail("not implemented yet");
+		boolean overlap = false;
+
+		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
+		{
+			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
+			{
+				Ship ship = ships[i][j];
+
+				int row = ship.getBowRow();
+				int column = ship.getBowColumn();
+
+				int length = ship.getLength();
+
+				if (ship.isRealShip() && length > 0)
+				{
+					if (ship.isHorizontal())
+					{
+						for (int k = 1; k < length; k++)
+						{
+							if (ships[row][column + k].getLength() > 0)
+							{
+								overlap = true;
+								break;
+							}
+						}
+					}
+					else
+					{
+						for (int k = 1; k < length; k++)
+						{
+							if (ships[row + k][column].getLength() > 0)
+							{
+								overlap = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
+
+		assertEquals(false, overlap);
 	}
 
 }
