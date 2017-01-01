@@ -2,3 +2,4 @@
 2. check whether or not getters and setters are required for instance vars in ship class
 3. provide validation for bow row and bow col (in subclasses???)
 4. email Carsten about Ocean.hasSunkShipAt method specs
+5. Ocean.getShipArray return actual ships...what are they???

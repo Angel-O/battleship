@@ -4,6 +4,7 @@
 package battleship;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Random;
 
@@ -307,48 +308,43 @@ public class OceanTest
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_ships_sould_not_overlap_when_placed_randomly_on_the_ocean()
 	{
-		boolean overlap = false;
+		// if ships overlap the total area covered by the ships will be less
+		// than what it would normally be (for the same amount of ships, having
+		// a specific length)
+		int totalShipArea = Ocean.BATTLESHIPS * Battleship.BATTLESHIP_LENGTH + Ocean.CRUISERS * Cruiser.CRUISER_LENGTH
+				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
 
-		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
+		int totalShips = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
+
+		// count the areas with real ships and the number of ships
+		int actualShipArea = 0;
+		int actualTotalShips = 0;
+
+		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
 		{
-			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
+			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
 			{
-				Ship ship = ships[i][j];
-
-				int row = ship.getBowRow();
-				int column = ship.getBowColumn();
-
-				int length = ship.getLength();
-
-				if (ship.isRealShip() && length > 0)
+				if (ships[i][j].isRealShip())
 				{
-					if (ship.isHorizontal())
+					// if the area contains a real ship (a bow or a another
+					// part) increment the total area
+					actualShipArea++;
+
+					if (ships[i][j].getLength() > 0)
 					{
-						for (int k = 1; k < length; k++)
-						{
-							if (ships[row][column + k].getLength() > 0)
-							{
-								overlap = true;
-								break;
-							}
-						}
-					}
-					else
-					{
-						for (int k = 1; k < length; k++)
-						{
-							if (ships[row + k][column].getLength() > 0)
-							{
-								overlap = true;
-								break;
-							}
-						}
+						// if the (real) ship length is greater than zero, we
+						// have a bow: each ship has only one bow
+						actualTotalShips++;
 					}
 				}
 			}
 		}
 
-		assertEquals(false, overlap);
-	}
+		// we would expect that the total number of ships and the total area
+		// covered by the ships
+		// is what we would have if there were'n't any ship overlapping
+		boolean expected = totalShipArea == actualShipArea && totalShips == actualTotalShips;
 
+		assertTrue("no overlapping ships in the ocean", expected);
+	}
 }
