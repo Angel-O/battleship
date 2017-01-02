@@ -4,8 +4,10 @@
 package battleship;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashMap;
 import java.util.Random;
 
 import org.junit.After;
@@ -238,6 +240,103 @@ public class OceanTest
 		assertEquals("checking diagonal adjacency moving vertically along each column", false, adjacent);
 	}
 
+	@Test
+	public void test_ships_should_not_be_adjacent_on_a_straight_line_when_placed_randomly_on_ocean()
+	{
+		// if there are any adjacent ship there will be a mismatch between the
+		// distance from each ship bow till the first empty sea area and the
+		// number of ships expected to have a certain length
+		int expectedBattleshipArea = Ocean.BATTLESHIPS * Battleship.BATTLESHIP_LENGTH;
+		int expectedCruiserArea = Ocean.CRUISERS * Cruiser.CRUISER_LENGTH;
+		int expecteDestroyerArea = Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH;
+		int expectedSubmarineArea = Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
+
+		HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper = new HashMap<>();
+
+		shipTypeToAreaMapper.put(Battleship.class, 0);
+		shipTypeToAreaMapper.put(Cruiser.class, 0);
+		shipTypeToAreaMapper.put(Destroyer.class, 0);
+		shipTypeToAreaMapper.put(Submarine.class, 0);
+
+		// if we scan the ocean horizontally and increment the ship area for
+		// each horizontal ship we encounter
+		scanOceanAndAddShipValuesToTheMapper(ships, shipTypeToAreaMapper);
+
+		// and then do the same vertically
+		Ship[][] rotatedOcean = rotateOceanNinetyDegreeAntiClockwise();
+		scanOceanAndAddShipValuesToTheMapper(rotatedOcean, shipTypeToAreaMapper);
+
+		// we should expect that the area covered by each ship type (in the
+		// given amount) is what it would be if there were not adjacent ships in
+		// the ocean on straight lines
+		boolean actual = shipTypeToAreaMapper.get(Battleship.class) == expectedBattleshipArea
+				&& shipTypeToAreaMapper.get(Cruiser.class) == expectedCruiserArea
+				&& shipTypeToAreaMapper.get(Destroyer.class) == expecteDestroyerArea
+				&& shipTypeToAreaMapper.get(Submarine.class) == expectedSubmarineArea;
+
+		assertTrue("checking horizontal and vertical adjecency", actual);
+
+		// if instead we create an empty ocean
+		ocean = new Ocean();
+
+		// and add adjacent ships on a straight line
+		ships = ocean.getShipArray();
+		ships[0][0] = new Battleship();
+		ships[3][0] = new Submarine();
+		ships[4][0] = new Submarine();
+		ships[5][0] = new Submarine();
+		ships[6][0] = new Submarine();
+
+		// we should get this amount
+		int expectedBattleshipSurface = Battleship.BATTLESHIP_LENGTH * 1;
+		int expectedSubmarineSurface = Submarine.SUBMARINE_LENGTH * 4;
+
+		// if we scan the ocean horizontally
+		HashMap<Class<? extends Ship>, Integer> failMapper = new HashMap<>();
+		failMapper.put(Battleship.class, 0);
+		failMapper.put(Submarine.class, 0);
+
+		// then vertically
+		scanOceanAndAddShipValuesToTheMapper(ships, failMapper);
+		Ship[][] rotatatedOcean = rotateOceanNinetyDegreeAntiClockwise();
+		scanOceanAndAddShipValuesToTheMapper(rotatatedOcean, shipTypeToAreaMapper);
+
+		// we get this amount instead
+		actual = failMapper.get(Battleship.class) == expectedBattleshipSurface
+				&& failMapper.get(Submarine.class) == expectedSubmarineSurface;
+
+		assertFalse("checking failing horizontal and vertical adjecency", actual);
+	}
+
+	private void scanOceanAndAddShipValuesToTheMapper(Ship[][] ships,
+			HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper)
+	{
+		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
+		{
+			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
+			{
+				Ship ship = ships[i][j];
+
+				if (ship.isRealShip() && ship.getLength() == establishShipLengthFromShipType(ship)
+						&& ship.isHorizontal())
+				{
+					// the bow is already included in the count
+					int realShipAreaCounter = 1;
+					int start = ship.getBowColumn();
+
+					while (start + realShipAreaCounter < Ocean.OCEAN_WIDTH
+							&& ships[i][start + realShipAreaCounter].isRealShip())
+					{
+						realShipAreaCounter++;
+					}
+
+					Class<? extends Ship> shipClass = ship.getClass();
+
+					shipTypeToAreaMapper.put(shipClass, shipTypeToAreaMapper.get(shipClass) + realShipAreaCounter);
+				}
+			}
+		}
+	}
 	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
 	{
 		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
