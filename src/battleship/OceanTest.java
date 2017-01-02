@@ -208,6 +208,121 @@ public class OceanTest
 	}
 
 	@Test
+	public void test_ships_should_not_be_adjacent_diagonally_when_placed_randomly_on_ocean()
+	{
+		for (int i = 0; i < 10000; i++)
+		{
+
+
+			ocean = new Ocean();
+			ocean.placeAllShipsRandomly();
+			ships = ocean.getShipArray();
+
+		boolean adjacent = false;
+
+		// if you move along each row until you find a horizontal ship bow and
+		// there are ships in the ocean spots placed diagonally, there shouldn't
+		// be any other ship around
+		for (Ship[] oceanRow : ships)
+		{
+			adjacent = checkDiagonalAdjecency(oceanRow);
+		}
+
+		// we expect not to have any diagonal adjacency when moving horizontally
+		assertEquals("checking diagonal adjacency moving horizontally along each row", false, adjacent);
+
+		// then, if you move along each column in the same ocean until you find
+		// a vertical ship bow and there are ships in the ocean spots placed
+		// diagonally, there shouldn't be any other ship around
+		Ship[][] rotatedOcean = rotateOceanNinetyDegreeAntiClockwise();
+
+		for (Ship[] oceanColumn : rotatedOcean)
+		{
+			adjacent = checkDiagonalAdjecency(oceanColumn);
+		}
+
+		// we expect not to have any diagonal adjacency when moving vertically
+		assertEquals("checking diagonal adjacency moving vertically along each column", false, adjacent);
+		}
+	}
+
+	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
+	{
+		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
+
+		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
+		{
+			// get the i-th row of the ocean
+			Ship[] oceanRow = ships[i];
+
+			// place each element of the row in the rotated ocean so that the
+			// vertical ships appear as horizontal and vice-versa
+			for (int j = oceanRow.length - 1; j >= 0; j--)
+			{
+				// invert the orientation of each ship
+				oceanRow[j].setHorizontal(!oceanRow[j].isHorizontal());
+
+				rotatedOcean[j][i] = oceanRow[j];
+
+				// match the coordinates of the ships to reflect the new
+				// orientation that each ship will have in the rotated ocean
+				oceanRow[j].setBowRow(j);
+				oceanRow[j].setBowColumn(i);
+			}
+		}
+
+		return rotatedOcean;
+	}
+
+	private boolean checkDiagonalAdjecency(Ship[] oceanRow, boolean rotatedOcean)
+	{
+		boolean adjacent = false;
+
+		// column index, start from 1 as there is no possible diagonal
+		// adjacency on the left border. Keep moving along the ocean row until a
+		// horizontal ship bow is found
+		for (int column = 1; column < Ocean.OCEAN_WIDTH; column++)
+		{
+			// TODO : fix this after removing zero-length ships
+			boolean horizontalBowFound = oceanRow[column].isRealShip() && oceanRow[column].getLength() > 0
+					&& oceanRow[column].isHorizontal();
+
+			if (horizontalBowFound)
+			{
+				Ship horizontalShip = oceanRow[column];
+
+				// bow row coordinate of the horizontal ship found
+				int row = horizontalShip.getBowRow();
+
+				// if the ocean spot on the diagonal is a real ship, we have
+				// found to adjacent ships diagonally
+				if (row > 0 && ships[row - 1][column - 1].isRealShip()
+						|| row < Ocean.OCEAN_HEIGHT - 1 && ships[row + 1][column - 1].isRealShip())
+				{
+					adjacent = true;
+					break;
+				}
+
+				// stern column coordinate of the horizontal ship found
+				int sternColumn = column + horizontalShip.getLength() - 1;
+
+				// check that the column is still within the range
+				if (sternColumn < Ocean.OCEAN_WIDTH - 1)
+				{
+					if (row > 0 && ships[row - 1][sternColumn + 1].isRealShip()
+							|| row < Ocean.OCEAN_HEIGHT - 1 && ships[row + 1][sternColumn + 1].isRealShip())
+					{
+						adjacent = true;
+						break;
+					}
+				}
+			}
+		}
+
+		return adjacent;
+	}
+
+	@Test
 	public void test_ships_sould_not_be_adjacent_when_placed_randomly_on_the_ocean()
 	{
 		// ships can overlap partially (having only one part in common) or
@@ -224,6 +339,10 @@ public class OceanTest
 		// verify that no ship is in each others range: given length and
 		// orientation
 		// no other ship should be found across the length on that direction
+
+
+
+		// horizontally & vertically mismatch between ships lengths
 
 
 		// ships[0][0] = new Submarine();
