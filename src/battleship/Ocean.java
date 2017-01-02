@@ -293,8 +293,9 @@ public class Ocean
 			// rest it for each ship part
 			boolean shipPartplaced = false;
 
-			// create a ship of length zero representing a ship part
-			Ship shipPart = createShipPart(shipClass);
+			// create a ship representing a ship part with length
+			// based on the offset from the bow
+			Ship shipPart = createShipPart(shipClass, i);
 
 			// set the coordinates and the orientation of the ship part
 			int row = horizontal ? bowRow : bowRow + i;
@@ -544,25 +545,25 @@ public class Ocean
 		return ship;
 	}
 
-	private <T> Ship createShipPart(Class<T> shipClass)
+	private <T> Ship createShipPart(Class<T> shipClass, int offsetFromBow)
 	{
 		Ship shipPart = null;
 
 		if (shipClass == Battleship.class)
 		{
-			shipPart = new Battleship(0);
+			shipPart = new Battleship(Battleship.BATTLESHIP_LENGTH - offsetFromBow);
 		}
 		else if (shipClass == Cruiser.class)
 		{
-			shipPart = new Cruiser(0);
+			shipPart = new Cruiser(Cruiser.CRUISER_LENGTH - offsetFromBow);
 		}
 		else if (shipClass == Destroyer.class)
 		{
-			shipPart = new Destroyer(0);
+			shipPart = new Destroyer(Destroyer.DESTROYER_LENGTH - offsetFromBow);
 		}
 		else
 		{
-			shipPart = new Submarine(0);
+			shipPart = new Submarine(Submarine.SUBMARINE_LENGTH - offsetFromBow);
 		}
 
 		return shipPart;

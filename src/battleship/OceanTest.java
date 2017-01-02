@@ -102,10 +102,11 @@ public class OceanTest
 		{
 			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
 			{
-				if (ships[i][j].isRealShip() && ships[i][j].getLength() > 0)
+				if (ships[i][j].isRealShip() && ships[i][j].getLength() == establishShipLengthFromShipType(ships[i][j]))
 				{
-					// (not counting ships with length == 0 as they are
-					// just part of another ship)
+					// (counting only ships with length equal to the max length
+					// for the particular ship type, as they represent the ship
+					// bow and there is only one bow per ship)
 					actual++;
 				}
 			}
@@ -142,7 +143,7 @@ public class OceanTest
 					// part) increment the total area
 					actualShipArea++;
 
-					if (ships[i][j].getLength() > 0)
+					if (ships[i][j].getLength() == establishShipLengthFromShipType(ships[i][j]))
 					{
 						// if the (real) ship length is greater than zero, we
 						// have a bow: each ship has only one bow
@@ -210,14 +211,6 @@ public class OceanTest
 	@Test
 	public void test_ships_should_not_be_adjacent_diagonally_when_placed_randomly_on_ocean()
 	{
-		for (int i = 0; i < 10000; i++)
-		{
-
-
-			ocean = new Ocean();
-			ocean.placeAllShipsRandomly();
-			ships = ocean.getShipArray();
-
 		boolean adjacent = false;
 
 		// if you move along each row until you find a horizontal ship bow and
@@ -225,7 +218,7 @@ public class OceanTest
 		// be any other ship around
 		for (Ship[] oceanRow : ships)
 		{
-			adjacent = checkDiagonalAdjecency(oceanRow);
+			adjacent = checkDiagonalAdjecency(oceanRow, ships);
 		}
 
 		// we expect not to have any diagonal adjacency when moving horizontally
@@ -238,12 +231,11 @@ public class OceanTest
 
 		for (Ship[] oceanColumn : rotatedOcean)
 		{
-			adjacent = checkDiagonalAdjecency(oceanColumn);
+			adjacent = checkDiagonalAdjecency(oceanColumn, rotatedOcean);
 		}
 
 		// we expect not to have any diagonal adjacency when moving vertically
 		assertEquals("checking diagonal adjacency moving vertically along each column", false, adjacent);
-		}
 	}
 
 	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
@@ -274,7 +266,7 @@ public class OceanTest
 		return rotatedOcean;
 	}
 
-	private boolean checkDiagonalAdjecency(Ship[] oceanRow, boolean rotatedOcean)
+	private boolean checkDiagonalAdjecency(Ship[] oceanRow, Ship[][] ocean)
 	{
 		boolean adjacent = false;
 
@@ -283,8 +275,8 @@ public class OceanTest
 		// horizontal ship bow is found
 		for (int column = 1; column < Ocean.OCEAN_WIDTH; column++)
 		{
-			// TODO : fix this after removing zero-length ships
-			boolean horizontalBowFound = oceanRow[column].isRealShip() && oceanRow[column].getLength() > 0
+			boolean horizontalBowFound = oceanRow[column].isRealShip()
+					&& oceanRow[column].getLength() == establishShipLengthFromShipType(oceanRow[column])
 					&& oceanRow[column].isHorizontal();
 
 			if (horizontalBowFound)
@@ -295,9 +287,9 @@ public class OceanTest
 				int row = horizontalShip.getBowRow();
 
 				// if the ocean spot on the diagonal is a real ship, we have
-				// found to adjacent ships diagonally
-				if (row > 0 && ships[row - 1][column - 1].isRealShip()
-						|| row < Ocean.OCEAN_HEIGHT - 1 && ships[row + 1][column - 1].isRealShip())
+				// found two ships that are adjacent diagonally
+				if (row > 0 && ocean[row - 1][column - 1].isRealShip()
+						|| row < Ocean.OCEAN_HEIGHT - 1 && ocean[row + 1][column - 1].isRealShip())
 				{
 					adjacent = true;
 					break;
@@ -309,8 +301,8 @@ public class OceanTest
 				// check that the column is still within the range
 				if (sternColumn < Ocean.OCEAN_WIDTH - 1)
 				{
-					if (row > 0 && ships[row - 1][sternColumn + 1].isRealShip()
-							|| row < Ocean.OCEAN_HEIGHT - 1 && ships[row + 1][sternColumn + 1].isRealShip())
+					if (row > 0 && ocean[row - 1][sternColumn + 1].isRealShip()
+							|| row < Ocean.OCEAN_HEIGHT - 1 && ocean[row + 1][sternColumn + 1].isRealShip())
 					{
 						adjacent = true;
 						break;
@@ -320,6 +312,30 @@ public class OceanTest
 		}
 
 		return adjacent;
+	}
+
+	private int establishShipLengthFromShipType(Ship ship)
+	{
+		if (ship instanceof Battleship)
+		{
+			return Battleship.BATTLESHIP_LENGTH;
+		}
+		else if (ship instanceof Cruiser)
+		{
+			return Cruiser.CRUISER_LENGTH;
+		}
+		else if (ship instanceof Destroyer)
+		{
+			return Destroyer.DESTROYER_LENGTH;
+		}
+		else if (ship instanceof Submarine)
+		{
+			return Submarine.SUBMARINE_LENGTH;
+		}
+		else
+		{
+			return 0;
+		}
 	}
 
 	@Test
