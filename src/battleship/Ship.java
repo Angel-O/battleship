@@ -44,57 +44,14 @@ public abstract class Ship
 	 */
 	public boolean shootAt(int row, int column)
 	{
-		if (!isSunk() && trajectoryIsRight(row, column))
+		if (row == bowRow && column == bowColumn && !isSunk())
 		{
-			// if the ship is horizontal check the horizontal range and try
-			// and shoot, otherwise check the vertical range.
-			return isHorizontal() ? checkRangetAndShoot(bowColumn, column) : checkRangetAndShoot(bowRow, row);
-		}
-		return false;
-	}
-
-	/**
-	 * Checks that the shot fired has potential to hit the ship, by checking its
-	 * trajectory. A ship can only be hit with a horizontal or vertical
-	 * trajectory.
-	 *
-	 * @param row
-	 *            vertical coordinate of the shot
-	 * @param horizontal
-	 *            coordinate of the shot
-	 * @return {@code true} if the trajectory is either horizontal or vertical,
-	 *         {@code false} otherwise
-	 */
-	private boolean trajectoryIsRight(int row, int column)
-	{
-		// horizontal trajectory: target row is equal to bow row
-		// vertical trajectory: target column is equal to bow column
-		return row == bowRow || column == bowColumn;
-	}
-
-	/**
-	 * Checks if the ship is in range and if so it will mark the hit point.
-	 * Returns true in case of a successful shot, false otherwise.
-	 *
-	 * @param bowCoordinate
-	 *            coordinate of the bow. If the ship is horizontal the bow
-	 *            column coordinate should be used
-	 * @param targetCoordinate
-	 *            coordinate targeted by the hit. If the ship is horizontal the
-	 *            target column coordinate should be used
-	 * @return {@code true} if it's a hit, {@code false} it if's a miss
-	 */
-	private boolean checkRangetAndShoot(int bowCoordinate, int targetCoordinate)
-	{
-		// Add the length to the relevant coordinate
-		// and subtract one since the ship will stretch from the bow to length -
-		// 1 at most.
-		if (bowCoordinate + length - 1 >= targetCoordinate)
-		{
-			// mark the hit point
-			hit[targetCoordinate - bowCoordinate] = true;
 			return true;
 		}
+		// if we receive a message from the ocean with different coordinates
+		// we will interpret as...
+		hit[row] = true;
+
 		return false;
 	}
 

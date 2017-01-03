@@ -221,6 +221,10 @@ public class Ocean
 		{
 			hitCount++;
 
+			int shipLength = ships[row][column].getLength();
+
+			// establish ship position
+
 			// propagate to the other ships..???
 			// get the ship location...
 			// propagate via shoot at.. with different coordinates

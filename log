@@ -9,3 +9,25 @@
 9. establishshiplength by type method (test and ocean class..pick one)
 10. rotate matrix strategy: can I use it in the ocean class?
 11. change rotated ocean private method to return void
+
+
+
+// shoot at strategy
+
+1. assign each ship the coordinates of the boat
+2. each ship will be placed on the right ocean spot anyway, but they will have the same bow coordinates
+	so if we place a new Battleship at location (0,0) horizontally we will have something like
+	ships[0][0] = ship1 ...
+	....
+	ships[0][3] = ship2 ... ==> all ships with the same bow coordinates
+
+3. when the ocean fires at location it will first get the ship type at that location
+4. if successful it will then get it's length and its orientation to check whether they are all sunk or not...
+5. when a ship receive the shoot at message it will know which element of the hit array to change by
+	comparing the shoot at coordinates with the bow coordinates and checking the orientation
+6. how are the other ships notified so that they can update their hit array????
+7. each ship part will be fired by the ocean. Before shooting the ocean needs to gather all the ship
+   parts belonging to the same ship (it will get the length and the orientation of the ship at the shooting location...)
+   then it will shoot all of them with the shooting coordinates: the ship part at the fired location will be marked as sunk
+   and the shoot array will be updated in each ship part
+8. eventually the ocean will have to check if they are all sunk
