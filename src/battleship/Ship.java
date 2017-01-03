@@ -32,9 +32,10 @@ public abstract class Ship
 	public abstract String getShipType();
 
 	/**
-	 * If a part of the ship occupies the given row and column, and the ship
-	 * hasn't been sunk, mark that part of the ship as hit (in the hit array,
-	 * index 0 indicates the bow) and return true, otherwise return false.
+	 * If a part of the ship occupies the given row and column (OCEAN
+	 * KNOWLEDGE), and the ship hasn't been sunk, mark that part of the ship as
+	 * hit (in the hit array, index 0 indicates the bow) and return true,
+	 * otherwise return false.
 	 *
 	 * @param row
 	 *            represents the vertical coordinate to be hit
@@ -44,15 +45,16 @@ public abstract class Ship
 	 */
 	public boolean shootAt(int row, int column)
 	{
-		if (row == bowRow && column == bowColumn && !isSunk())
-		{
-			return true;
-		}
-		// if we receive a message from the ocean with different coordinates
-		// we will interpret as...
-		hit[row] = true;
+		markHitArray(row, column);
 
-		return false;
+		return !isSunk();
+	}
+
+	private void markHitArray(int row, int column)
+	{
+		int offsetFromTheBow = horizontal ? column - bowColumn : row - bowRow;
+
+		hit[offsetFromTheBow] = true;
 	}
 
 	/**

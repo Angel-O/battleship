@@ -327,9 +327,9 @@ public class OceanTest
 		int column = 0;
 		placeBattleshipAt(row, column, false);
 
-		// if we shoot anywhere at the ship
+		// if we shoot once anywhere at the ship
 		Random random = new Random();
-		boolean hitAfloatShip = ocean.shootAt(random.nextInt(Battleship.BATTLESHIP_LENGTH), 0);
+		boolean hitAfloatShip = ocean.shootAt(random.nextInt(Battleship.BATTLESHIP_LENGTH), column);
 
 		// we should expect to catch an afloat ship
 		assertTrue("hitting an afloat ship", hitAfloatShip);
@@ -347,7 +347,7 @@ public class OceanTest
 		int column = 0;
 		placeBattleshipAt(row, column, true);
 
-		// if we shoot across its length
+		// if we shoot across its length until we sink it
 		boolean hitSunkShip;
 
 		for (int i = 0; i < ships[row][column].getLength(); i++)
@@ -355,7 +355,9 @@ public class OceanTest
 			ocean.shootAt(row, column + i);
 		}
 
-		hitSunkShip = ocean.shootAt(row, column);
+		// then shoot again at it anywhere across its length
+		Random random = new Random();
+		hitSunkShip = ocean.shootAt(row, random.nextInt(Battleship.BATTLESHIP_LENGTH));
 
 		// we should expect an unsuccessful shot
 		assertFalse("hitting a sunk ship", hitSunkShip);
@@ -501,13 +503,15 @@ public class OceanTest
 
 		for (int k = 0; k < Battleship.BATTLESHIP_LENGTH; k++)
 		{
-			row = isHorizontal ? bowRow : bowRow + k;
-			column = isHorizontal ? bowColumn + k : bowColumn;
-			Battleship battleship = new Battleship(Battleship.BATTLESHIP_LENGTH - k);
-			battleship.setBowRow(row);
-			battleship.setBowColumn(column);
+			// create the ship
+			Battleship battleship = new Battleship();
+			battleship.setBowRow(bowRow);
+			battleship.setBowColumn(bowColumn);
 			battleship.setHorizontal(isHorizontal);
 
+			// place it on the ocean
+			row = isHorizontal ? bowRow : bowRow + k;
+			column = isHorizontal ? bowColumn + k : bowColumn;
 			ships[row][column] = battleship;
 		}
 	}

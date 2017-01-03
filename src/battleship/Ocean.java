@@ -203,34 +203,80 @@ public class Ocean
 	 * @param nextInt
 	 * @param bowColumn
 	 * @return
+	 *
+	 *
+	 * 		OCEAN Shoots at the part of the ship at that location. Returns
+	 *         true if the given location contains a real ship (not an
+	 *         EmptySea), still afloat, false if it does not. In addition, this
+	 *         method updates the number of shots that have been fired, and the
+	 *         number of hits. Note: If a location contains a real ship, shootAt
+	 *         should return true every time the user shoots at that same
+	 *         location. Once a ship has been sunk, additional shots at its
+	 *         location should return false.
+	 *
+	 *         SHIP boolean shootAt(int row, int column) If a part of the ship
+	 *         occupies the given row and column, and the ship hasn't been sunk,
+	 *         mark that part of the ship as hit (in the hit array, index 0
+	 *         indicates the bow) and return true, otherwise return false.
 	 */
 	public boolean shootAt(int row, int column)
 	{
-		// increment the total shots fired
+		// increment the total number of shots fired
 		shotsFired++;
 
-		boolean succesfullShot = false;
-
+		// if the location contains a ship that is still afloat...
 		if (isOccupied(row, column) && !ships[row][column].isSunk())
 		{
-			succesfullShot = ships[row][column].shootAt(row, column);
-		}
-
-		// if the shot was successful increment the hit count
-		if (succesfullShot)
-		{
+			// increment the hit count
 			hitCount++;
 
-			int shipLength = ships[row][column].getLength();
+			// gather all the ship parts so that they can update their hit array
+			Ship[] wholeShip = getWholeShip(ships[row][column]);
 
-			// establish ship position
-
-			// propagate to the other ships..???
-			// get the ship location...
-			// propagate via shoot at.. with different coordinates
+			// shoot at each location so that ships can mark themselves on the
+			// hit array: this way the info will be propagated to the other
+			// ships
+			for (Ship shipPart : wholeShip)
+			{
+				// shooting each ship part so that they can update their status
+				// on the hit array
+				shipPart.shootAt(row, column);
+			}
 		}
 
-		return succesfullShot;
+		// checking again after each part has updated their hit array status...
+		// or shooting only at one do a global check???
+		return isOccupied(row, column) && !ships[row][column].isSunk();
+	}
+
+	private Ship[] getWholeShip(Ship ship)
+	{
+		int bowRow = ship.getBowRow();
+		int bowColumn = ship.getBowColumn();
+		int shipLength = ship.getLength();
+
+		// the ship length tells us how many ship parts form a ship
+		Ship[] wholeShip = new Ship[shipLength];
+
+		if (ship.isHorizontal())
+		{
+			for (int i = 0; i < shipLength; i++)
+			{
+
+				wholeShip[i] = ships[bowRow][bowColumn + i];
+			}
+		}
+		else
+		{
+			for (int i = 0; i < shipLength; i++)
+			{
+
+				wholeShip[i] = ships[bowRow + i][bowColumn];
+			}
+		}
+
+		return wholeShip;
+
 	}
 
 	/**
