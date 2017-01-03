@@ -24,7 +24,7 @@ public class Submarine extends Ship
 	@Override
 	public String toString()
 	{
-		return "1";
+		return isHorizontal() ? "H" : "V";
 	}
 
 }

@@ -269,7 +269,7 @@ public class Ocean
 			{
 				// create a ship representing a ship part with length
 				// based on the offset from the bow
-				Ship shipPart = createShip(shipClass, i);
+				Ship shipPart = createShip(shipClass);
 
 				// set the orientation of the ship part
 				shipPart.setHorizontal(horizontal);
@@ -289,25 +289,25 @@ public class Ocean
 		while (shipPlaced < amount);
 	}
 
-	private <T extends Ship> Ship createShip(Class<T> shipClass, int offsetFromBow)
+	private <T extends Ship> Ship createShip(Class<T> shipClass)
 	{
 		Ship shipPart = null;
 
 		if (shipClass == Battleship.class)
 		{
-			shipPart = new Battleship(Battleship.BATTLESHIP_LENGTH - offsetFromBow);
+			shipPart = new Battleship();
 		}
 		else if (shipClass == Cruiser.class)
 		{
-			shipPart = new Cruiser(Cruiser.CRUISER_LENGTH - offsetFromBow);
+			shipPart = new Cruiser();
 		}
 		else if (shipClass == Destroyer.class)
 		{
-			shipPart = new Destroyer(Destroyer.DESTROYER_LENGTH - offsetFromBow);
+			shipPart = new Destroyer();
 		}
 		else if (shipClass == Submarine.class)
 		{
-			shipPart = new Submarine(Submarine.SUBMARINE_LENGTH - offsetFromBow);
+			shipPart = new Submarine();
 		}
 
 		return shipPart;
