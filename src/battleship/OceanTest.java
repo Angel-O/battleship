@@ -311,16 +311,56 @@ public class OceanTest
 		assertEquals(expected, ocean.isOccupied(row, column));
 	}
 
+	// ================ shooting at ocean location test ============== //
+
 	@Test
 	public void test_shooting_afloat_ship_should_be_succesfull()
 	{
-		fail("not implemented yet");
+		// if we create an empty ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		// and place a ship onto it
+		Ship ship = new Battleship();
+		ship.setBowRow(0);
+		ship.setBowColumn(0);
+		ship.setHorizontal(false);
+		ships[ship.getBowRow()][ship.getBowColumn()] = ship;
+
+		// if we shoot anywhere at at the ship
+		Random random = new Random();
+		boolean hitAfloatShip = ocean.shootAt(random.nextInt(ship.getLength()), ship.getBowColumn());
+
+		// we should expect to catch an afloat ship
+		assertTrue("hitting an afloat ship", hitAfloatShip);
 	}
 
 	@Test
 	public void test_shooting_sunk_ships_should_be_unsuccesfull()
 	{
-		fail("not implemented yet");
+		// if we create an empty ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		// and place a ship onto it
+		Ship ship = new Battleship();
+		ship.setBowRow(0);
+		ship.setBowColumn(0);
+		ship.setHorizontal(true);
+		ships[ship.getBowRow()][ship.getBowColumn()] = ship;
+
+		// if we shoot across its length
+		boolean hitSunkShip;
+
+		for (int i = 0; i < ship.getLength(); i++)
+		{
+			ocean.shootAt(ship.getBowRow(), ship.getBowColumn() + i);
+		}
+
+		hitSunkShip = ocean.shootAt(ship.getBowRow(), ship.getBowColumn());
+
+		// we should expect an unsuccessful shot
+		assertFalse("hitting a sunk ship", hitSunkShip);
 	}
 
 	@Test

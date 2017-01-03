@@ -7,3 +7,4 @@
 7. check nesting in print method
 8. add check whenever accessing the ship matrix
 9. establishshiplength by type method (test and ocean class..pick one)
+10. rotate matrix strategy: can I use it in the ocean class?
