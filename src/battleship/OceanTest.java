@@ -321,15 +321,13 @@ public class OceanTest
 		ships = ocean.getShipArray();
 
 		// and place a ship onto it
-		Ship ship = new Battleship();
-		ship.setBowRow(0);
-		ship.setBowColumn(0);
-		ship.setHorizontal(false);
-		ships[ship.getBowRow()][ship.getBowColumn()] = ship;
+		int row = 0;
+		int column = 0;
+		placeBattleshipAt(row, column, false);
 
-		// if we shoot anywhere at at the ship
+		// if we shoot anywhere at the ship
 		Random random = new Random();
-		boolean hitAfloatShip = ocean.shootAt(random.nextInt(ship.getLength()), ship.getBowColumn());
+		boolean hitAfloatShip = ocean.shootAt(random.nextInt(Battleship.BATTLESHIP_LENGTH), 0);
 
 		// we should expect to catch an afloat ship
 		assertTrue("hitting an afloat ship", hitAfloatShip);
@@ -343,25 +341,24 @@ public class OceanTest
 		ships = ocean.getShipArray();
 
 		// and place a ship onto it
-		Ship ship = new Battleship();
-		ship.setBowRow(0);
-		ship.setBowColumn(0);
-		ship.setHorizontal(true);
-		ships[ship.getBowRow()][ship.getBowColumn()] = ship;
+		int row = 0;
+		int column = 0;
+		placeBattleshipAt(row, column, true);
 
 		// if we shoot across its length
 		boolean hitSunkShip;
 
-		for (int i = 0; i < ship.getLength(); i++)
+		for (int i = 0; i < ships[row][column].getLength(); i++)
 		{
-			ocean.shootAt(ship.getBowRow(), ship.getBowColumn() + i);
+			ocean.shootAt(row, column + i);
 		}
 
-		hitSunkShip = ocean.shootAt(ship.getBowRow(), ship.getBowColumn());
+		hitSunkShip = ocean.shootAt(row, column);
 
 		// we should expect an unsuccessful shot
 		assertFalse("hitting a sunk ship", hitSunkShip);
 	}
+
 
 	@Test
 	public void test_number_of_shots_fired_should_be_updated_at_each_shot()
@@ -504,6 +501,24 @@ public class OceanTest
 		else
 		{
 			return 0;
+		}
+	}
+
+	private void placeBattleshipAt(int bowRow, int bowColumn, boolean isHorizontal)
+	{
+		int row;
+		int column;
+
+		for (int k = 0; k < Battleship.BATTLESHIP_LENGTH; k++)
+		{
+			row = isHorizontal ? bowRow : bowRow + k;
+			column = isHorizontal ? bowColumn + k : bowColumn;
+			Battleship battleship = new Battleship(Battleship.BATTLESHIP_LENGTH - k);
+			battleship.setBowRow(row);
+			battleship.setBowColumn(column);
+			battleship.setHorizontal(isHorizontal);
+
+			ships[row][column] = battleship;
 		}
 	}
 }

@@ -19,10 +19,9 @@ public abstract class Ship
 
 	protected Ship(int length)
 	{
-		assert length >= 0 : "ship length cannot be negative";
+		assert length > 0 : "ship length must be positive";
 		this.length = length;
 		hit = new boolean[length];
-		// setUpShipParts();
 	}
 
 	/**

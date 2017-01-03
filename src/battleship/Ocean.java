@@ -200,6 +200,36 @@ public class Ocean
 	}
 
 	/**
+	 * @param nextInt
+	 * @param bowColumn
+	 * @return
+	 */
+	public boolean shootAt(int row, int column)
+	{
+		// increment the total shots fired
+		shotsFired++;
+
+		boolean succesfullShot = false;
+
+		if (isOccupied(row, column) && !ships[row][column].isSunk())
+		{
+			succesfullShot = ships[row][column].shootAt(row, column);
+		}
+
+		// if the shot was successful increment the hit count
+		if (succesfullShot)
+		{
+			hitCount++;
+
+			// propagate to the other ships..???
+			// get the ship location...
+			// propagate via shoot at.. with different coordinates
+		}
+
+		return succesfullShot;
+	}
+
+	/**
 	 * @param amount
 	 * @param shipClass
 	 */
