@@ -6,6 +6,7 @@ package battleship;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.util.HashMap;
 import java.util.Random;
@@ -63,6 +64,8 @@ public class OceanTest
 		ocean = null;
 		ships = null;
 	}
+
+	// ========= random ships placed in the ocean test ============== //
 
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_exact_number_of_emptysea_sould_be_placed_randomly_on_the_ocean()
@@ -163,53 +166,6 @@ public class OceanTest
 		assertTrue("no overlapping ships in the ocean", expected);
 	}
 
-	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_occupied_ocean_spots_should_be_flagged_accordingly()
-	{
-		// if we create an empty ocean
-		ocean = new Ocean();
-
-		// and create new ships
-		Ship battleship = new Battleship();
-		Ship cruiser = new Cruiser();
-		Ship destroyer = new Destroyer();
-		Ship submarine = new Submarine();
-
-		// that we place the ships in the ocean
-		ships = ocean.getShipArray();
-		ships[0][0] = battleship;
-		ships[0][9] = cruiser;
-		ships[9][0] = destroyer;
-		ships[9][9] = submarine;
-
-		// then the ocean spots where they have been placed should be marked as
-		// occupied
-		boolean expected = true;
-		assertEquals(expected, ocean.isOccupied(0, 0));
-		assertEquals(expected, ocean.isOccupied(0, 9));
-		assertEquals(expected, ocean.isOccupied(9, 0));
-		assertEquals(expected, ocean.isOccupied(9, 9));
-	}
-
-	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_clear_ocean_spot_should_be_flagged_accordingly()
-	{
-		// if we create an empty ocean
-		ocean = new Ocean();
-
-		// and check what's on it
-		ships = ocean.getShipArray();
-
-		// whatever random area that we pick
-		Random random = new Random();
-		int row = random.nextInt(Ocean.OCEAN_HEIGHT);
-		int column = random.nextInt(Ocean.OCEAN_WIDTH);
-
-		// it should not be flagged as occupied
-		boolean expected = false;
-		assertEquals(expected, ocean.isOccupied(row, column));
-	}
-
 	@Test
 	public void test_ships_should_not_be_adjacent_diagonally_when_placed_randomly_on_ocean()
 	{
@@ -308,6 +264,79 @@ public class OceanTest
 		assertFalse("checking failing horizontal and vertical adjecency", actual);
 	}
 
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_occupied_ocean_spots_should_be_flagged_accordingly()
+	{
+		// if we create an empty ocean
+		ocean = new Ocean();
+
+		// and create new ships
+		Ship battleship = new Battleship();
+		Ship cruiser = new Cruiser();
+		Ship destroyer = new Destroyer();
+		Ship submarine = new Submarine();
+
+		// that we place the ships in the ocean
+		ships = ocean.getShipArray();
+		ships[0][0] = battleship;
+		ships[0][9] = cruiser;
+		ships[9][0] = destroyer;
+		ships[9][9] = submarine;
+
+		// then the ocean spots where they have been placed should be marked as
+		// occupied
+		boolean expected = true;
+		assertEquals(expected, ocean.isOccupied(0, 0));
+		assertEquals(expected, ocean.isOccupied(0, 9));
+		assertEquals(expected, ocean.isOccupied(9, 0));
+		assertEquals(expected, ocean.isOccupied(9, 9));
+	}
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_clear_ocean_spot_should_be_flagged_accordingly()
+	{
+		// if we create an empty ocean
+		ocean = new Ocean();
+
+		// and check what's on it
+		ships = ocean.getShipArray();
+
+		// whatever random area that we pick
+		Random random = new Random();
+		int row = random.nextInt(Ocean.OCEAN_HEIGHT);
+		int column = random.nextInt(Ocean.OCEAN_WIDTH);
+
+		// it should not be flagged as occupied
+		boolean expected = false;
+		assertEquals(expected, ocean.isOccupied(row, column));
+	}
+
+	@Test
+	public void test_shooting_afloat_ship_should_be_succesfull()
+	{
+		fail("not implemented yet");
+	}
+
+	@Test
+	public void test_shooting_sunk_ships_should_be_unsuccesfull()
+	{
+		fail("not implemented yet");
+	}
+
+	@Test
+	public void test_number_of_shots_fired_should_be_updated_at_each_shot()
+	{
+		fail("not implemented yet");
+	}
+
+	@Test
+	public void test_number_of_hits_should_be_updated_at_each_shot()
+	{
+		fail("not implemented yet");
+	}
+
+	// ======================= helper methods ======================== //
+
 	private void scanOceanAndAddShipValuesToTheMapper(Ship[][] ships,
 			HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper)
 	{
@@ -337,6 +366,7 @@ public class OceanTest
 			}
 		}
 	}
+
 	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
 	{
 		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
@@ -435,222 +465,5 @@ public class OceanTest
 		{
 			return 0;
 		}
-	}
-
-	@Test
-	public void test_ships_sould_not_be_adjacent_when_placed_randomly_on_the_ocean()
-	{
-		// ships can overlap partially (having only one part in common) or
-		// entirely.
-		// when they overlap entirely we have two options:
-		// - they are the same length
-		// - they aren't
-
-
-		// each ship part has 9 cells around it unless the ship is on the border
-		// verify that each part of each ship has nothing around it apart from
-		// empty sea portions or another ship part belonging to he same ship
-
-		// verify that no ship is in each others range: given length and
-		// orientation
-		// no other ship should be found across the length on that direction
-
-
-
-		// horizontally & vertically mismatch between ships lengths
-
-
-		// ships[0][0] = new Submarine();
-		// ships[0][1] = new Submarine();
-
-		// ships[5][0] = new Battleship();
-		// ships[5][5] = new Battleship();
-
-
-		boolean foundAdjacent = false;
-
-		boolean nothingAround;
-
-		for (int k = 0; k < 10000000; k++)
-		{
-
-			ocean = new Ocean();
-			ocean.placeAllShipsRandomly();
-			ships = ocean.getShipArray();
-
-
-			for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
-			{
-				for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
-				{
-
-					Ship ship = ships[i][j];
-
-					if (ship.isRealShip() && ship.getLength() > 0)
-					{
-
-						// if nothing around is found it will be true
-						nothingAround = checkShipSides(ship) && checkShipEnds(ship);
-
-
-						if (!nothingAround)
-						{
-							foundAdjacent = true;
-							break;
-						}
-						assertEquals("checking adjacency", false, foundAdjacent);
-					}
-				}
-
-				if (foundAdjacent)
-				{
-					break;
-				}
-			}
-
-			// ocean.print();
-
-			assertEquals("checking adjacency", false, foundAdjacent);
-
-		}
-
-
-		// verify that when you hit a ship, only one will be hit (if they
-		// overlap that wouldn't be the case ==> not always true)
-
-	}
-
-	private boolean checkEnds(Ship ship)
-	{
-		int length = ship.getLength();
-		boolean horizontal = ship.isHorizontal();
-		int bowRow = ship.getBowRow();
-		int bowColumn = ship.getBowColumn();
-
-		int sternRow = horizontal ? bowRow : bowRow + length - 1;
-		int sternColumn = horizontal ? bowColumn + length - 1 : bowColumn;
-
-		if (horizontal)
-		{
-			if (bowColumn > 0 && bowColumn > 0 && bowRow < Ocean.OCEAN_HEIGHT - 1 && sternColumn < Ocean.OCEAN_WIDTH - 1
-					&& sternRow > 0 && sternRow > 0)
-			{
-				return !(ocean.isOccupied(bowRow - 1, bowColumn - 1) && ocean.isOccupied(bowRow, bowColumn - 1)
-						&& ocean.isOccupied(bowRow + 1, bowColumn - 1)
-						&& ocean.isOccupied(sternRow - 1, sternColumn + 1)
-						&& ocean.isOccupied(sternRow, sternColumn + 1)
-						&& ocean.isOccupied(sternRow + 1, sternColumn + 1));
-			}
-			return true;
-		}
-		else
-		{
-			if (bowRow > 0 && bowColumn > 0 && sternRow < Ocean.OCEAN_HEIGHT - 1 && sternColumn < Ocean.OCEAN_WIDTH - 1
-					&& sternColumn > 0 && bowColumn < Ocean.OCEAN_WIDTH - 1)
-			{
-				return !(ocean.isOccupied(bowRow - 1, bowColumn - 1) && ocean.isOccupied(bowRow - 1, bowColumn)
-						&& ocean.isOccupied(bowRow - 1, bowColumn + 1)
-						&& ocean.isOccupied(sternRow + 1, sternColumn - 1)
-						&& ocean.isOccupied(sternRow + 1, sternColumn)
-						&& ocean.isOccupied(sternRow + 1, sternColumn + 1));
-			}
-			return true;
-		}
-
-	}
-
-	private boolean checkShipSides(Ship ship)
-	{
-		boolean horizontal = ship.isHorizontal();
-
-		int bowRow = ship.getBowRow();
-		int bowColumn = ship.getBowColumn();
-
-		int row;
-		int column;
-
-		// checking both ship sides vertically or horizontally
-		for (int i = 0; i < ship.getLength(); i++)
-		{
-			// checking bottom (if horizontal), or right (if vertical)
-			// if horizontal take the row below(+1), iterate over the column(+i)
-			// if vertical take the right column(+1), iterate over the row(+i)
-			row = horizontal ? bowRow + 1 : bowRow + i;
-			column = horizontal ? bowColumn + i : bowColumn + 1;
-
-			if (row < Ocean.OCEAN_HEIGHT && column < Ocean.OCEAN_WIDTH)
-			{
-				if (ships[row][column].isRealShip())
-				{
-					return false;
-				}
-			}
-
-			// checking top (if horizontal), or left (if vertical)
-			// if horizontal take the row above(-1), iterate over the column(+i)
-			// if vertical take the left column(-1), iterate over the row(+i)
-			row = horizontal ? bowRow - 1 : bowRow + i;
-			column = horizontal ? bowColumn + i : bowColumn - 1;
-
-			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
-			{
-				if (ships[row][column].isRealShip())
-				{
-					return false;
-				}
-			}
-		}
-		return true;
-	}
-
-	private boolean checkShipEnds(Ship ship)
-	{
-		boolean horizontal = ship.isHorizontal();
-		int length = ship.getLength();
-
-		int bowRow = ship.getBowRow();
-		int bowColumn = ship.getBowColumn();
-
-		int sternRow = horizontal ? bowRow : bowRow + length - 1;
-		int sternColumn = horizontal ? bowColumn + length - 1 : bowColumn;
-
-		int row;
-		int column;
-
-		// checking both ship ends vertically or horizontally...diagonally
-
-		// from -1 to 1..
-		for (int i = -1; i <= 1; i++)
-		{
-			// checking left end (if horizontal), or top end (if vertical)
-			// if horizontal take the left column(-1), iterate over the row(+i)
-			// if vertical take the row above(-1), iterate over the column(+i)
-			row = horizontal ? bowRow + i : bowRow - 1;
-			column = horizontal ? bowColumn - 1 : bowColumn + i;
-
-			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
-			{
-				if (ships[row][column].isRealShip())
-				{
-					return false;
-				}
-			}
-
-			// checking right end (if horizontal), or bottom end (if vertical)
-			// if horizontal take the right column(+1), iterate over the row(+i)
-			// if vertical take the row below(+1), iterate over the column(+i)
-			row = horizontal ? sternRow + i : sternRow + 1;
-			column = horizontal ? sternColumn + 1 : sternColumn + i;
-
-			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
-			{
-				if (ships[row][column].isRealShip())
-				{
-					return false;
-				}
-			}
-		}
-
-		return true;
 	}
 }

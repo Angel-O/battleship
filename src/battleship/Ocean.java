@@ -1,6 +1,5 @@
 package battleship;
 
-import java.util.ArrayList;
 import java.util.Random;
 
 /**
@@ -17,7 +16,7 @@ public class Ocean
 	/** count of the total shots fired at any given time of the game */
 	private int shotsFired;
 
-	/** count of the total hits */
+	/** count of the total times ships were hit */
 	private int hitCount;
 
 	/** number of ships sunk */
@@ -208,13 +207,8 @@ public class Ocean
 	{
 		assert amount > 0 : "number of ships must be strictly positive";
 
-		// fill the ship list with the correct amount of ships of the right type
-		ArrayList<T> shipList = populateShipList(amount, shipClass);
-
-		assert shipList.size() == amount : "unable to build ships";
-
 		// get the length of the particular ship type
-		int shipLength = shipList.get(0).getLength();
+		int shipLength = establishShipLengthFromShipType(shipClass);
 
 		Random random = new Random();
 
@@ -231,321 +225,41 @@ public class Ocean
 			int bowRow = random.nextInt(OCEAN_WIDTH - shipLength + 1);
 			int bowColumn = random.nextInt(OCEAN_HEIGHT - shipLength + 1);
 
-			if (isOccupied(bowRow, bowColumn) || !sorroundingAreaIsClear(bowRow, bowColumn))
+			// get a random orientation for the current ship
+			boolean horizontal = random.nextBoolean();
+
+			if (!areaIsSuitableToPlaceShip(bowRow, bowColumn, shipLength, horizontal))
 			{
-				// if there is a ship is already there or the area around is
+				// if there is a ship already there or the area around is
 				// not clear, try a new position
 				continue;
 			}
 
-			// set the bow coordinates for the current ship in the list
-			Ship ship = shipList.get(shipPlaced);
-			ship.setBowRow(bowRow);
-			ship.setBowColumn(bowColumn);
-
-			// set a random orientation for the current ship
-			ship.setHorizontal(random.nextBoolean());
-
-			// try and place the ship in the ocean
-			if (tryPlaceShipInTheOcean(ship, shipClass))
+			for (int i = 0; i < shipLength; i++)
 			{
-				// if the ship was successfully dropped, go to the next ship
-				// in the list (by updating the counter),
-				// if not try again with new random coordinates (leave the
-				// counter unchanged)
-				shipPlaced++;
+				// create a ship representing a ship part with length
+				// based on the offset from the bow
+				Ship shipPart = createShip(shipClass, i);
+
+				// set the orientation of the ship part
+				shipPart.setHorizontal(horizontal);
+
+				// set the coordinates of the ship part
+				int row = horizontal ? bowRow : bowRow + i;
+				int column = horizontal ? bowColumn + i : bowColumn;
+				shipPart.setBowRow(row);
+				shipPart.setBowColumn(column);
+
+				// place the ship part onto the ocean
+				ships[row][column] = shipPart;
 			}
+
+			shipPlaced++;
 		}
 		while (shipPlaced < amount);
 	}
 
-	private void removeShipFromTheOcean(Ship ship, int length)
-	{
-		int row = ship.getBowRow();
-		int column = ship.getBowColumn();
-		boolean horizontal = ship.isHorizontal();
-
-		for (int i = 0; i < length; i++)
-		{
-			// if the ship is horizontal the variable index (i) is the column,
-			// otherwise it's the row
-			ships[horizontal ? row : row + i][horizontal ? column + i : column] = new EmptySea();
-		}
-	}
-
-	private <T extends Ship> boolean tryPlaceShipInTheOcean(Ship ship, Class<T> shipClass)
-	{
-		int bowRow = ship.getBowRow();
-		int bowColumn = ship.getBowColumn();
-		boolean horizontal = ship.isHorizontal();
-
-		// place the bow of the current ship in the ocean
-		ships[bowRow][bowColumn] = ship;
-
-		// starting from 1 as we just placed the bow
-		int shipsPlacedSoFar = 1;
-
-		boolean wholeShipPlaced = true;
-
-		// start from index one as the bow has already been placed
-		for (int i = 1; i < ship.getLength(); i++)
-		{
-			// rest it for each ship part
-			boolean shipPartplaced = false;
-
-			// create a ship representing a ship part with length
-			// based on the offset from the bow
-			Ship shipPart = createShipPart(shipClass, i);
-
-			// set the coordinates and the orientation of the ship part
-			int row = horizontal ? bowRow : bowRow + i;
-			int column = horizontal ? bowColumn + i : bowColumn;
-			shipPart.setBowRow(row);
-			shipPart.setBowColumn(column);
-			shipPart.setHorizontal(horizontal);
-
-			// try and place it in the ocean
-			if (!isOccupied(row, column))
-			{
-				// check the route (horizontally or vertically) as you place
-				// ship parts onto the ocean
-				if (horizontal ? horizontalRouteIsClear(row, column) : verticalRouteIsClear(row, column))
-				{
-					ships[row][column] = shipPart;
-					shipsPlacedSoFar++;
-					shipPartplaced = true;
-				}
-			}
-			if (!shipPartplaced)
-			{
-				// if the ship part was not dropped remove whatever was
-				// dropped up to that point
-				wholeShipPlaced = false;
-				removeShipFromTheOcean(ship, shipsPlacedSoFar);
-				break;
-			}
-		}
-
-		return wholeShipPlaced;
-	}
-
-	// =============== ROUTE CHECKERS =============== //
-	private boolean horizontalRouteIsClear(int row, int column)
-	{
-
-		if (row == 0)
-		{
-			// top edge
-			return rightIsClear(row, column) && bottomIsClear(row, column) && bottomRightIsClear(row, column);
-		}
-		else if (row == OCEAN_HEIGHT - 1)
-		{
-			// bottom edge
-			return rightIsClear(row, column) && topIsClear(row, column) && topRightIsClear(row, column);
-		}
-		else
-		{
-			// mid area
-			return rightIsClear(row, column) && topIsClear(row, column) && topRightIsClear(row, column)
-					&& bottomRightIsClear(row, column) && bottomIsClear(row, column);
-		}
-	}
-
-	private boolean verticalRouteIsClear(int row, int column)
-	{
-		if (column == 0)
-		{
-			// left edge
-			return bottomIsClear(row, column) && bottomRightIsClear(row, column) && rightIsClear(row, column);
-		}
-		else if (column == OCEAN_WIDTH - 1)
-		{
-			// right edge
-			return bottomIsClear(row, column) && bottomLeftIsClear(row, column) && leftIsClear(row, column);
-		}
-		else
-		{
-			// mid area
-			return bottomIsClear(row, column) && leftIsClear(row, column) && bottomLeftIsClear(row, column)
-					&& bottomRightIsClear(row, column) && rightIsClear(row, column);
-		}
-	}
-
-	// ================ AREA CHECKER ================ //
-	// adjacency check before dropping the bow of the ship (scans the whole area
-	// for a given location)
-	private boolean sorroundingAreaIsClear(int row, int column)
-	{
-		if (row == 0)
-		{
-			// top edge
-			if (column == 0)
-			{
-				// left corner
-				return bottomIsClear(row, column) && bottomRightIsClear(row, column) && rightIsClear(row, column);
-			}
-			else if (column == OCEAN_WIDTH - 1)
-			{
-				// right corner
-				return bottomIsClear(row, column) && bottomLeftIsClear(row, column) && leftIsClear(row, column);
-			}
-			// mid part of the top edge
-			return rightIsClear(row, column) && bottomIsClear(row, column) && bottomRightIsClear(row, column)
-					&& bottomLeftIsClear(row, column) && leftIsClear(row, column);
-		}
-		else if (row == OCEAN_HEIGHT - 1)
-		{
-			// bottom edge
-			if (column == 0)
-			{
-				// left corner
-				return topIsClear(row, column) && topRightIsClear(row, column) && rightIsClear(row, column);
-			}
-			else if (column == OCEAN_WIDTH - 1)
-			{
-				// right corner
-				return topIsClear(row, column) && topLeftIsClear(row, column) && leftIsClear(row, column);
-			}
-			// mid part of the bottom edge
-			return rightIsClear(row, column) && topIsClear(row, column) && topRightIsClear(row, column)
-					&& leftIsClear(row, column) && topLeftIsClear(row, column);
-		}
-		else if (column == 0)
-		{
-			// left edge (only the mid part as the corners were considered
-			// above)
-			return topIsClear(row, column) && topRightIsClear(row, column) && rightIsClear(row, column)
-					&& bottomRightIsClear(row, column) && bottomIsClear(row, column);
-
-		}
-		else if (column == OCEAN_WIDTH - 1)
-		{
-			// right edge (only the mid part as the corners were considered
-			// above)
-			return topIsClear(row, column) && topLeftIsClear(row, column) && leftIsClear(row, column)
-					&& bottomLeftIsClear(row, column) && bottomIsClear(row, column);
-		}
-		else
-		{
-			// mid area of the ocean (no borders, no corners)
-			return rightIsClear(row, column) && bottomRightIsClear(row, column) && bottomIsClear(row, column)
-					&& bottomLeftIsClear(row, column) && leftIsClear(row, column) && topLeftIsClear(row, column)
-					&& topIsClear(row, column) && topRightIsClear(row, column);
-		}
-	}
-
-	// ============= helper CHECKERS ================ //
-	private boolean bottomIsClear(int row, int column)
-	{
-		if (row == OCEAN_HEIGHT - 1)
-		{
-			return true;
-		}
-		return !isOccupied(row + 1, column);
-	}
-
-	private boolean rightIsClear(int row, int column)
-	{
-		if (column == OCEAN_WIDTH - 1)
-		{
-			return true;
-		}
-		return !isOccupied(row, column + 1);
-	}
-
-	private boolean topIsClear(int row, int column)
-	{
-		if (row == 0)
-		{
-			return true;
-		}
-		return !isOccupied(row - 1, column);
-	}
-
-	private boolean leftIsClear(int row, int column)
-	{
-		if (column == 0)
-		{
-			return true;
-		}
-		return !isOccupied(row, column - 1);
-	}
-
-	private boolean topRightIsClear(int row, int column)
-	{
-		if (row == 0 || column == OCEAN_WIDTH - 1)
-		{
-			return true;
-		}
-		return !isOccupied(row - 1, column + 1);
-	}
-
-	private boolean topLeftIsClear(int row, int column)
-	{
-		if (row == 0 || column == 0)
-		{
-			return true;
-		}
-		return !isOccupied(row - 1, column - 1);
-	}
-
-	private boolean bottomRightIsClear(int row, int column)
-	{
-		if (row == OCEAN_HEIGHT - 1 || column == OCEAN_WIDTH - 1)
-		{
-			return true;
-		}
-		return !isOccupied(row + 1, column + 1);
-	}
-
-	private boolean bottomLeftIsClear(int row, int column)
-	{
-		if (row == OCEAN_HEIGHT - 1 || column == 0)
-		{
-			return true;
-		}
-		return !isOccupied(row + 1, column - 1);
-	}
-
-	private <T extends Ship> ArrayList<T> populateShipList(int amount, Class<T> shipClass)
-	{
-		ArrayList<T> shipList = new ArrayList<>();
-
-		for (int i = 0; i < amount; i++)
-		{
-			T ship = createShip(shipClass);
-
-			if (ship != null)
-			{
-				// only add a ship if it was actually created
-				shipList.add(ship);
-			}
-		}
-
-		return shipList;
-	}
-
-	private <T extends Ship> T createShip(Class<T> shipClass)
-	{
-		T ship = null;
-
-		try
-		{
-			ship = shipClass.newInstance();
-		}
-		catch (InstantiationException e)
-		{
-			e.printStackTrace();
-		}
-		catch (IllegalAccessException e)
-		{
-			e.printStackTrace();
-		}
-
-		return ship;
-	}
-
-	private <T> Ship createShipPart(Class<T> shipClass, int offsetFromBow)
+	private <T extends Ship> Ship createShip(Class<T> shipClass, int offsetFromBow)
 	{
 		Ship shipPart = null;
 
@@ -561,11 +275,125 @@ public class Ocean
 		{
 			shipPart = new Destroyer(Destroyer.DESTROYER_LENGTH - offsetFromBow);
 		}
-		else
+		else if (shipClass == Submarine.class)
 		{
 			shipPart = new Submarine(Submarine.SUBMARINE_LENGTH - offsetFromBow);
 		}
 
 		return shipPart;
+	}
+
+	private <T extends Ship> int establishShipLengthFromShipType(Class<T> shipClass)
+	{
+		if (shipClass == Battleship.class)
+		{
+			return Battleship.BATTLESHIP_LENGTH;
+		}
+		else if (shipClass == Cruiser.class)
+		{
+			return Cruiser.CRUISER_LENGTH;
+		}
+		else if (shipClass == Destroyer.class)
+		{
+			return Destroyer.DESTROYER_LENGTH;
+		}
+		else if (shipClass == Submarine.class)
+		{
+			return Submarine.SUBMARINE_LENGTH;
+		}
+		else
+		{
+			return 0;
+		}
+	}
+
+	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
+	{
+		return !isOccupied(bowRow, bowColumn) && areaAtEachEndIsClear(bowRow, bowColumn, shipLength, horizontal)
+				&& areaAlongTheLengthIsClear(bowRow, bowColumn, shipLength, horizontal);
+	}
+
+	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
+	{
+		int row;
+		int column;
+
+		// checking both ship sides vertically or horizontally
+		for (int i = 0; i < shipLength; i++)
+		{
+			// checking bottom (if horizontal), or right (if vertical)
+			// if horizontal take the row below(+1), iterate over the column(+i)
+			// if vertical take the right column(+1), iterate over the row(+i)
+			row = horizontal ? bowRow + 1 : bowRow + i;
+			column = horizontal ? bowColumn + i : bowColumn + 1;
+
+			if (row < Ocean.OCEAN_HEIGHT && column < Ocean.OCEAN_WIDTH)
+			{
+				if (isOccupied(row, column))
+				{
+					return false;
+				}
+			}
+
+			// checking top (if horizontal), or left (if vertical)
+			// if horizontal take the row above(-1), iterate over the column(+i)
+			// if vertical take the left column(-1), iterate over the row(+i)
+			row = horizontal ? bowRow - 1 : bowRow + i;
+			column = horizontal ? bowColumn + i : bowColumn - 1;
+
+			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
+			{
+				if (isOccupied(row, column))
+				{
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
+	{
+		int sternRow = horizontal ? bowRow : bowRow + shipLength - 1;
+		int sternColumn = horizontal ? bowColumn + shipLength - 1 : bowColumn;
+
+		int row;
+		int column;
+
+		// checking both ship ends vertically or horizontally...diagonally
+
+		// from -1 to 1..
+		for (int i = -1; i <= 1; i++)
+		{
+			// checking left end (if horizontal), or top end (if vertical)
+			// if horizontal take the left column(-1), iterate over the row(+i)
+			// if vertical take the row above(-1), iterate over the column(+i)
+			row = horizontal ? bowRow + i : bowRow - 1;
+			column = horizontal ? bowColumn - 1 : bowColumn + i;
+
+			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
+			{
+				if (isOccupied(row, column))
+				{
+					return false;
+				}
+			}
+
+			// checking right end (if horizontal), or bottom end (if vertical)
+			// if horizontal take the right column(+1), iterate over the row(+i)
+			// if vertical take the row below(+1), iterate over the column(+i)
+			row = horizontal ? sternRow + i : sternRow + 1;
+			column = horizontal ? sternColumn + 1 : sternColumn + i;
+
+			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
+			{
+				if (isOccupied(row, column))
+				{
+					return false;
+				}
+			}
+		}
+
+		return true;
 	}
 }

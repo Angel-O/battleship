@@ -3,11 +3,11 @@ package battleship;
 public class EmptySea extends Ship
 {
 	/** dummy length for an empty portion of sea */
-	private static final int emptySeaLength = 1;
+	private static final int EMPTY_SEA_LENGTH = 1;
 
 	public EmptySea()
 	{
-		super(emptySeaLength);
+		super(EMPTY_SEA_LENGTH);
 	}
 
 	/** For an EmptySea it returns the string {@code empty sea} */

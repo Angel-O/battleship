@@ -3,3 +3,7 @@
 3. provide validation for bow row and bow col (in subclasses???)
 4. email Carsten about Ocean.hasSunkShipAt method specs
 5. Ocean.getShipArray return actual ships...what are they???
+6. add test to avoid ship overflow
+7. check nesting in print method
+8. add check whenever accessing the ship matrix
+9. establishshiplength by type method (test and ocean class..pick one)
