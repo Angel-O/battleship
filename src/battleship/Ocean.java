@@ -275,16 +275,14 @@ public class Ocean
 				// based on the offset from the bow
 				Ship shipPart = createShip(shipClass);
 
-				// set the orientation of the ship part
+				// set the orientation of the ship part and the coordinates
 				shipPart.setHorizontal(horizontal);
+				shipPart.setBowRow(bowRow);
+				shipPart.setBowColumn(bowColumn);
 
-				// set the coordinates of the ship part
+				// place the ship part onto the ocean at 'i' offset from the bow
 				int row = horizontal ? bowRow : bowRow + i;
 				int column = horizontal ? bowColumn + i : bowColumn;
-				shipPart.setBowRow(row);
-				shipPart.setBowColumn(column);
-
-				// place the ship part onto the ocean
 				ships[row][column] = shipPart;
 			}
 
