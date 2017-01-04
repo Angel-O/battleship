@@ -10,6 +10,7 @@
 10. rotate matrix strategy: can I use it in the ocean class?
 11. change rotated ocean private method to return void
 12. remove unnecessary code from test classes, fix names...
+13. improve reusability of tests method by scanning ocean by type
 
 
 
@@ -32,3 +33,6 @@
    then it will shoot all of them with the shooting coordinates: the ship part at the fired location will be marked as sunk
    and the shoot array will be updated in each ship part
 8. eventually the ocean will have to check if they are all sunk
+
+9. NO!!! the only way all the specs about hitting a ship can be achieved is if the ship parts share the same
+	array....=> they need to be copies of the same ship part

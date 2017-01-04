@@ -45,9 +45,14 @@ public abstract class Ship
 	 */
 	public boolean shootAt(int row, int column)
 	{
-		markHitArray(row, column);
+		if (!isSunk())
+		{
+			markHitArray(row, column);
 
-		return !isSunk();
+			return true;
+		}
+
+		return false;
 	}
 
 	private void markHitArray(int row, int column)

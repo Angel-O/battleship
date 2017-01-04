@@ -62,11 +62,13 @@ public class Ocean
 	{
 		Ship[][] ships = new Ship[OCEAN_WIDTH][OCEAN_HEIGHT];
 
+		Ship emptySea = new EmptySea();
+
 		for (int i = 0; i < OCEAN_WIDTH; i++)
 		{
 			for (int j = 0; j < OCEAN_HEIGHT; j++)
 			{
-				ships[i][j] = new EmptySea();
+				ships[i][j] = emptySea;
 			}
 		}
 
@@ -224,60 +226,16 @@ public class Ocean
 		// increment the total number of shots fired
 		shotsFired++;
 
-		// if the location contains a ship that is still afloat...
-		if (isOccupied(row, column) && !ships[row][column].isSunk())
+		if (ships[row][column].shootAt(row, column))
 		{
 			// increment the hit count
 			hitCount++;
-
-			// gather all the ship parts so that they can update their hit array
-			Ship[] wholeShip = getWholeShip(ships[row][column]);
-
-			// shoot at each location so that ships can mark themselves on the
-			// hit array: this way the info will be propagated to the other
-			// ships
-			for (Ship shipPart : wholeShip)
-			{
-				// shooting each ship part so that they can update their status
-				// on the hit array
-				shipPart.shootAt(row, column);
-			}
+			return true;
 		}
 
-		// checking again after each part has updated their hit array status...
-		// or shooting only at one do a global check???
-		return isOccupied(row, column) && !ships[row][column].isSunk();
+		return false;
 	}
 
-	private Ship[] getWholeShip(Ship ship)
-	{
-		int bowRow = ship.getBowRow();
-		int bowColumn = ship.getBowColumn();
-		int shipLength = ship.getLength();
-
-		// the ship length tells us how many ship parts form a ship
-		Ship[] wholeShip = new Ship[shipLength];
-
-		if (ship.isHorizontal())
-		{
-			for (int i = 0; i < shipLength; i++)
-			{
-
-				wholeShip[i] = ships[bowRow][bowColumn + i];
-			}
-		}
-		else
-		{
-			for (int i = 0; i < shipLength; i++)
-			{
-
-				wholeShip[i] = ships[bowRow + i][bowColumn];
-			}
-		}
-
-		return wholeShip;
-
-	}
 
 	/**
 	 * @param amount
@@ -315,18 +273,20 @@ public class Ocean
 				continue;
 			}
 
+			// create a ship representing a ship part with length
+			// based on the offset from the bow
+			Ship shipPart = createShip(shipClass);
+
+			// set the orientation of the ship part and the coordinates
+			shipPart.setHorizontal(horizontal);
+			shipPart.setBowRow(bowRow);
+			shipPart.setBowColumn(bowColumn);
+
 			for (int i = 0; i < shipLength; i++)
 			{
-				// create a ship representing a ship part with length
-				// based on the offset from the bow
-				Ship shipPart = createShip(shipClass);
-
-				// set the orientation of the ship part and the coordinates
-				shipPart.setHorizontal(horizontal);
-				shipPart.setBowRow(bowRow);
-				shipPart.setBowColumn(bowColumn);
-
-				// place the ship part onto the ocean at 'i' offset from the bow
+				// place copies of the ship part onto the ocean at 'i' offset
+				// from the bow
+				// each ship part will hold a reference to the same hit array
 				int row = horizontal ? bowRow : bowRow + i;
 				int column = horizontal ? bowColumn + i : bowColumn;
 				ships[row][column] = shipPart;
