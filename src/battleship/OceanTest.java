@@ -101,8 +101,6 @@ public class OceanTest
 	@Test
 	public void test_exact_number_of_ships_should_be_placed_randomly_on_the_ocean()
 	{
-		print(ocean.getShipArray());
-
 		// if we count the total number of horizontal ships in the ocean
 		int actual = countShipsOnEachOceanLine(scanHorizontally);
 
@@ -382,10 +380,10 @@ public class OceanTest
 		int expected = Battleship.BATTLESHIP_LENGTH;
 
 		// if then we shoot 4 shots across its length at different locations
-		// each time, and keep shooting till the end of the empty ocean' border
+		// each time and keep shooting till the end of the empty ocean' border
 		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
 		{
-			ocean.shootAt(bowRow, bowColumn + i);
+			ocean.shootAt(bowRow + i, bowColumn);
 		}
 
 		// knowing that the Battleship does not span across the whole length
