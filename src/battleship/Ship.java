@@ -32,16 +32,14 @@ public abstract class Ship
 	public abstract String getShipType();
 
 	/**
-	 * If a part of the ship occupies the given row and column (OCEAN
-	 * KNOWLEDGE), and the ship hasn't been sunk, mark that part of the ship as
-	 * hit (in the hit array, index 0 indicates the bow) and return true,
-	 * otherwise return false.
+	 * Shoots at the part of the ship placed at the given location and marks
+	 * that part of the ship as hit.
 	 *
 	 * @param row
 	 *            represents the vertical coordinate to be hit
 	 * @param column
 	 *            represents the horizontal coordinate to be hit
-	 * @return {@code true} if the ship was hit, {@code false} otherwise
+	 * @return {@code true} if the ship is not sunk, {@code false} otherwise
 	 */
 	public boolean shootAt(int row, int column)
 	{

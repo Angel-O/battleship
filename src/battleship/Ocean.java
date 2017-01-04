@@ -16,7 +16,7 @@ public class Ocean
 	/** count of the total shots fired at any given time of the game */
 	private int shotsFired;
 
-	/** count of the total times ships were hit */
+	/** count of the total times a shot hit any ship */
 	private int hitCount;
 
 	/** number of ships sunk */
@@ -76,7 +76,7 @@ public class Ocean
 	}
 
 	/**
-	 * Returns the number of shots fired.
+	 * Returns the total number of shots fired.
 	 *
 	 * @return the number of shots fired.
 	 */
@@ -86,7 +86,7 @@ public class Ocean
 	}
 
 	/**
-	 * Returns the hit count.
+	 * Returns the hit count, that is the count of how many times a ship was hit
 	 *
 	 * @return the current hit count.
 	 */
@@ -96,7 +96,7 @@ public class Ocean
 	}
 
 	/**
-	 * Returns the number of ships sunk
+	 * Returns the current number of ships sunk
 	 *
 	 * @return the number of ships sunk
 	 */
@@ -106,15 +106,20 @@ public class Ocean
 	}
 
 	/**
-	 * @return
+	 * Indicates the current status of the game.
+	 *
+	 * @return {@code true} if all ships have been sunk, {@code false}
+	 *         otherwise.
 	 */
 	public boolean isGameOver()
 	{
-		return true;
+		return shipsSunk == BATTLESHIPS + CRUISERS + DESTROYERS + SUBMARINES;
 	}
 
 	/**
-	 * @return
+	 * Return a 2-dimensional array containing the ships in the ocean
+	 *
+	 * @return the array containing the ships in the ocean
 	 */
 	public Ship[][] getShipArray()
 	{
@@ -167,7 +172,12 @@ public class Ocean
 	}
 
 	/**
-	 * Displays the current status of the ocean.
+	 * Displays the current status of the ocean on a numbered grid.
+	 *
+	 * "S" indicates a location that was fired with a successful outcome.
+	 * "-" indicates a location that was fired with an unsuccessful outcome.
+	 * "x" indicates a location containing a sunken ship.
+	 * "." indicates a location that is yet to be fired upon
 	 *
 	 */
 	public void print()
@@ -202,24 +212,18 @@ public class Ocean
 	}
 
 	/**
-	 * @param nextInt
-	 * @param bowColumn
-	 * @return
+	 * Shoots at the location correspondent to the given coordinates and updates
+	 * the shot and the hit count. If a If a location contains a real ship, it
+	 * returns true every time the user shoots at that same location. Once a
+	 * ship has been sunk, additional shots at the same location will return
+	 * false.
 	 *
-	 *
-	 * 		OCEAN Shoots at the part of the ship at that location. Returns
-	 *         true if the given location contains a real ship (not an
-	 *         EmptySea), still afloat, false if it does not. In addition, this
-	 *         method updates the number of shots that have been fired, and the
-	 *         number of hits. Note: If a location contains a real ship, shootAt
-	 *         should return true every time the user shoots at that same
-	 *         location. Once a ship has been sunk, additional shots at its
-	 *         location should return false.
-	 *
-	 *         SHIP boolean shootAt(int row, int column) If a part of the ship
-	 *         occupies the given row and column, and the ship hasn't been sunk,
-	 *         mark that part of the ship as hit (in the hit array, index 0
-	 *         indicates the bow) and return true, otherwise return false.
+	 * @param row
+	 *            horizontal coordinate to be fired upon
+	 * @param column
+	 *            vertical coordinate to be fired upon
+	 * @return {@code true} if the location contains a real ship still afloat,
+	 *         {@code false} otherwise
 	 */
 	public boolean shootAt(int row, int column)
 	{
@@ -228,8 +232,16 @@ public class Ocean
 
 		if (ships[row][column].shootAt(row, column))
 		{
-			// increment the hit count
+			// increment the hit count in case of a successful shot
 			hitCount++;
+
+			if (ships[row][column].isSunk())
+			{
+				// increment the count of ship sunk if this shot
+				// sunk the ship
+				shipsSunk++;
+			}
+
 			return true;
 		}
 
