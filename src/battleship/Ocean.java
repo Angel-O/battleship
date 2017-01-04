@@ -249,9 +249,15 @@ public class Ocean
 	}
 
 
+	// ============== helper methods ============= //
+
 	/**
+	 * Places the given number of ships of the given type on the ocean.
+	 *
 	 * @param amount
+	 *            number of ships to place
 	 * @param shipClass
+	 *            type of the ship to place
 	 */
 	private <T extends Ship> void placeShips(int amount, Class<T> shipClass)
 	{
@@ -309,6 +315,15 @@ public class Ocean
 		while (shipPlaced < amount);
 	}
 
+	/**
+	 * Factory method to generate ship parts.
+	 *
+	 * @param <T>
+	 *            subclass of the {@link Ship} type
+	 * @param shipClass
+	 *            type of the ship part to be generated
+	 * @return a ship part of the requested type
+	 */
 	private <T extends Ship> Ship createShip(Class<T> shipClass)
 	{
 		Ship shipPart = null;
@@ -333,6 +348,16 @@ public class Ocean
 		return shipPart;
 	}
 
+	/**
+	 * Returns the length of the ship based on the ship type; if the ship type
+	 * does not match any Known ship type it will return {@code 0}
+	 *
+	 * @param <T>
+	 *            subclass of the {@link Ship} type
+	 * @param shipClass
+	 *            type of the ship whose length needs to be found
+	 * @return the length of the particular ship type
+	 */
 	private <T extends Ship> int establishShipLengthFromShipType(Class<T> shipClass)
 	{
 		if (shipClass == Battleship.class)
@@ -351,18 +376,51 @@ public class Ocean
 		{
 			return Submarine.SUBMARINE_LENGTH;
 		}
-		else
+		else if (shipClass == EmptySea.class)
 		{
-			return 0;
+			return 1;
 		}
+		return 0;
 	}
 
+	/**
+	 * Determines whether or not a ship can be placed in the area starting from
+	 * the bow coordinates. The criteria to pass the test are: the ship cannot
+	 * overlap with any other ship and cannot be adjacent to any other ship,
+	 * either vertically, horizontally or diagonally and the ship length cannot
+	 * exceed the ocena's borders
+	 *
+	 * @param bowRow
+	 *            horizontal coordinate of the bow
+	 * @param bowColumn
+	 *            vertical coordinate of the bow
+	 * @param shipLength
+	 *            length of the ship
+	 * @param horizontal
+	 *            orientation on the ocean's matrix (vertical or diagonal)
+	 * @return {@code true} if the ship can be placed in the area respecting the
+	 *         criteria
+	 */
 	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
 		return !isOccupied(bowRow, bowColumn) && areaAtEachEndIsClear(bowRow, bowColumn, shipLength, horizontal)
 				&& areaAlongTheLengthIsClear(bowRow, bowColumn, shipLength, horizontal);
 	}
 
+	/**
+	 * Determines whether the area along the length of the ship is clear.
+	 *
+	 * @param bowRow
+	 *            horizontal coordinate of the bow
+	 * @param bowColumn
+	 *            vertical coordinate of the bow
+	 * @param shipLength
+	 *            length of the ship
+	 * @param horizontal
+	 *            orientation on the ocean's matrix (vertical or diagonal)
+	 * @return {@code true} if the ship can be placed in the area respecting the
+	 *         criteria
+	 */
 	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
 		int row;
@@ -402,6 +460,20 @@ public class Ocean
 		return true;
 	}
 
+	/**
+	 * Determines whether the area at both ends of the ship is clear.
+	 *
+	 * @param bowRow
+	 *            horizontal coordinate of the bow
+	 * @param bowColumn
+	 *            vertical coordinate of the bow
+	 * @param shipLength
+	 *            length of the ship
+	 * @param horizontal
+	 *            orientation on the ocean's matrix (vertical or diagonal)
+	 * @return {@code true} if the ship can be placed in the area respecting the
+	 *         criteria
+	 */
 	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
 		int sternRow = horizontal ? bowRow : bowRow + shipLength - 1;

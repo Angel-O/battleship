@@ -394,6 +394,33 @@ public class OceanTest
 		assertEquals(expected, ocean.getHitCount());
 	}
 
+	// ===================== game status test ======================== //
+
+	@Test
+	public void test_sunk_ship_should_be_correctly_reported_when_requested()
+	{
+		// if we create an empty ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		// and place a ship onto it
+		int row = 0;
+		int column = 0;
+		boolean isHorizontal = true;
+		placeShipTypeAt(Battleship.class, row, column, isHorizontal, ocean);
+
+		for (int i = 0; i < ships[row][column].getLength(); i++)
+		{
+			ocean.shootAt(row, column + i);
+		}
+
+		// then request the ocean for if the location contains a sunk ship
+		boolean actual = ocean.hasSunkShipAt();
+
+		// we should expect it to be correctly reported
+		assertTrue("reporting sunk ship", actual);
+	}
+
 	// ======================= helper methods ======================== //
 
 	private void countShipAreaByTypeHorizontally(HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper)
