@@ -172,12 +172,27 @@ public class Ocean
 	}
 
 	/**
+	 * Indicates if the given location contains a sunken ship.
+	 *
+	 * @param row
+	 *            horizontal coordinate
+	 * @param column
+	 *            vertical coordinate
+	 * @return {@code true} if the location contains a sunken ship,
+	 *         {@code false} otherwise
+	 */
+	public boolean hasSunkShipAt(int row, int column)
+	{
+		return ships[row][column].isSunk();
+	}
+
+	/**
 	 * Displays the current status of the ocean on a numbered grid.
 	 *
-	 * "S" indicates a location that was fired with a successful outcome.
-	 * "-" indicates a location that was fired with an unsuccessful outcome.
-	 * "x" indicates a location containing a sunken ship.
-	 * "." indicates a location that is yet to be fired upon
+	 * "S" indicates a location that was fired with a successful outcome. "-"
+	 * indicates a location that was fired with an unsuccessful outcome. "x"
+	 * indicates a location containing a sunken ship. "." indicates a location
+	 * that is yet to be fired upon
 	 *
 	 */
 	public void print()

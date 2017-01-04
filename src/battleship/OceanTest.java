@@ -415,7 +415,7 @@ public class OceanTest
 		}
 
 		// then request the ocean for if the location contains a sunk ship
-		boolean actual = ocean.hasSunkShipAt();
+		boolean actual = ocean.hasSunkShipAt(row, column);
 
 		// we should expect it to be correctly reported
 		assertTrue("reporting sunk ship", actual);
