@@ -112,14 +112,18 @@ public class Ocean
 	/**
 	 * Places all the ships randomly on the ocean in such a way that ships do
 	 * not overlap, or are adjacent to other ships (either vertically,
-	 * horizontally, or diagonally).
+	 * horizontally, or diagonally). Longer ships are placed first to increase
+	 * efficiency and the chances of dropping all the ships
 	 */
-	public void placeAllShipsRandomly()
+	public final void placeAllShipsRandomly()
 	{
-		this.<Battleship>spreadShipsOntoOcean(BATTLESHIPS, Battleship.class);
-		this.<Cruiser>spreadShipsOntoOcean(CRUISERS, Cruiser.class);
-		this.<Destroyer>spreadShipsOntoOcean(DESTROYERS, Destroyer.class);
-		this.<Submarine>spreadShipsOntoOcean(SUBMARINES, Submarine.class);
+		// placing longer ships first so that checking if ships overlap as we
+		// move forward from the bow won't be needed (except from the bow
+		// itself)
+		this.<Battleship>placeShipsOntoOcean(BATTLESHIPS, Battleship.class);
+		this.<Cruiser>placeShipsOntoOcean(CRUISERS, Cruiser.class);
+		this.<Destroyer>placeShipsOntoOcean(DESTROYERS, Destroyer.class);
+		this.<Submarine>placeShipsOntoOcean(SUBMARINES, Submarine.class);
 	}
 
 	/**
@@ -192,10 +196,10 @@ public class Ocean
 						// print the first row of numbers
 						System.out.print(j == 0 ? " " + j : j);
 					}
-					else if (i > 0 && j < OCEAN_HEIGHT)
+					else if (j == 0)
 					{
 						// print the first column of numbers
-						System.out.print(i == 0 ? " " : i - 1);
+						System.out.print(i - 1);
 					}
 				}
 				else
@@ -320,14 +324,16 @@ public class Ocean
 	}
 
 	/**
-	 * Places the given number of ships of the given type on the ocean.
+	 * Randomly places the given number of ships of the given type on to the
+	 * ocean, without having any ship overlapping, be adjacent in any direction
+	 * or exceed the ocean's border.
 	 *
 	 * @param amount
 	 *            number of ships to place.
 	 * @param shipClass
 	 *            type of the ship to place.
 	 */
-	private <T extends Ship> void spreadShipsOntoOcean(int amount, Class<T> shipClass)
+	private <T extends Ship> void placeShipsOntoOcean(int amount, Class<T> shipClass)
 	{
 		assert amount > 0 : "number of ships must be strictly positive";
 
@@ -360,17 +366,20 @@ public class Ocean
 			}
 
 			// otherwise create a ship representing a ship part to replicate
-			// across the length of the ship
+			// across the length of the (whole) ship
 			Ship shipPart = createShip(shipClass);
 
-			// set the orientation of the ship part and the coordinates
+			assert shipPart != null : "unable to build ship part";
+
+			// set the orientation of the ship part and the bow coordinates
 			shipPart.setHorizontal(horizontal);
 			shipPart.setBowRow(bowRow);
 			shipPart.setBowColumn(bowColumn);
 
 			// place copies of the ship part onto the ocean at 'i' offset from
-			// the bow so that each one of them will hold a reference to the
-			// same hit array
+			// the bow. Copying the same ship part will ensure that the
+			// information contained in the hit array will be the same
+			// regardless of the location of the ship part
 			for (int i = 0; i < shipLength; i++)
 			{
 				int row = horizontal ? bowRow : bowRow + i;
@@ -418,6 +427,7 @@ public class Ocean
 	}
 
 
+
 	/**
 	 * Returns the length of the ship based on the ship type; if the ship type
 	 * does not match any Known ship type it will return {@code 0}.
@@ -454,6 +464,7 @@ public class Ocean
 	}
 
 
+
 	/**
 	 * Determines whether or not a ship can be placed in the area starting from
 	 * the bow coordinates. The criteria to pass the test are: the ship cannot
@@ -474,9 +485,14 @@ public class Ocean
 	 */
 	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
+		// there is no need to check the mid area, where the ship will
+		// actually be placed (overlapping is guaranteed not to occur since
+		// we are dropping the longest ships first). The only overlapping that
+		// can happen in the mid area is at the bow location
 		return !isOccupied(bowRow, bowColumn) && areaAtEachEndIsClear(bowRow, bowColumn, shipLength, horizontal)
 				&& areaAlongTheLengthIsClear(bowRow, bowColumn, shipLength, horizontal);
 	}
+
 
 
 	/**
@@ -509,7 +525,7 @@ public class Ocean
 			row = horizontal ? bowRow + 1 : bowRow + i;
 			column = horizontal ? bowColumn + i : bowColumn + 1;
 
-			if (row < Ocean.OCEAN_HEIGHT && column < Ocean.OCEAN_WIDTH)
+			if (row < OCEAN_HEIGHT && column < OCEAN_WIDTH)
 			{
 				if (isOccupied(row, column))
 				{
@@ -523,7 +539,7 @@ public class Ocean
 			row = horizontal ? bowRow - 1 : bowRow + i;
 			column = horizontal ? bowColumn + i : bowColumn - 1;
 
-			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
+			if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
 			{
 				if (isOccupied(row, column))
 				{
@@ -533,6 +549,7 @@ public class Ocean
 		}
 		return true;
 	}
+
 
 
 	/**
@@ -572,7 +589,7 @@ public class Ocean
 			row = horizontal ? bowRow + i : bowRow - 1;
 			column = horizontal ? bowColumn - 1 : bowColumn + i;
 
-			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
+			if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
 			{
 				if (isOccupied(row, column))
 				{
@@ -586,7 +603,7 @@ public class Ocean
 			row = horizontal ? sternRow + i : sternRow + 1;
 			column = horizontal ? sternColumn + 1 : sternColumn + i;
 
-			if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
+			if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
 			{
 				if (isOccupied(row, column))
 				{

@@ -11,4 +11,7 @@
 11. remove unnecessary code from test classes, fix names...
 12. improve re-usability of tests method by scanning ocean by type
 13. add comments to .ctors
-14 ship name as static constant??
+14. ship name as static constant??
+15. try and fix matrix rotation issue (bow coordinates needs to be updated, but how????)
+16 is there limit to the number of attempt to place a ship?
+17. null check when creating ship part

@@ -6,6 +6,7 @@ package battleship;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -87,12 +88,18 @@ public class ShipTest
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_should_return_empty_sea_dummy_length()
+	public void test_should_return_empty_sea_correct_length()
 	{
 		Ship ship = new EmptySea();
 		int expected = EmptySea.EMPTY_SEA_LENGTH;
 		int actual = ship.getLength();
 		assertEquals("verifying empty sea length", expected, actual);
+	}
+
+	@Test
+	public void test_should_return_battleship_correct_ship_type()
+	{
+		fail("not implemented yet");
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)

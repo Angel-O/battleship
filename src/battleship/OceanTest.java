@@ -254,26 +254,20 @@ public class OceanTest
 		// if we create an empty ocean
 		ocean = new Ocean();
 
-		// and create new ships
-		Ship battleship = new Battleship();
-		Ship cruiser = new Cruiser();
-		Ship destroyer = new Destroyer();
-		Ship submarine = new Submarine();
-
-		// that we place the ships in the ocean
-		ships = ocean.getShipArray();
-		ships[0][0] = battleship;
-		ships[0][9] = cruiser;
-		ships[9][0] = destroyer;
-		ships[9][9] = submarine;
+		// and we place ships onto it
+		boolean isHorizontal = true;
+		placeShipTypeAt(Battleship.class, 0, 0, isHorizontal, ocean);
+		placeShipTypeAt(Cruiser.class, 2, 0, isHorizontal, ocean);
+		placeShipTypeAt(Destroyer.class, 4, 0, isHorizontal, ocean);
+		placeShipTypeAt(Submarine.class, 6, 0, isHorizontal, ocean);
 
 		// then the ocean spots where they have been placed should be marked as
 		// occupied
 		boolean expected = true;
 		assertEquals(expected, ocean.isOccupied(0, 0));
-		assertEquals(expected, ocean.isOccupied(0, 9));
-		assertEquals(expected, ocean.isOccupied(9, 0));
-		assertEquals(expected, ocean.isOccupied(9, 9));
+		assertEquals(expected, ocean.isOccupied(2, 0));
+		assertEquals(expected, ocean.isOccupied(4, 0));
+		assertEquals(expected, ocean.isOccupied(6, 0));
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
@@ -414,7 +408,7 @@ public class OceanTest
 			ocean.shootAt(row, column + i);
 		}
 
-		// then request the ocean for if the location contains a sunk ship
+		// then check if the location contains a sunk ship
 		boolean actual = ocean.hasSunkShipAt(row, column);
 
 		// we should expect it to be correctly reported
@@ -468,7 +462,7 @@ public class OceanTest
 				// get the current ship
 				Ship ship = ships[i][j];
 
-				// if it's a real horizontal ship count the area occupied
+				// if it's a real vertical ship count the area occupied
 				// by the ship
 				if (ship.isRealShip() && !ship.isHorizontal())
 				{
@@ -725,7 +719,7 @@ public class OceanTest
 					else if (i > 0 && j < Ocean.OCEAN_HEIGHT)
 					{
 						// print the first column of numbers
-						System.out.print(i == 0 ? " " : i - 1);
+						System.out.print(i - 1);
 					}
 				}
 				else
