@@ -1,29 +1,33 @@
 package battleship;
 
+/**
+ * Represents a real {@linkplain Ship} of length equal to
+ * {@value #CRUISER_LENGTH}.
+ *
+ * @author Angelo Oparah
+ *
+ */
 public class Cruiser extends Ship
 {
-	/** length of a cruiser */
+	/** length of a cruiser. */
 	public static final int CRUISER_LENGTH = 3;
 
+	/** cruiser type. */
+	public static final String cruiserType = "cruiser";
+
+
+	/**
+	 * Creates a real {@linkplain Ship} of length equal to
+	 * {@value #CRUISER_LENGTH}.
+	 */
 	public Cruiser()
 	{
-		this(CRUISER_LENGTH);
-	}
-
-	public Cruiser(int length)
-	{
-		super(length);
+		super(CRUISER_LENGTH);
 	}
 
 	@Override
 	public String getShipType()
 	{
-		return "cruiser";
-	}
-
-	@Override
-	public String toString()
-	{
-		return "3";
+		return cruiserType;
 	}
 }

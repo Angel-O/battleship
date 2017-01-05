@@ -3,76 +3,57 @@ package battleship;
 import java.util.Random;
 
 /**
- * Represents the matrix which ships are placed onto.
+ * Represents the {@value #OCEAN_WIDTH} x {@value #OCEAN_HEIGHT} matrix where
+ * {@value #BATTLESHIPS} {@linkplain Battleship}(s), {@value #CRUISERS}
+ * {@linkplain Cruiser}(s), {@value #DESTROYERS} {@linkplain Destroyer}(s),
+ * {@value #SUBMARINES} {@linkplain Submarine}(s) are randomly placed onto. It
+ * keeps a count of the number of shots fired during the game, the number of
+ * successful hits and the number of ships that have been sunk
  *
  * @author Angelo Oparah
  *
  */
 public class Ocean
 {
-	/** matrix to access ships in the ocean */
+	/** matrix to access ships in the ocean. */
 	private Ship[][] ships;
 
-	/** count of the total shots fired at any given time of the game */
+	/** count of the total shots fired at any given time of the game. */
 	private int shotsFired;
 
-	/** count of the total times a shot hit any ship */
+	/** count of the total times a shot hit any ship that was not sunken. */
 	private int hitCount;
 
-	/** number of ships sunk */
+	/** number of ships sunk. */
 	private int shipsSunk;
 
-	/** max height of the {@link Ocean} */
+	/** max height of the {@linkplain Ocean}. */
 	public static final int OCEAN_HEIGHT = 10;
 
-	/** max length of the {@link Ocean} */
+	/** max length of the {@linkplain Ocean}. */
 	public static final int OCEAN_WIDTH = 10;
 
-	/** number of {@link Battleship} in the ocean */
+	/** number of {@linkplain Battleship} in the ocean. */
 	public static final int BATTLESHIPS = 1;
 
-	/** number of {@link Cruiser} ships in the ocean */
+	/** number of {@linkplain Cruiser} ships in the ocean. */
 	public static final int CRUISERS = 2;
 
-	/** number of {@link Destroyer} ships in the ocean */
+	/** number of {@linkplain Destroyer} ships in the ocean. */
 	public static final int DESTROYERS = 3;
 
-	/** number of {@link Submarine} ships in the ocean */
+	/** number of {@linkplain Submarine} ships in the ocean. */
 	public static final int SUBMARINES = 4;
 
 
 	/**
 	 * Constructs a new Ocean instance filling each position with an
-	 * {@link EmptySea}.
+	 * {@linkplain EmptySea}.
 	 *
 	 */
 	public Ocean()
 	{
 		ships = InitializeOcean();
-	}
-
-	/**
-	 * Sets {@link EmptySea} in the ocean.
-	 *
-	 * @return a matrix containing all EmptySea instances representing the
-	 *         initial state of the ocean before any ship is placed onto it
-	 *
-	 */
-	private static final Ship[][] InitializeOcean()
-	{
-		Ship[][] ships = new Ship[OCEAN_WIDTH][OCEAN_HEIGHT];
-
-		Ship emptySea = new EmptySea();
-
-		for (int i = 0; i < OCEAN_WIDTH; i++)
-		{
-			for (int j = 0; j < OCEAN_HEIGHT; j++)
-			{
-				ships[i][j] = emptySea;
-			}
-		}
-
-		return ships;
 	}
 
 	/**
@@ -86,7 +67,8 @@ public class Ocean
 	}
 
 	/**
-	 * Returns the hit count, that is the count of how many times a ship was hit
+	 * Returns the hit count, that is the count of how many times a ship was
+	 * hit.
 	 *
 	 * @return the current hit count.
 	 */
@@ -96,9 +78,9 @@ public class Ocean
 	}
 
 	/**
-	 * Returns the current number of ships sunk
+	 * Returns the current number of ships sunk.
 	 *
-	 * @return the number of ships sunk
+	 * @return the number of ships sunk.
 	 */
 	public int getShipsSunk()
 	{
@@ -117,9 +99,10 @@ public class Ocean
 	}
 
 	/**
-	 * Return a 2-dimensional array containing the ships in the ocean
+	 * Return a 2-dimensional array containing the ships in the ocean. Used for
+	 * testing and debugging purposes.
 	 *
-	 * @return the array containing the ships in the ocean
+	 * @return the array containing the ships in the ocean.
 	 */
 	public Ship[][] getShipArray()
 	{
@@ -133,24 +116,24 @@ public class Ocean
 	 */
 	public void placeAllShipsRandomly()
 	{
-		this.<Battleship>placeShips(BATTLESHIPS, Battleship.class);
-		this.<Cruiser>placeShips(CRUISERS, Cruiser.class);
-		this.<Destroyer>placeShips(DESTROYERS, Destroyer.class);
-		this.<Submarine>placeShips(SUBMARINES, Submarine.class);
+		this.<Battleship>spreadShipsOntoOcean(BATTLESHIPS, Battleship.class);
+		this.<Cruiser>spreadShipsOntoOcean(CRUISERS, Cruiser.class);
+		this.<Destroyer>spreadShipsOntoOcean(DESTROYERS, Destroyer.class);
+		this.<Submarine>spreadShipsOntoOcean(SUBMARINES, Submarine.class);
 	}
 
 	/**
 	 * Checks whether or not the location specified contains a real ship. A real
 	 * ship is an actual ship, that is any ship in the ocean that is not a
-	 * {@link EmptySea}.
+	 * {@linkplain EmptySea}.
 	 *
 	 * @param row
-	 *            vertical coordinate of the ship
+	 *            vertical coordinate of the ship.
 	 * @param column
-	 *            horizontal coordinate of the ship
+	 *            horizontal coordinate of the ship.
 	 *
 	 * @return {@code true} if the ship at the specified location is real,
-	 *         {@code false} otherwise
+	 *         {@code false} otherwise.
 	 */
 	public boolean isOccupied(int row, int column)
 	{
@@ -158,13 +141,13 @@ public class Ocean
 	}
 
 	/**
-	 * Returns the ship type at the given location
+	 * Returns the ship type at the given location.
 	 *
 	 * @param row
-	 *            vertical coordinate of the ship
+	 *            vertical coordinate of the ship.
 	 * @param column
-	 *            horizontal coordinate of the ship
-	 * @return the type of the ship at the location specified
+	 *            horizontal coordinate of the ship.
+	 * @return the type of the ship at the location specified.
 	 */
 	public String getShipTypeAt(int row, int column)
 	{
@@ -175,11 +158,11 @@ public class Ocean
 	 * Indicates if the given location contains a sunken ship.
 	 *
 	 * @param row
-	 *            horizontal coordinate
+	 *            horizontal coordinate.
 	 * @param column
-	 *            vertical coordinate
+	 *            vertical coordinate.
 	 * @return {@code true} if the location contains a sunken ship,
-	 *         {@code false} otherwise
+	 *         {@code false} otherwise.
 	 */
 	public boolean hasSunkShipAt(int row, int column)
 	{
@@ -192,7 +175,7 @@ public class Ocean
 	 * "S" indicates a location that was fired with a successful outcome. "-"
 	 * indicates a location that was fired with an unsuccessful outcome. "x"
 	 * indicates a location containing a sunken ship. "." indicates a location
-	 * that is yet to be fired upon
+	 * that is yet to be fired upon.
 	 *
 	 */
 	public void print()
@@ -218,13 +201,14 @@ public class Ocean
 				else
 				{
 					// otherwise print the whatever is in the ocean
-					System.out.print(ships[i - 1][j - 1]);
+					System.out.print(displayShipState(i - 1, j - 1));
 				}
 			}
 			// print the next row on a separate line
 			System.out.println();
 		}
 	}
+
 
 	/**
 	 * Shoots at the location correspondent to the given coordinates and updates
@@ -234,11 +218,11 @@ public class Ocean
 	 * false.
 	 *
 	 * @param row
-	 *            horizontal coordinate to be fired upon
+	 *            horizontal coordinate to be fired upon.
 	 * @param column
-	 *            vertical coordinate to be fired upon
+	 *            vertical coordinate to be fired upon.
 	 * @return {@code true} if the location contains a real ship still afloat,
-	 *         {@code false} otherwise
+	 *         {@code false} otherwise.
 	 */
 	public boolean shootAt(int row, int column)
 	{
@@ -263,18 +247,87 @@ public class Ocean
 		return false;
 	}
 
+	// ============== private methods ============= //
 
-	// ============== helper methods ============= //
+	/**
+	 * Sets {@linkplain EmptySea} in the ocean.
+	 *
+	 * @return a matrix containing all EmptySea instances representing the
+	 *         initial state of the ocean before any ship is placed onto it.
+	 *
+	 */
+	private static final Ship[][] InitializeOcean()
+	{
+		Ship[][] ships = new Ship[OCEAN_WIDTH][OCEAN_HEIGHT];
+
+		for (int i = 0; i < OCEAN_WIDTH; i++)
+		{
+			for (int j = 0; j < OCEAN_HEIGHT; j++)
+			{
+				Ship emptySea = new EmptySea();
+				emptySea.setBowRow(i);
+				emptySea.setBowColumn(j);
+
+				ships[i][j] = emptySea;
+			}
+		}
+
+		return ships;
+	}
+
+	/**
+	 * Returns a {@code char} representing the current state of the ship part,
+	 * where "x" indicates a sunk ship, "." a location that is yet to be fired
+	 * upon, "S" a location that was fired upon hitting a ship and "-" a
+	 * location that was fired upon without hitting any ship.
+	 *
+	 * @param row
+	 *            horizontal coordinate of the ship part to display.
+	 * @param column
+	 *            vertical coordinate of the ship part to display
+	 * @return a {@code char} representing the state of the part of the ship at
+	 *         the given location.
+	 */
+	private char displayShipState(int row, int column)
+	{
+		return hasSunkShipAt(row, column) ? 'x' : getShipStateAndPrintShipPart(row, column);
+	}
+
+	/**
+	 * Gets the current state of the ship in {@code string} format and extracts
+	 * a {@code char} representing the part of the (yet to be sunken, if real)
+	 * ship at the given location. If hit, the ship part will be marked by the
+	 * {@linkplain Ship} class with a "S" if it's a real ship or a "-" if it's a
+	 * {@linkplain EmptySea}, otherwise it will be marked with a "." to indicate
+	 * that the location in yet to be fired upon.
+	 *
+	 * @param row
+	 *            horizontal coordinate of the ship part to display.
+	 * @param column
+	 *            vertical coordinate of the ship part to display
+	 * @return a {@code char} representing the state of the part of the ship at
+	 *         the given location.
+	 */
+	private char getShipStateAndPrintShipPart(int row, int column)
+	{
+		Ship ship = ships[row][column];
+
+		String shipState = ships[row][column].toString();
+
+		// get the relevant char based on orientation and offset from the bow
+		return ship.isHorizontal() ? shipState.charAt(column - ship.getBowColumn())
+				: shipState.charAt(row - ship.getBowRow());
+	}
 
 	/**
 	 * Places the given number of ships of the given type on the ocean.
 	 *
 	 * @param amount
-	 *            number of ships to place
+	 *            number of ships to place.
 	 * @param shipClass
-	 *            type of the ship to place
+	 *            type of the ship to place.
 	 */
-	private <T extends Ship> void placeShips(int amount, Class<T> shipClass)
+	private <T extends Ship> void spreadShipsOntoOcean(int amount, Class<T> shipClass)
 	{
 		assert amount > 0 : "number of ships must be strictly positive";
 
@@ -306,8 +359,8 @@ public class Ocean
 				continue;
 			}
 
-			// create a ship representing a ship part with length
-			// based on the offset from the bow
+			// otherwise create a ship representing a ship part to replicate
+			// across the length of the ship
 			Ship shipPart = createShip(shipClass);
 
 			// set the orientation of the ship part and the coordinates
@@ -315,16 +368,17 @@ public class Ocean
 			shipPart.setBowRow(bowRow);
 			shipPart.setBowColumn(bowColumn);
 
+			// place copies of the ship part onto the ocean at 'i' offset from
+			// the bow so that each one of them will hold a reference to the
+			// same hit array
 			for (int i = 0; i < shipLength; i++)
 			{
-				// place copies of the ship part onto the ocean at 'i' offset
-				// from the bow
-				// each ship part will hold a reference to the same hit array
 				int row = horizontal ? bowRow : bowRow + i;
 				int column = horizontal ? bowColumn + i : bowColumn;
 				ships[row][column] = shipPart;
 			}
 
+			// increment the count of ship placed
 			shipPlaced++;
 		}
 		while (shipPlaced < amount);
@@ -334,10 +388,10 @@ public class Ocean
 	 * Factory method to generate ship parts.
 	 *
 	 * @param <T>
-	 *            subclass of the {@link Ship} type
+	 *            subclass of the {@linkplain Ship} type.
 	 * @param shipClass
 	 *            type of the ship part to be generated
-	 * @return a ship part of the requested type
+	 * @return a ship part of the requested type.
 	 */
 	private <T extends Ship> Ship createShip(Class<T> shipClass)
 	{
@@ -363,15 +417,16 @@ public class Ocean
 		return shipPart;
 	}
 
+
 	/**
 	 * Returns the length of the ship based on the ship type; if the ship type
-	 * does not match any Known ship type it will return {@code 0}
+	 * does not match any Known ship type it will return {@code 0}.
 	 *
 	 * @param <T>
-	 *            subclass of the {@link Ship} type
+	 *            subclass of the {@linkplain Ship} type.
 	 * @param shipClass
-	 *            type of the ship whose length needs to be found
-	 * @return the length of the particular ship type
+	 *            type of the ship whose length needs to be found.
+	 * @return the length of the particular ship type.
 	 */
 	private <T extends Ship> int establishShipLengthFromShipType(Class<T> shipClass)
 	{
@@ -398,23 +453,24 @@ public class Ocean
 		return 0;
 	}
 
+
 	/**
 	 * Determines whether or not a ship can be placed in the area starting from
 	 * the bow coordinates. The criteria to pass the test are: the ship cannot
 	 * overlap with any other ship and cannot be adjacent to any other ship,
 	 * either vertically, horizontally or diagonally and the ship length cannot
-	 * exceed the ocena's borders
+	 * exceed the ocena's borders.
 	 *
 	 * @param bowRow
-	 *            horizontal coordinate of the bow
+	 *            horizontal coordinate of the bow.
 	 * @param bowColumn
-	 *            vertical coordinate of the bow
+	 *            vertical coordinate of the bow.
 	 * @param shipLength
-	 *            length of the ship
+	 *            length of the ship.
 	 * @param horizontal
-	 *            orientation on the ocean's matrix (vertical or diagonal)
+	 *            orientation on the ocean's matrix (vertical or diagonal).
 	 * @return {@code true} if the ship can be placed in the area respecting the
-	 *         criteria
+	 *         criteria.
 	 */
 	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
@@ -422,26 +478,29 @@ public class Ocean
 				&& areaAlongTheLengthIsClear(bowRow, bowColumn, shipLength, horizontal);
 	}
 
+
 	/**
 	 * Determines whether the area along the length of the ship is clear.
 	 *
 	 * @param bowRow
-	 *            horizontal coordinate of the bow
+	 *            horizontal coordinate of the bow.
 	 * @param bowColumn
-	 *            vertical coordinate of the bow
+	 *            vertical coordinate of the bow.
 	 * @param shipLength
-	 *            length of the ship
+	 *            length of the ship.
 	 * @param horizontal
-	 *            orientation on the ocean's matrix (vertical or diagonal)
+	 *            orientation on the ocean's matrix (vertical or diagonal).
 	 * @return {@code true} if the ship can be placed in the area respecting the
-	 *         criteria
+	 *         criteria.
 	 */
 	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
+		// iteration variables used to scan the area
 		int row;
 		int column;
 
-		// checking both ship sides vertically or horizontally
+		// checking both sides (vertically or horizontally) of the area that
+		// could potentially host the ship
 		for (int i = 0; i < shipLength; i++)
 		{
 			// checking bottom (if horizontal), or right (if vertical)
@@ -475,31 +534,36 @@ public class Ocean
 		return true;
 	}
 
+
 	/**
 	 * Determines whether the area at both ends of the ship is clear.
 	 *
 	 * @param bowRow
-	 *            horizontal coordinate of the bow
+	 *            horizontal coordinate of the bow.
 	 * @param bowColumn
-	 *            vertical coordinate of the bow
+	 *            vertical coordinate of the bow.
 	 * @param shipLength
-	 *            length of the ship
+	 *            length of the ship.
 	 * @param horizontal
 	 *            orientation on the ocean's matrix (vertical or diagonal)
 	 * @return {@code true} if the ship can be placed in the area respecting the
-	 *         criteria
+	 *         criteria.
 	 */
 	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
+		// coordinates of the end of the ship
 		int sternRow = horizontal ? bowRow : bowRow + shipLength - 1;
 		int sternColumn = horizontal ? bowColumn + shipLength - 1 : bowColumn;
 
+		// iteration variables used to scan the area
 		int row;
 		int column;
 
-		// checking both ship ends vertically or horizontally...diagonally
-
-		// from -1 to 1..
+		// checking both ends (vertically or horizontally, on the same line, and
+		// diagonally) of the area that could potentially host the ship,
+		// looping from -1 to 1 as we only need to check 3 cells at each end
+		// placed above(or left ==> -1), on the same line (==> 0) or below(or
+		// right ==> +1)
 		for (int i = -1; i <= 1; i++)
 		{
 			// checking left end (if horizontal), or top end (if vertical)

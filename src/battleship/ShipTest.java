@@ -1,9 +1,10 @@
 /**
- *
+ * @author Angelo Oparah
  */
 package battleship;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -53,7 +54,7 @@ public class ShipTest
 	public void test_should_return_battleship_correct_length()
 	{
 		Ship ship = new Battleship();
-		int expected = 4;
+		int expected = Battleship.BATTLESHIP_LENGTH;
 		int actual = ship.getLength();
 		assertEquals("verifying battleship length", expected, actual);
 	}
@@ -62,7 +63,7 @@ public class ShipTest
 	public void test_should_return_cruiser_correct_length()
 	{
 		Ship ship = new Cruiser();
-		int expected = 3;
+		int expected = Cruiser.CRUISER_LENGTH;
 		int actual = ship.getLength();
 		assertEquals("verifying cruiser length", expected, actual);
 	}
@@ -71,7 +72,7 @@ public class ShipTest
 	public void test_should_return_destroyer_correct_length()
 	{
 		Ship ship = new Destroyer();
-		int expected = 2;
+		int expected = Destroyer.DESTROYER_LENGTH;
 		int actual = ship.getLength();
 		assertEquals("verifying destroyer length", expected, actual);
 	}
@@ -80,7 +81,7 @@ public class ShipTest
 	public void test_should_return_submarine_correct_length()
 	{
 		Ship ship = new Submarine();
-		int expected = 1;
+		int expected = Submarine.SUBMARINE_LENGTH;
 		int actual = ship.getLength();
 		assertEquals("verifying submarine length", expected, actual);
 	}
@@ -89,96 +90,67 @@ public class ShipTest
 	public void test_should_return_empty_sea_dummy_length()
 	{
 		Ship ship = new EmptySea();
-		int expected = 1;
+		int expected = EmptySea.EMPTY_SEA_LENGTH;
 		int actual = ship.getLength();
-		assertEquals("verifying dummy length of empty sea", expected, actual);
+		assertEquals("verifying empty sea length", expected, actual);
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_horizontal_ships_should_be_sunk_when_shots_are_fired_across_their_length()
+	public void test_ships_should_be_sunk_when_shots_are_fired_across_their_length()
 	{
-		// set the ships bow at position (1,1) and align them horizontally
+		// if we have any type of ship
 		Ship battleship = new Battleship();
-		battleship.setBowRow(1);
-		battleship.setBowColumn(1);
-		battleship.setHorizontal(true);
-
 		Ship destroyer = new Destroyer();
-		destroyer.setBowRow(1);
-		destroyer.setBowColumn(1);
-		destroyer.setHorizontal(true);
-
 		Ship cruiser = new Cruiser();
-		cruiser.setBowRow(1);
-		cruiser.setBowColumn(1);
-		cruiser.setHorizontal(true);
-
 		Ship submarine = new Submarine();
-		submarine.setBowRow(1);
-		submarine.setBowColumn(1);
-		submarine.setHorizontal(true);
 
-		// shoot each part along the length of the ship
-		shootHorizontallyAcrossShipLength(battleship);
-		shootHorizontallyAcrossShipLength(destroyer);
-		shootHorizontallyAcrossShipLength(cruiser);
-		shootHorizontallyAcrossShipLength(submarine);
+		// and shoot each part along the length of the ship
+		firingShotsAcrossShipLength(battleship, Battleship.BATTLESHIP_LENGTH);
+		firingShotsAcrossShipLength(destroyer, Destroyer.DESTROYER_LENGTH);
+		firingShotsAcrossShipLength(cruiser, Cruiser.CRUISER_LENGTH);
+		firingShotsAcrossShipLength(submarine, Submarine.SUBMARINE_LENGTH);
 
 		// verify that the ships have been actually sunk
-		assertTrue("sinking a horizontal battleship", battleship.isSunk());
-		assertTrue("Sinking a horizontal destroyer", destroyer.isSunk());
-		assertTrue("sinking a horizontal cruiser", cruiser.isSunk());
-		assertTrue("Sinking a horizontal submarine", submarine.isSunk());
+		assertTrue("shooting a battleship until it sinks", battleship.isSunk());
+		assertTrue("shooting a destroyer until it sinks", destroyer.isSunk());
+		assertTrue("shooting a cruiser until it sinks", cruiser.isSunk());
+		assertTrue("shooting a submarine will sink it", submarine.isSunk());
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_vertical_ships_should_be_sunk_when_shots_are_fired_across_their_length()
+	public void test_ships_should_not_be_sunk_if_not_all_parts_are_hit()
 	{
-		// NO LONGER MEANINGFUL
-		// // if we have a vertical battleship with bow at (1)
-		// Ship battleship = new Battleship();
-		// battleship.setBowRow(1);
-		// battleship.setBowColumn(1);
-		//
-		// Ship destroyer = new Destroyer();
-		// destroyer.setBowRow(1);
-		// destroyer.setBowColumn(1);
-		//
-		// Ship cruiser = new Cruiser();
-		// cruiser.setBowRow(1);
-		// cruiser.setBowColumn(1);
-		//
-		// Ship submarine = new Submarine();
-		// submarine.setBowRow(1);
-		// submarine.setBowColumn(1);
-		//
-		// // shoot each part along the length of the ship
-		// shootVerticallyAcrossShipLength(battleship);
-		// shootVerticallyAcrossShipLength(destroyer);
-		// shootVerticallyAcrossShipLength(cruiser);
-		// shootVerticallyAcrossShipLength(submarine);
-		//
-		// // verify that the ships have been actually sunk
-		// assertTrue("sinking a vertical battleship", battleship.isSunk());
-		// assertTrue("Sinking a vertical destroyer", destroyer.isSunk());
-		// assertTrue("sinking a vertical cruiser", cruiser.isSunk());
-		// assertTrue("Sinking a vertical submarine", submarine.isSunk());
+		// if we have any type of ship
+		Ship battleship = new Battleship();
+		Ship destroyer = new Destroyer();
+		Ship cruiser = new Cruiser();
+		Ship submarine = new Submarine();
+
+		// and shoot along the length of the ship without hitting all parts
+		firingShotsAcrossShipLength(battleship, Battleship.BATTLESHIP_LENGTH - 1);
+		firingShotsAcrossShipLength(destroyer, Destroyer.DESTROYER_LENGTH - 1);
+		firingShotsAcrossShipLength(cruiser, Cruiser.CRUISER_LENGTH - 1);
+		firingShotsAcrossShipLength(submarine, Submarine.SUBMARINE_LENGTH - 1);
+
+		// verify that the ships have been actually sunk
+		assertFalse("shooting a battleship without sinking it", battleship.isSunk());
+		assertFalse("shooting a destroyer without sinking it", destroyer.isSunk());
+		assertFalse("shooting a cruiser without sinking it", cruiser.isSunk());
+		assertFalse("not shooting at submarine will not sink it", submarine.isSunk());
 	}
 
-	private void shootHorizontallyAcrossShipLength(Ship ship)
+	private void firingShotsAcrossShipLength(Ship ship, int length)
 	{
-		for (int i = ship.getBowColumn(); i < ship.getBowColumn() + ship.getLength(); i++)
+		// get ship orientation
+		boolean horizontal = ship.isHorizontal();
+
+		int start = horizontal ? ship.getBowColumn() : ship.getBowRow();
+
+		for (int i = start; i < start + length; i++)
 		{
-			ship.shootAt(ship.getBowRow(), i);
+			// if the ship is horizontal increment the column, otherwise
+			// increment the row
+			ship.shootAt(horizontal ? ship.getBowRow() : i, horizontal ? i : ship.getBowColumn());
 		}
 	}
-
-	private void shootVerticallyAcrossShipLength(Ship ship)
-	{
-		for (int i = ship.getBowRow(); i < ship.getBowRow() + ship.getLength(); i++)
-		{
-			ship.shootAt(i, ship.getBowColumn());
-		}
-	}
-
 }

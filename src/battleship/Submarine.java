@@ -1,30 +1,33 @@
 package battleship;
 
+/**
+ * Represents a real {@linkplain Ship} of length equal to
+ * {@value #SUBMARINE_LENGTH}.
+ *
+ * @author Angelo Oparah
+ *
+ */
 public class Submarine extends Ship
 {
-	/** length of a submarine */
+	/** length of a submarine. */
 	public static final int SUBMARINE_LENGTH = 1;
 
+	/** submarine type. */
+	public static final String submarineType = "submarine";
+
+
+	/**
+	 * Creates a real {@linkplain Ship} of length equal to
+	 * {@value #SUBMARINE_LENGTH}.
+	 */
 	public Submarine()
 	{
-		this(SUBMARINE_LENGTH);
-	}
-
-	public Submarine(int length)
-	{
-		super(length);
+		super(SUBMARINE_LENGTH);
 	}
 
 	@Override
 	public String getShipType()
 	{
-		return "submarine";
+		return submarineType;
 	}
-
-	@Override
-	public String toString()
-	{
-		return isHorizontal() ? "H" : "V";
-	}
-
 }

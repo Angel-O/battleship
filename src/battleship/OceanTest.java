@@ -361,7 +361,7 @@ public class OceanTest
 		}
 
 		// we should expect the number of shots registered by the ocean to be
-		// the whatever it was fired
+		// whatever it was fired
 		assertEquals(expected, ocean.getShotsFired());
 	}
 
