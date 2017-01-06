@@ -216,12 +216,10 @@ public class OceanTest
 
 		assertTrue("checking horizontal and vertical adjecency", actual);
 
-		// if instead we create an empty ocean
+		// if instead we create an empty ocean and add adjacent ships on a
+		// straight line
 		ocean = new Ocean();
 		ships = ocean.getShipArray();
-		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
-
-		// and add adjacent ships on a straight line
 		boolean horizontal = false;
 		placeShipTypeAt(Battleship.class, 0, 0, horizontal, ocean);
 		placeShipTypeAt(Submarine.class, 3, 0, horizontal, ocean);
@@ -241,6 +239,7 @@ public class OceanTest
 		countShipAreaByShipTypeOnEachOceanRow(failMapper, ships);
 
 		// then vertically
+		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
 		countShipAreaByShipTypeOnEachOceanRow(failMapper, rotatedShips);
 
 		// we should expect a mismatch compared to the expected values
