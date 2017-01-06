@@ -26,7 +26,7 @@ public class OceanTest
 
 	private static Ship[][] ships;
 
-	private boolean scanHorizontally = true;
+	private static Ship[][] rotatedShips;
 
 	/** default timeout test duration in milliseconds */
 	private static final int DEFAULT_TIMEOUT = 2000;
@@ -54,6 +54,7 @@ public class OceanTest
 		ocean = new Ocean();
 		ocean.placeAllShipsRandomly();
 		ships = ocean.getShipArray();
+		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
 	}
 
 	/**
@@ -64,11 +65,12 @@ public class OceanTest
 	{
 		ocean = null;
 		ships = null;
+		rotatedShips = null;
 	}
 
 	// ========= random ships placed in the ocean test ============== //
 
-	@Test(timeout = DEFAULT_TIMEOUT)
+	@Test
 	public void test_exact_number_of_emptysea_sould_be_placed_randomly_on_the_ocean()
 	{
 		// the total ocean area should be equal to this
@@ -102,10 +104,10 @@ public class OceanTest
 	public void test_exact_number_of_ships_should_be_placed_randomly_on_the_ocean()
 	{
 		// if we count the total number of horizontal ships in the ocean
-		int actual = countShipsOnEachOceanLine(scanHorizontally);
+		int actual = countShipsOnEachOceanRow(ships);
 
 		// and then we add the count of the vertical ships
-		actual += countShipsOnEachOceanLine(!scanHorizontally);
+		actual += countShipsOnEachOceanRow(rotatedShips);
 
 		// we should have this amount of ships
 		int expected = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
@@ -128,8 +130,7 @@ public class OceanTest
 		int actualShipArea = 0;
 
 		// if we count the total number of ships in the ocean
-		int actualTotalShips = countShipsOnEachOceanLine(scanHorizontally)
-				+ countShipsOnEachOceanLine(!scanHorizontally);
+		int actualTotalShips = countShipsOnEachOceanRow(ships) + countShipsOnEachOceanRow(rotatedShips);
 
 		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
 		{
@@ -160,7 +161,7 @@ public class OceanTest
 		// if you move along each row until you find a horizontal ship bow and
 		// there are ships in the ocean spots placed diagonally, there shouldn't
 		// be any other ship around
-		adjacent = checkDiagonalAdjecencyMovingHorizontally();
+		adjacent = checkDiagonalAdjecencyMovingHorizontally(ships);
 
 		// we expect not to have any diagonal adjacency when moving horizontally
 		assertEquals("checking diagonal adjacency moving horizontally along each row", false, adjacent);
@@ -168,7 +169,7 @@ public class OceanTest
 		// then, if you move along each column in the same ocean until you find
 		// a vertical ship bow and there are ships in the ocean spots placed
 		// diagonally, there shouldn't be any other ship around
-		adjacent = checkDiagonalAdjecencyMovingVertically();
+		adjacent = checkDiagonalAdjecencyMovingHorizontally(rotatedShips);
 
 
 		// we expect not to have any diagonal adjacency when moving vertically
@@ -200,10 +201,10 @@ public class OceanTest
 
 		// if we scan the ocean horizontally and increment the ship area for
 		// each horizontal ship we encounter
-		countShipAreaByTypeHorizontally(shipTypeToAreaMapper);
+		countShipAreaByShipTypeOnEachOceanRow(shipTypeToAreaMapper, ships);
 
 		// and then do the same vertically
-		countShipAreaByTypeVertically(shipTypeToAreaMapper);
+		countShipAreaByShipTypeOnEachOceanRow(shipTypeToAreaMapper, rotatedShips);
 
 		// we should expect that the area covered by each ship type (in the
 		// given amount) is what it would be if there were not adjacent ships in
@@ -217,7 +218,10 @@ public class OceanTest
 
 		// if instead we create an empty ocean
 		ocean = new Ocean();
+		ships = ocean.getShipArray();
+		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
 
+		// and add adjacent ships on a straight line
 		boolean horizontal = false;
 		placeShipTypeAt(Battleship.class, 0, 0, horizontal, ocean);
 		placeShipTypeAt(Submarine.class, 3, 0, horizontal, ocean);
@@ -225,23 +229,21 @@ public class OceanTest
 		placeShipTypeAt(Submarine.class, 5, 0, horizontal, ocean);
 		placeShipTypeAt(Submarine.class, 6, 0, horizontal, ocean);
 
-		// and add adjacent ships on a straight line
-		ships = ocean.getShipArray();
-
-		// we should get this amount
-		int expectedBattleshipSurface = Battleship.BATTLESHIP_LENGTH * 1;
-		int expectedSubmarineSurface = Submarine.SUBMARINE_LENGTH * 4;
-
-		// if we scan the ocean horizontally
 		HashMap<Class<? extends Ship>, Integer> failMapper = new HashMap<>();
 		failMapper.put(Battleship.class, 0);
 		failMapper.put(Submarine.class, 0);
 
-		// then vertically
-		countShipAreaByTypeHorizontally(failMapper);
-		countShipAreaByTypeVertically(failMapper);
+		// we should get this amount for each ship type
+		int expectedBattleshipSurface = Battleship.BATTLESHIP_LENGTH * 1;
+		int expectedSubmarineSurface = Submarine.SUBMARINE_LENGTH * 4;
 
-		// we get this amount instead
+		// if we scan the ocean horizontally
+		countShipAreaByShipTypeOnEachOceanRow(failMapper, ships);
+
+		// then vertically
+		countShipAreaByShipTypeOnEachOceanRow(failMapper, rotatedShips);
+
+		// we should expect a mismatch compared to the expected values
 		actual = failMapper.get(Battleship.class) == expectedBattleshipSurface
 				&& failMapper.get(Submarine.class) == expectedSubmarineSurface;
 
@@ -417,7 +419,49 @@ public class OceanTest
 
 	// ======================= helper methods ======================== //
 
-	private void countShipAreaByTypeHorizontally(HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper)
+	private static Ship[][] rotateOceanNinetyDegreeAntiClockwise()
+	{
+		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
+
+		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
+		{
+			// get the i-th row of the ocean
+			Ship[] oceanRow = ships[i];
+
+			// place each element of the row in the rotated ocean so that the
+			// vertical ships appear as horizontal and vice-versa
+			for (int j = oceanRow.length - 1; j >= 0; j--)
+			{
+				// get the info of the current ship
+				int shipLength = oceanRow[j].getLength();
+				int bowRow = oceanRow[j].getBowRow();
+				int bowColumn = oceanRow[j].getBowColumn();
+				boolean wasHorizontal = oceanRow[j].isHorizontal();
+
+				// create a ship of the same type as the current ship
+				Ship ship = createShip(oceanRow[j].getClass());
+
+				// invert its orientation
+				ship.setHorizontal(!wasHorizontal);
+
+				// change the coordinates of the bow of the new ship to match
+				// the new orientation
+				int rotatedBowRow = wasHorizontal ? (oceanRow.length - 1) - (bowColumn + shipLength - 1)
+						: (oceanRow.length - 1) - bowColumn;
+				int rotatedBowColumn = bowRow;
+
+				ship.setBowRow(rotatedBowRow);
+				ship.setBowColumn(rotatedBowColumn);
+
+				// place it in the rotated ocean
+				rotatedOcean[(oceanRow.length - 1) - j][i] = ship;
+			}
+		}
+
+		return rotatedOcean;
+	}
+
+	private void countShipAreaByShipTypeOnEachOceanRow(HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper, Ship[][] ships)
 	{
 		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
 		{
@@ -453,43 +497,7 @@ public class OceanTest
 		}
 	}
 
-	private void countShipAreaByTypeVertically(HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper)
-	{
-		for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
-		{
-			for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
-			{
-				// get the current ship
-				Ship ship = ships[i][j];
-
-				// if it's a real vertical ship count the area occupied
-				// by the ship
-				if (ship.isRealShip() && !ship.isHorizontal())
-				{
-					// the bow is already included in the count
-					int realShipAreaCounter = 1;
-					int shipLength = ship.getLength();
-
-					Class<? extends Ship> shipClass = ship.getClass();
-
-					// stop when an empty sea is found or the edge of the border
-					// is reached
-					while (i + realShipAreaCounter < Ocean.OCEAN_HEIGHT
-							&& ships[i + realShipAreaCounter][j].isRealShip())
-					{
-						realShipAreaCounter++;
-					}
-
-					shipTypeToAreaMapper.put(shipClass, shipTypeToAreaMapper.get(shipClass) + realShipAreaCounter);
-
-					// move past the current ship
-					i += shipLength - 1;
-				}
-			}
-		}
-	}
-
-	private boolean checkDiagonalAdjecencyMovingHorizontally()
+	private boolean checkDiagonalAdjecencyMovingHorizontally(Ship[][] ships)
 	{
 		boolean adjacent = false;
 
@@ -499,24 +507,19 @@ public class OceanTest
 		{
 			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
 			{
-
 				if (ships[i][j].isRealShip() && ships[i][j].isHorizontal())
 				{
 					Ship ship = ships[i][j];
 
 					// there is no possible diagonal adjacency on the left
-					// border,
-					// but we still want to enter
-					// the for loop as at column == 1 there could be a real ship
-					// part belonging to a ship
-					// with the bow adjacent to the left border: we need to skip
-					// that as we are only
-					// checking bows and sterns
+					// border, but we still want to enter the for loop as at
+					// column == 1 there could be a real ship part belonging to
+					// a ship with the bow adjacent to the left border: we need
+					// to skip that as we are only checking bows and sterns
 					if (j > 0)
 					{
 						// if the ocean spot on the diagonal is a real ship, we
-						// have
-						// found two ships that are adjacent diagonally
+						// have found two ships that are adjacent diagonally
 						if (i > 0 && ships[i - 1][j - 1].isRealShip()
 								|| i < Ocean.OCEAN_HEIGHT - 1 && ships[i + 1][j - 1].isRealShip())
 						{
@@ -525,80 +528,20 @@ public class OceanTest
 						}
 					}
 
-					// stern column coordinate of the horizontal ship found
-					int sternColumn = j + ship.getLength() - 1;
+					// move to the stern column coordinate of the horizontal
+					// ship found
+					j = j + ship.getLength() - 1;
 
 					// check that the column is still within the range
-					if (sternColumn < Ocean.OCEAN_WIDTH - 1)
+					if (j < Ocean.OCEAN_WIDTH - 1)
 					{
-						if (i > 0 && ships[i - 1][sternColumn + 1].isRealShip()
-								|| i < Ocean.OCEAN_HEIGHT - 1 && ships[i + 1][sternColumn + 1].isRealShip())
+						if (i > 0 && ships[i - 1][j + 1].isRealShip()
+								|| i < Ocean.OCEAN_HEIGHT - 1 && ships[i + 1][j + 1].isRealShip())
 						{
 							adjacent = true;
 							break;
 						}
 					}
-
-					// get past the current ship
-					j = sternColumn;
-				}
-			}
-		}
-
-		return adjacent;
-	}
-
-	private boolean checkDiagonalAdjecencyMovingVertically()
-	{
-		boolean adjacent = false;
-
-		// Keep moving along the ocean row until a
-		// horizontal ship bow is found
-		for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
-		{
-			for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
-			{
-				if (ships[i][j].isRealShip() && !ships[i][j].isHorizontal())
-				{
-					Ship ship = ships[i][j];
-
-					// there is no possible diagonal adjacency on the TOP
-					// border,
-					// but we still want to enter
-					// the for loop as at column == 1 there could be a real ship
-					// part belonging to a ship
-					// with the bow adjacent to the left border: we need to skip
-					// that as we are only
-					// checking bows and sterns
-					if (i > 0)
-					{
-						// if the ocean spot on the diagonal is a real ship, we
-						// have
-						// found two ships that are adjacent diagonally
-						if (j > 0 && ships[i - 1][j - 1].isRealShip()
-								|| j < Ocean.OCEAN_WIDTH - 1 && ships[i - 1][j + 1].isRealShip())
-						{
-							adjacent = true;
-							break;
-						}
-					}
-
-					// stern column coordinate of the horizontal ship found
-					int sternRow = i + ship.getLength() - 1;
-
-					// check that the column is still within the range
-					if (sternRow < Ocean.OCEAN_HEIGHT - 1)
-					{
-						if (j < Ocean.OCEAN_HEIGHT - 1 && ships[sternRow + 1][j + 1].isRealShip()
-								|| j > 0 && ships[sternRow + 1][j - 1].isRealShip())
-						{
-							adjacent = true;
-							break;
-						}
-					}
-
-					// get past the current ship
-					i = sternRow;
 				}
 			}
 		}
@@ -658,29 +601,16 @@ public class OceanTest
 		return shipPart;
 	}
 
-	private int countShipsOnEachOceanLine(boolean horizontally)
+	private int countShipsOnEachOceanRow(Ship[][] ships)
 	{
 		int totalShips = 0;
-		int temporarySlowIndex;
-		int temporaryFastIndex;
 
 		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
 		{
-			temporarySlowIndex = i;
-
 			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
 			{
-				temporaryFastIndex = j;
 
-				// swap indexes depending on the navigation direction
-				i = horizontally ? i : j;
-				j = horizontally ? j : temporarySlowIndex;
-
-				// if we scan horizontally we are interested in horizontal ships
-				// and vice-versa
-				boolean shipOrientationisRight = horizontally ? ships[i][j].isHorizontal() : !ships[i][j].isHorizontal();
-
-				if (ships[i][j].isRealShip() && shipOrientationisRight)
+				if (ships[i][j].isRealShip() && ships[i][j].isHorizontal())
 				{
 					// increment the running count
 					totalShips++;
@@ -688,14 +618,8 @@ public class OceanTest
 					// move past the current ship (by adding the ship length to
 					// the 'fast' index --> inner loop; minus one since the for
 					// loop performs an increment)
-					j = (horizontally ? j : i) + ships[i][j].getLength() - 1;
+					j = j + ships[i][j].getLength() - 1;
 				}
-				else
-				{
-					j = temporaryFastIndex;
-				}
-
-				i = temporarySlowIndex;
 			}
 		}
 
@@ -716,7 +640,7 @@ public class OceanTest
 						// print the first row of numbers
 						System.out.print(j == 0 ? " " + j : j);
 					}
-					else if (i > 0 && j < Ocean.OCEAN_HEIGHT)
+					else if (j == 0)
 					{
 						// print the first column of numbers
 						System.out.print(i - 1);
@@ -724,12 +648,44 @@ public class OceanTest
 				}
 				else
 				{
-					// otherwise print the whatever is in the ocean
-					System.out.print(matrix[i - 1][j - 1]);
+					Ship ship = matrix[i - 1][j - 1];
+					boolean horizontal = ship.isHorizontal();
+					Class<? extends Ship> shipClass = ship.getClass();
+					// otherwise print whatever is in the ocean
+					System.out.print(printShip(shipClass, horizontal));
 				}
 			}
 			// print the next row on a separate line
 			System.out.println();
+		}
+	}
+
+	private static <T extends Ship> String printShip(Class<T> shipClass, boolean horizontal)
+	{
+
+		if (shipClass.equals(Battleship.class))
+		{
+
+			return "4";
+		}
+		else if (shipClass.equals(Cruiser.class))
+		{
+
+			return "3";
+		}
+		else if (shipClass.equals(Destroyer.class))
+		{
+
+			return "2";
+		}
+		else if (shipClass.equals(Submarine.class))
+		{
+
+			return horizontal ? "H" : "V";
+		}
+		else
+		{
+			return ".";
 		}
 	}
 }
