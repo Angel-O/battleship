@@ -197,7 +197,7 @@ public abstract class Ship
 	{
 		if (isRealShip())
 		{
-			return printShipState();
+			return getShipStateToString();
 		}
 		return isHit() ? "-" : ".";
 	}
@@ -242,12 +242,12 @@ public abstract class Ship
 	/**
 	 * Returns a string representing the current state of the ship as a whole
 	 * marking each part that was hit with an 'S'. If the part of the ship was
-	 * not fired a place holder will be added to preserve the length of the
-	 * ship.
+	 * not fired upon a place holder will be added to preserve the position of
+	 * each ship part in relation to the whole ship.
 	 *
 	 * @return a string indicating what part of the ship was hit.
 	 */
-	private String printShipState()
+	private String getShipStateToString()
 	{
 		String state = "";
 

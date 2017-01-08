@@ -16,3 +16,4 @@
 16 is there limit to the number of attempt to place a ship?
 17. null check when creating ship part
 18. add comments to instance and class variables in test classes
+19. move diagonal check to its own method to squash lateral and end check in a unique method

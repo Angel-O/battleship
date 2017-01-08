@@ -53,7 +53,7 @@ public class Ocean
 	 */
 	public Ocean()
 	{
-		ships = InitializeOcean();
+		ships = initialiseOcean();
 	}
 
 	/**
@@ -254,13 +254,14 @@ public class Ocean
 	// ============== private methods ============= //
 
 	/**
-	 * Sets {@linkplain EmptySea} in the ocean.
+	 * Places {@linkplain EmptySea} all over the ocean's surface.
 	 *
 	 * @return a matrix containing all EmptySea instances representing the
-	 *         initial state of the ocean before any ship is placed onto it.
+	 *         initial state of the ocean before any real ship is placed onto
+	 *         it.
 	 *
 	 */
-	private static final Ship[][] InitializeOcean()
+	private static final Ship[][] initialiseOcean()
 	{
 		Ship[][] ships = new Ship[OCEAN_WIDTH][OCEAN_HEIGHT];
 
@@ -294,16 +295,16 @@ public class Ocean
 	 */
 	private char displayShipState(int row, int column)
 	{
-		return hasSunkShipAt(row, column) ? 'x' : getShipStateAndPrintShipPart(row, column);
+		return hasSunkShipAt(row, column) ? 'x' : getShipPartState(row, column);
 	}
 
 	/**
-	 * Gets the current state of the ship in {@code string} format and extracts
-	 * a {@code char} representing the part of the (yet to be sunken, if real)
-	 * ship at the given location. If hit, the ship part will be marked by the
-	 * {@linkplain Ship} class with a "S" if it's a real ship or a "-" if it's a
-	 * {@linkplain EmptySea}, otherwise it will be marked with a "." to indicate
-	 * that the location in yet to be fired upon.
+	 * Gets the current state of the (whole) ship in {@code string} format and
+	 * extracts a {@code char} representing the part of the (yet to be sunken,
+	 * if real) ship at the given location. If hit, the ship part will be marked
+	 * by the {@linkplain Ship} class with a "S" if it's a real ship or a "-" if
+	 * it's a {@linkplain EmptySea}, otherwise it will be marked with a "." to
+	 * indicate that the location in yet to be fired upon.
 	 *
 	 * @param row
 	 *            horizontal coordinate of the ship part to display.
@@ -312,7 +313,7 @@ public class Ocean
 	 * @return a {@code char} representing the state of the part of the ship at
 	 *         the given location.
 	 */
-	private char getShipStateAndPrintShipPart(int row, int column)
+	private char getShipPartState(int row, int column)
 	{
 		Ship ship = ships[row][column];
 
@@ -325,8 +326,9 @@ public class Ocean
 
 	/**
 	 * Randomly places the given number of ships of the given type and the given
-	 * length on to the ocean, without having any ship overlapping, be adjacent
-	 * in any direction or exceed the ocean's borders.
+	 * length on to the ocean, making sure that ships don't overlap, aren't
+	 * adjacent in any direction to any other ship and don't exceed the ocean's
+	 * borders.
 	 *
 	 * @param amount
 	 *            number of ships to place.
@@ -359,7 +361,7 @@ public class Ocean
 
 			if (!areaIsSuitableToPlaceShip(bowRow, bowColumn, shipLength, horizontal))
 			{
-				// if there is a ship already there or the area around is
+				// if there is a ship already or the area around is
 				// not clear, try a new position
 				continue;
 			}
@@ -377,8 +379,8 @@ public class Ocean
 
 			// place copies of the ship part onto the ocean at 'i' offset from
 			// the bow. Copying the same ship part will ensure that the
-			// information contained in the hit array will be the same
-			// regardless of the location of the ship part
+			// information contained in the hit array will be the same for thw
+			// whole ship regardless of the location of the ship part
 			for (int i = 0; i < shipLength; i++)
 			{
 				int row = horizontal ? bowRow : bowRow + i;
@@ -393,13 +395,13 @@ public class Ocean
 	}
 
 	/**
-	 * Factory method to generate ship parts.
+	 * Factory method to generate ship parts of the given type.
 	 *
 	 * @param <T>
 	 *            subclass of the {@linkplain Ship} type.
 	 * @param shipClass
 	 *            type of the ship part to be generated
-	 * @return a ship part of the requested type.
+	 * @return a ship part of the requested type; {@code can be null}.
 	 */
 	private <T extends Ship> Ship createShip(Class<T> shipClass)
 	{
@@ -427,10 +429,11 @@ public class Ocean
 
 	/**
 	 * Determines whether or not a ship can be placed in the area starting from
-	 * the bow coordinates. The criteria to pass the test are: the ship cannot
-	 * overlap with any other ship and cannot be adjacent to any other ship,
-	 * either vertically, horizontally or diagonally and the ship length cannot
-	 * exceed the ocena's borders.
+	 * the bow coordinates up to the ship length, moving in the specified
+	 * direction. The criteria to determine if the area is suitable are: ships
+	 * cannot overlap with any other ship, they cannot be adjacent to any other
+	 * ship (either vertically, horizontally or diagonally) and they cannot
+	 * exceed the ocean's borders.
 	 *
 	 * @param bowRow
 	 *            horizontal coordinate of the bow.
@@ -446,9 +449,11 @@ public class Ocean
 	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
 		// there is no need to check the mid area, where the ship will
-		// actually be placed (overlapping is guaranteed not to occur since
-		// we are dropping the longest ships first). The only overlapping that
-		// can happen in the mid area is at the bow location
+		// actually be placed as long as we check the adjacent areas
+		// (overlapping is guaranteed not to occur in the mid area, bow
+		// excluded, since we are dropping the longest ships first). Under these
+		// conditions the only place where ships can overlap in the mid area is
+		// the location where the bow will be placed
 		return !isOccupied(bowRow, bowColumn) && areaAtEachEndIsClear(bowRow, bowColumn, shipLength, horizontal)
 				&& areaAlongTheLengthIsClear(bowRow, bowColumn, shipLength, horizontal);
 	}
@@ -469,37 +474,34 @@ public class Ocean
 	 */
 	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
-		// iteration variables used to scan the area
-		int row;
+		// treating vertical ships as horizontal ships with length equal to 1
+		// and higth equal the length of the ship
+		int height = horizontal ? 1 : shipLength;
+		int length = horizontal ? shipLength : 1;
+
+		// row above the area that would host the ship
+		int topRow;
+		// row below the area that would host the ship
+		int bottomRow;
+		// iteration variable used to scan the area
 		int column;
 
-		// checking both sides along the length of the area that
-		// could potentially host the ship
-		for (int i = 0; i < shipLength; i++)
+		// checking both sides (top and bottom) along the length of the area
+		// that could potentially host the ship, looping from 0 to length
+		// (exclusive) as we do not need to check the diagonal area around the
+		// ship
+		for (int i = 0; i < length; i++)
 		{
-			// checking top (if horizontal), or left (if vertical)
-			// if horizontal take the row above(-1), iterate over the column(+i)
-			// if vertical take the left column(-1), iterate over the row(+i)
-			row = horizontal ? bowRow - 1 : bowRow + i;
-			column = horizontal ? bowColumn + i : bowColumn - 1;
+			// row above(-1), row below(+height), iterate over the
+			// row( ==>column(+i) )
+			column = bowColumn + i;
+			topRow = bowRow - 1;
+			bottomRow = bowRow + height;
 
-			if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
+			if (column < OCEAN_WIDTH && column >= 0)
 			{
-				if (isOccupied(row, column) || isOccupied(row, column))
-				{
-					return false;
-				}
-			}
-
-			// checking bottom (if horizontal), or right (if vertical)
-			// if horizontal take the row below(+1), iterate over the column(+i)
-			// if vertical take the right column(+1), iterate over the row(+i)
-			row = horizontal ? bowRow + 1 : bowRow + i;
-			column = horizontal ? bowColumn + i : bowColumn + 1;
-
-			if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
-			{
-				if (isOccupied(row, column))
+				if (topRow >= 0 && isOccupied(topRow, column)
+						|| bottomRow < OCEAN_HEIGHT && isOccupied(bottomRow, column))
 				{
 					return false;
 				}
@@ -509,7 +511,8 @@ public class Ocean
 	}
 
 	/**
-	 * Determines whether the area at both ends of the ship is clear.
+	 * Determines whether the area at both ends of the ship including the
+	 * diagonal areas are clear.
 	 *
 	 * @param bowRow
 	 *            horizontal coordinate of the bow.
@@ -524,39 +527,33 @@ public class Ocean
 	 */
 	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
-		// iteration variables used to scan the area
+		// treating vertical ships as horizontal ships with length equal to 1
+		// and higth equal the length of the ship
+		int height = horizontal ? 1 : shipLength;
+		int length = horizontal ? shipLength : 1;
+
+		// column on the left of area that would host the ship
+		int leftColumn;
+		// column on the right of the area that would host the ship
+		int rightColumn;
+		// iteration variable used to scan the area
 		int row;
-		int column;
 
-		// checking both ends of the area that could potentially host the ship,
-		// looping from -1 to 1 as we only need to check 3 cells at each end
-		// placed above(or left ==> -1), on the same line (==> 0) or below(or
-		// right ==> +1)
-		for (int i = -1; i <= 1; i++)
+		// checking both ends (left and right) of the area that could
+		// potentially host the ship, looping from -1 to height (inclusive) as
+		// we also need to check the diagonal area around the ship
+		for (int i = -1; i <= height; i++)
 		{
-			// checking left end (if horizontal), or top end (if vertical)
-			// if horizontal take the left column(-1), iterate over the row(+i)
-			// if vertical take the row above(-1), iterate over the column(+i)
-			row = horizontal ? bowRow + i : bowRow - 1;
-			column = horizontal ? bowColumn - 1 : bowColumn + i;
+			// left column(-1), right column(+length), iterate over the
+			// column( ==>row(+i) )
+			row = bowRow + i;
+			leftColumn = bowColumn - 1;
+			rightColumn = bowColumn + length;
 
-			if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
+			if (row >= 0 && row < OCEAN_HEIGHT)
 			{
-				if (isOccupied(row, column))
-				{
-					return false;
-				}
-			}
-
-			// checking right end (if horizontal), or bottom end (if vertical)
-			// if horizontal take the right column(+1), iterate over the row(+i)
-			// if vertical take the row below(+1), iterate over the column(+i)
-			row = horizontal ? bowRow + i : bowRow + shipLength;
-			column = horizontal ? bowColumn + shipLength : bowColumn + i;
-
-			if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
-			{
-				if (isOccupied(row, column))
+				if (leftColumn >= 0 && isOccupied(row, leftColumn)
+						|| rightColumn < OCEAN_WIDTH && isOccupied(row, rightColumn))
 				{
 					return false;
 				}

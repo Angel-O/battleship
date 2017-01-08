@@ -71,7 +71,7 @@ public class OceanTest
 	// ========= random ships placed in the ocean test ============== //
 
 	@Test
-	public void test_exact_number_of_emptysea_sould_be_placed_randomly_on_the_ocean()
+	public void test_exact_number_of_empty_sea_should_be_placed_randomly_on_the_ocean()
 	{
 		// the total ocean area should be equal to this
 		int totoalOceanSpace = Ocean.OCEAN_WIDTH * Ocean.OCEAN_HEIGHT;
@@ -161,7 +161,7 @@ public class OceanTest
 		// if you move along each row until you find a horizontal ship bow and
 		// there are ships in the ocean spots placed diagonally, there shouldn't
 		// be any other ship around
-		adjacent = checkDiagonalAdjecencyMovingHorizontally(ships);
+		adjacent = checkDiagonalAdjacencyMovingHorizontally(ships);
 
 		// we expect not to have any diagonal adjacency when moving horizontally
 		assertEquals("checking diagonal adjacency moving horizontally along each row", false, adjacent);
@@ -169,7 +169,7 @@ public class OceanTest
 		// then, if you move along each column in the same ocean until you find
 		// a vertical ship bow and there are ships in the ocean spots placed
 		// diagonally, there shouldn't be any other ship around
-		adjacent = checkDiagonalAdjecencyMovingHorizontally(rotatedShips);
+		adjacent = checkDiagonalAdjacencyMovingHorizontally(rotatedShips);
 
 
 		// we expect not to have any diagonal adjacency when moving vertically
@@ -293,7 +293,7 @@ public class OceanTest
 	// ================ shooting at ocean location test ============== //
 
 	@Test
-	public void test_shooting_afloat_ship_should_be_succesfull()
+	public void test_shooting_afloat_ship_should_be_successful()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
@@ -314,7 +314,7 @@ public class OceanTest
 	}
 
 	@Test
-	public void test_shooting_sunk_ships_should_be_unsuccesfull()
+	public void test_shooting_sunk_ships_should_be_unsuccessful()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
@@ -361,7 +361,7 @@ public class OceanTest
 	}
 
 	@Test
-	public void test_number_of_hits_should_be_updated_when_ship_is_succesfully_hit()
+	public void test_number_of_hits_should_be_updated_when_ship_is_successfully_hit()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
@@ -496,7 +496,7 @@ public class OceanTest
 		}
 	}
 
-	private boolean checkDiagonalAdjecencyMovingHorizontally(Ship[][] ships)
+	private boolean checkDiagonalAdjacencyMovingHorizontally(Ship[][] ships)
 	{
 		boolean adjacent = false;
 
