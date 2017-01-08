@@ -81,18 +81,7 @@ public class OceanTest
 				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
 
 		// if we count the empty ocean areas
-		int actual = 0;
-
-		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
-		{
-			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
-			{
-				if (!ships[i][j].isRealShip())
-				{
-					actual++;
-				}
-			}
-		}
+		int actual = countTotalSeaArea();
 
 		// we should get this amount of "empty sea" portions
 		int expected = totoalOceanSpace - totalShipSpace;
@@ -126,24 +115,14 @@ public class OceanTest
 
 		int totalShips = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
 
+		// the total ocean area should be equal to this
+		int totoalOceanSpace = Ocean.OCEAN_WIDTH * Ocean.OCEAN_HEIGHT;
+
 		// count the areas with real ships and the number of ships
-		int actualShipArea = 0;
+		int actualShipArea = totoalOceanSpace - countTotalSeaArea();
 
 		// if we count the total number of ships in the ocean
 		int actualTotalShips = countShipsOnEachOceanRow(ships) + countShipsOnEachOceanRow(rotatedShips);
-
-		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
-		{
-			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
-			{
-				if (ships[i][j].isRealShip())
-				{
-					// if the area contains a real ship (a bow or a another
-					// part) increment the total area
-					actualShipArea++;
-				}
-			}
-		}
 
 		// we would expect that the total number of ships and the total area
 		// covered by the ships is what we would have if there weren't any ship
@@ -192,14 +171,14 @@ public class OceanTest
 		int expecteDestroyerArea = Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH;
 		int expectedSubmarineArea = Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
 
+		// if we map each ship type to the area each of them covers
 		HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper = new HashMap<>();
-
 		shipTypeToAreaMapper.put(Battleship.class, 0);
 		shipTypeToAreaMapper.put(Cruiser.class, 0);
 		shipTypeToAreaMapper.put(Destroyer.class, 0);
 		shipTypeToAreaMapper.put(Submarine.class, 0);
 
-		// if we scan the ocean horizontally and increment the ship area for
+		// and we scan the ocean horizontally and increment the ship area for
 		// each horizontal ship we encounter
 		countShipAreaByShipTypeOnEachOceanRow(shipTypeToAreaMapper, ships);
 
@@ -227,6 +206,7 @@ public class OceanTest
 		placeShipTypeAt(Submarine.class, 5, 0, horizontal, ocean);
 		placeShipTypeAt(Submarine.class, 6, 0, horizontal, ocean);
 
+		// and map each type to the area covered
 		HashMap<Class<? extends Ship>, Integer> failMapper = new HashMap<>();
 		failMapper.put(Battleship.class, 0);
 		failMapper.put(Submarine.class, 0);
@@ -235,14 +215,15 @@ public class OceanTest
 		int expectedBattleshipSurface = Battleship.BATTLESHIP_LENGTH * 1;
 		int expectedSubmarineSurface = Submarine.SUBMARINE_LENGTH * 4;
 
-		// if we scan the ocean horizontally
+		// so if we scan the ocean horizontally
 		countShipAreaByShipTypeOnEachOceanRow(failMapper, ships);
 
 		// then vertically
 		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
 		countShipAreaByShipTypeOnEachOceanRow(failMapper, rotatedShips);
 
-		// we should expect a mismatch compared to the expected values
+		// we should expect a mismatch between what we found and the expected
+		// values
 		actual = failMapper.get(Battleship.class) == expectedBattleshipSurface
 				&& failMapper.get(Submarine.class) == expectedSubmarineSurface;
 
@@ -262,13 +243,14 @@ public class OceanTest
 		placeShipTypeAt(Destroyer.class, 4, 0, isHorizontal, ocean);
 		placeShipTypeAt(Submarine.class, 6, 0, isHorizontal, ocean);
 
-		// then the ocean spots where they have been placed should be marked as
-		// occupied
+		// then any random ocean spots from the bow till the ship length should
+		// be marked as occupied
 		boolean expected = true;
-		assertEquals(expected, ocean.isOccupied(0, 0));
-		assertEquals(expected, ocean.isOccupied(2, 0));
-		assertEquals(expected, ocean.isOccupied(4, 0));
-		assertEquals(expected, ocean.isOccupied(6, 0));
+		Random random = new Random();
+		assertEquals(expected, ocean.isOccupied(0, random.nextInt(Battleship.BATTLESHIP_LENGTH)));
+		assertEquals(expected, ocean.isOccupied(2, random.nextInt(Cruiser.CRUISER_LENGTH)));
+		assertEquals(expected, ocean.isOccupied(4, random.nextInt(Destroyer.DESTROYER_LENGTH)));
+		assertEquals(expected, ocean.isOccupied(6, random.nextInt(Submarine.SUBMARINE_LENGTH)));
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
@@ -277,10 +259,7 @@ public class OceanTest
 		// if we create an empty ocean
 		ocean = new Ocean();
 
-		// and check what's on it
-		ships = ocean.getShipArray();
-
-		// whatever random area that we pick
+		// whatever random area that we pick within its borders
 		Random random = new Random();
 		int row = random.nextInt(Ocean.OCEAN_HEIGHT);
 		int column = random.nextInt(Ocean.OCEAN_WIDTH);
@@ -460,6 +439,24 @@ public class OceanTest
 		return rotatedOcean;
 	}
 
+	private int countTotalSeaArea()
+	{
+		int totalSeaArea = 0;
+
+		for (int i = 0; i < Ocean.OCEAN_WIDTH; i++)
+		{
+			for (int j = 0; j < Ocean.OCEAN_HEIGHT; j++)
+			{
+				if (!ships[i][j].isRealShip())
+				{
+					totalSeaArea++;
+				}
+			}
+		}
+
+		return totalSeaArea;
+	}
+
 	private void countShipAreaByShipTypeOnEachOceanRow(HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper, Ship[][] ships)
 	{
 		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
@@ -574,30 +571,26 @@ public class OceanTest
 
 	private static <T extends Ship> Ship createShip(Class<T> shipClass)
 	{
-		Ship shipPart = null;
-
 		if (shipClass == Battleship.class)
 		{
-			shipPart = new Battleship();
+			return new Battleship();
 		}
 		else if (shipClass == Cruiser.class)
 		{
-			shipPart = new Cruiser();
+			return new Cruiser();
 		}
 		else if (shipClass == Destroyer.class)
 		{
-			shipPart = new Destroyer();
+			return new Destroyer();
 		}
 		else if (shipClass == Submarine.class)
 		{
-			shipPart = new Submarine();
+			return new Submarine();
 		}
 		else
 		{
-			shipPart = new EmptySea();
+			return new EmptySea();
 		}
-
-		return shipPart;
 	}
 
 	private int countShipsOnEachOceanRow(Ship[][] ships)
@@ -608,7 +601,6 @@ public class OceanTest
 		{
 			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
 			{
-
 				if (ships[i][j].isRealShip() && ships[i][j].isHorizontal())
 				{
 					// increment the running count
@@ -625,7 +617,9 @@ public class OceanTest
 		return totalShips;
 	}
 
-	public static void print(Ship[][] matrix)
+	// ========================== debug =============================== //
+
+	private static void print(Ship[][] matrix)
 	{
 		for (int i = 0; i <= Ocean.OCEAN_HEIGHT; i++)
 		{
