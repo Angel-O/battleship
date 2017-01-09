@@ -22,10 +22,16 @@ import org.junit.Test;
  */
 public class OceanTest
 {
+	/** Instance of the class under test */
 	private static Ocean ocean;
 
+	/** Contains the shios in the ocean */
 	private static Ship[][] ships;
 
+	/**
+	 * Contains the same ships in the ocean, rotated 90 degreess anticlockwise
+	 * to aid testing.
+	 */
 	private static Ship[][] rotatedShips;
 
 	/** default timeout test duration in milliseconds */
@@ -46,6 +52,10 @@ public class OceanTest
 	{}
 
 	/**
+	 * Initializes a new instance of the {@linkplain Ocean} class; gets the
+	 * {@linkplain Ship} 2-dimentional array, creates a matrix of the same ships
+	 * rotated 90 degrees anti-clockwise to aid testing.
+	 *
 	 * @throws java.lang.Exception
 	 */
 	@Before
@@ -54,10 +64,16 @@ public class OceanTest
 		ocean = new Ocean();
 		ocean.placeAllShipsRandomly();
 		ships = ocean.getShipArray();
+		System.out.println("==== sh ====");
+		print(ships);
 		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
+		System.out.println("==== ro ====");
+		print(rotatedShips);
 	}
 
 	/**
+	 * Clears the Ocean instance and the two matrices associated with it.
+	 *
 	 * @throws java.lang.Exception
 	 */
 	@After
@@ -68,10 +84,14 @@ public class OceanTest
 		rotatedShips = null;
 	}
 
-	// ========= random ships placed in the ocean test ============== //
+	// ======================= constructor tests ======================== //
+
+	// =================== getters and setters tests ==================== //
+
+	// ========= placing ships randomly in the ocean tests ============== //
 
 	@Test
-	public void test_exact_number_of_empty_sea_should_be_placed_randomly_on_the_ocean()
+	public void test_placeAllShipsRandomly_exactNumberOfEmptySeaShouldBePlacedRandomlyOnTheOcean()
 	{
 		// the total ocean area should be equal to this
 		int totoalOceanSpace = Ocean.OCEAN_WIDTH * Ocean.OCEAN_HEIGHT;
@@ -90,7 +110,7 @@ public class OceanTest
 	}
 
 	@Test
-	public void test_exact_number_of_ships_should_be_placed_randomly_on_the_ocean()
+	public void test_placeAllShipsRandomly_exactNumberOfShipsShouldBePlacedRandomlyOnTheOcean()
 	{
 		// if we count the total number of horizontal ships in the ocean
 		int actual = countShipsOnEachOceanRow(ships);
@@ -105,7 +125,7 @@ public class OceanTest
 	}
 
 	@Test
-	public void test_ships_should_not_overlap_when_placed_randomly_on_the_ocean()
+	public void test_placeAllShipsRandomly_shipsShouldNotOverlapWhenPlacedRandomlyOnTheOcean()
 	{
 		// if ships overlap the total area covered by the ships will be less
 		// than what it would normally be (for the same amount of ships, having
@@ -133,7 +153,7 @@ public class OceanTest
 	}
 
 	@Test
-	public void test_ships_should_not_be_adjacent_diagonally_when_placed_randomly_on_ocean()
+	public void test_placeAllShipsRandomly_shipsShouldNotBeAdjacentDiagonallyWhenPlacedRandomlyOnOcean()
 	{
 		boolean adjacent = false;
 
@@ -156,7 +176,7 @@ public class OceanTest
 	}
 
 	@Test
-	public void test_ships_should_not_be_adjacent_on_a_straight_line_when_placed_randomly_on_ocean()
+	public void test_placeAllShipsRandomly_shipsShouldNotBeAdjacentOnAStraightLineWhenPlacedRandomlyOnOcean()
 	{
 		// if there are any adjacent ship there will be a mismatch between the
 		// distance from each ship bow till the first empty sea area and the

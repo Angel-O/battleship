@@ -13,7 +13,7 @@ public class Destroyer extends Ship
 	public static final int DESTROYER_LENGTH = 2;
 
 	/** destroyer type. */
-	public static final String destroyerType = "destroyer";
+	public static final String DESTROYER_TYPE = "destroyer";
 
 
 	/**
@@ -28,6 +28,6 @@ public class Destroyer extends Ship
 	@Override
 	public String getShipType()
 	{
-		return destroyerType;
+		return DESTROYER_TYPE;
 	}
 }

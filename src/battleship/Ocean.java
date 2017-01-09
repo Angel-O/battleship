@@ -269,10 +269,12 @@ public class Ocean
 		{
 			for (int j = 0; j < OCEAN_HEIGHT; j++)
 			{
+				// create an empty sea with "bow" at row "i" and column "i"
 				Ship emptySea = new EmptySea();
 				emptySea.setBowRow(i);
 				emptySea.setBowColumn(j);
 
+				// drop it onto the ocean
 				ships[i][j] = emptySea;
 			}
 		}
@@ -340,91 +342,95 @@ public class Ocean
 	private <T extends Ship> void placeShipsOntoOcean(int amount, int shipLength, Class<T> shipClass)
 	{
 		assert amount > 0 : "number of ships must be strictly positive";
+		assert shipLength > 0 : "ship length must be strictly positive";
 
 		Random random = new Random();
 
 		// counts how many ships have been successfully placed in the ocean
 		int shipPlaced = 0;
 
-		do
+		// coordinates and orientation will be set at random
+		int bowRow;
+		int bowColumn;
+		boolean horizontal;
+
+		while (shipPlaced < amount)
 		{
-			// get random coordinates for the current ship bow (the maximum
-			// value valid for the bow is the width(or height) of the ocean
-			// minus the ship length: this avoids the ship to exceed the
-			// ocean's borders. Adding 1 as the higher boundary of the
-			// nextInt method is non inclusive)
-			int bowRow = random.nextInt(OCEAN_WIDTH - shipLength + 1);
-			int bowColumn = random.nextInt(OCEAN_HEIGHT - shipLength + 1);
-
 			// get a random orientation for the current ship
-			boolean horizontal = random.nextBoolean();
+			horizontal = random.nextBoolean();
 
-			if (!areaIsSuitableToPlaceShip(bowRow, bowColumn, shipLength, horizontal))
+			// set random coordinates for the bow within the ocean's boundaries,
+			// with the upper bound depending on the orientation of the ship
+			bowColumn = random.nextInt(horizontal ? OCEAN_HEIGHT - shipLength + 1 : OCEAN_HEIGHT);
+			bowRow = random.nextInt(horizontal ? OCEAN_HEIGHT : OCEAN_WIDTH - shipLength + 1);
+
+			// try and place the ship at the given location
+			if (areaIsSuitableToPlaceShip(bowRow, bowColumn, shipLength, horizontal))
 			{
-				// if there is a ship already or the area around is
-				// not clear, try a new position
-				continue;
+				// create a ship representing a ship part to replicate
+				// across the length of the (whole) ship
+				Ship shipPart = createShip(shipClass, bowRow, bowColumn, horizontal);
+
+				// place copies of the ship part onto the ocean at 'i' offset
+				// from the bow. Copying the same ship part will ensure that the
+				// information contained in the hit array will be the same for
+				// the whole ship regardless of the location of the ship part
+				for (int i = 0; i < shipLength; i++)
+				{
+					int row = horizontal ? bowRow : bowRow + i;
+					int column = horizontal ? bowColumn + i : bowColumn;
+					ships[row][column] = shipPart;
+				}
+
+				// increment the count of ship placed
+				shipPlaced++;
 			}
-
-			// otherwise create a ship representing a ship part to replicate
-			// across the length of the (whole) ship
-			Ship shipPart = createShip(shipClass);
-
-			assert shipPart != null : "unable to build ship part";
-
-			// set the orientation of the ship part and the bow coordinates
-			shipPart.setHorizontal(horizontal);
-			shipPart.setBowRow(bowRow);
-			shipPart.setBowColumn(bowColumn);
-
-			// place copies of the ship part onto the ocean at 'i' offset from
-			// the bow. Copying the same ship part will ensure that the
-			// information contained in the hit array will be the same for thw
-			// whole ship regardless of the location of the ship part
-			for (int i = 0; i < shipLength; i++)
-			{
-				int row = horizontal ? bowRow : bowRow + i;
-				int column = horizontal ? bowColumn + i : bowColumn;
-				ships[row][column] = shipPart;
-			}
-
-			// increment the count of ship placed
-			shipPlaced++;
 		}
-		while (shipPlaced < amount);
 	}
 
+
 	/**
-	 * Factory method to generate ship parts of the given type.
+	 * Factory method to generate (real) ship parts of the given type. It will
+	 * set the bow coordinates and orientation to the values passed as
+	 * arguments.
 	 *
 	 * @param <T>
 	 *            subclass of the {@linkplain Ship} type.
 	 * @param shipClass
-	 *            type of the ship part to be generated
-	 * @return a ship part of the requested type; {@code can be null}.
+	 *            type of the ship part to be generated.
+	 * @param bowRow
+	 *            horizontal coordinate of the bow.
+	 * @param bowColumn
+	 *            vertical coordinate of the bow.
+	 * @return a ship part of the requested type.
 	 */
-	private <T extends Ship> Ship createShip(Class<T> shipClass)
+	private <T extends Ship> Ship createShip(Class<T> shipClass, int bowRow, int bowColumn, boolean horizontal)
 	{
-		Ship shipPart = null;
+		Ship ship;
 
 		if (shipClass == Battleship.class)
 		{
-			shipPart = new Battleship();
+			ship = new Battleship();
 		}
 		else if (shipClass == Cruiser.class)
 		{
-			shipPart = new Cruiser();
+			ship = new Cruiser();
 		}
 		else if (shipClass == Destroyer.class)
 		{
-			shipPart = new Destroyer();
+			ship = new Destroyer();
 		}
-		else if (shipClass == Submarine.class)
+		else
 		{
-			shipPart = new Submarine();
+			ship = new Submarine();
 		}
 
-		return shipPart;
+		// set the bow coordinates and the orientation of the ship
+		ship.setBowRow(bowRow);
+		ship.setBowColumn(bowColumn);
+		ship.setHorizontal(horizontal);
+
+		return ship;
 	}
 
 	/**
@@ -457,6 +463,7 @@ public class Ocean
 		return !isOccupied(bowRow, bowColumn) && areaAtEachEndIsClear(bowRow, bowColumn, shipLength, horizontal)
 				&& areaAlongTheLengthIsClear(bowRow, bowColumn, shipLength, horizontal);
 	}
+
 
 	/**
 	 * Determines whether the area along the length of the ship is clear.
@@ -509,6 +516,7 @@ public class Ocean
 		}
 		return true;
 	}
+
 
 	/**
 	 * Determines whether the area at both ends of the ship including the

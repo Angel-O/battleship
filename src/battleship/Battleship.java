@@ -13,7 +13,7 @@ public class Battleship extends Ship
 	public static final int BATTLESHIP_LENGTH = 4;
 
 	/** battleship type. */
-	public static final String battleshipType = "battleship";
+	public static final String BATTLESHIP_TYPE = "battleship";
 
 
 	/**
@@ -28,6 +28,6 @@ public class Battleship extends Ship
 	@Override
 	public String getShipType()
 	{
-		return battleshipType;
+		return BATTLESHIP_TYPE;
 	}
 }

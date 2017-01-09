@@ -13,7 +13,7 @@ public class Cruiser extends Ship
 	public static final int CRUISER_LENGTH = 3;
 
 	/** cruiser type. */
-	public static final String cruiserType = "cruiser";
+	public static final String CRUISER_TYPE = "cruiser";
 
 
 	/**
@@ -28,6 +28,6 @@ public class Cruiser extends Ship
 	@Override
 	public String getShipType()
 	{
-		return cruiserType;
+		return CRUISER_TYPE;
 	}
 }

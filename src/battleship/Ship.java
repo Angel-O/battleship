@@ -29,18 +29,28 @@ public abstract class Ship
 	/**
 	 * Builds a part of a ship that will be placed onto the {@linkplain Ocean}
 	 * and set its initial state to 'no-hits', meaning no part of the ship has
-	 * suffered a shot.
+	 * suffered a shot. Note: the length of the ship, instead refers to the
+	 * whole ship so each ship part should have the same length. The length must
+	 * be less than both the {@linkplain} Ocean' height and width to ensure that
+	 * the ship can be placed anywhere in the ocean regardless of its
+	 * orientation.
+	 *
 	 *
 	 * @param length
 	 *            the length of the ship; must be greater than zero.
 	 * @throws IllegalArgumentException
-	 *             if the length provided is less or equal to zero.
+	 *             if the length provided is less or equal to zero or greater
+	 *             than the {@linkplain Ocean} boundaries.
 	 */
 	public Ship(int length)
 	{
 		if (length <= 0)
 		{
 			throw new IllegalArgumentException("Illegal non positive value for ship length: " + length);
+		}
+		if (length > Ocean.OCEAN_HEIGHT || length > Ocean.OCEAN_HEIGHT)
+		{
+			throw new IllegalArgumentException("Illegal out of range value for ship length: " + length);
 		}
 
 		this.length = length;
@@ -120,11 +130,16 @@ public abstract class Ship
 	 * Sets the vertical coordinate of the bow.
 	 *
 	 * @param bowRow
-	 *            value to set the vertical coordinate to.
+	 *            value to set the vertical coordinate to; must be within
+	 *            greater or equal to zero and less than the {@linkplain Ocean}
+	 *            Height.
+	 * @throws IllegalArgumentException
+	 *             if the coordinate falls outside the {@linkplain Ocean}
+	 *             borders
 	 */
 	public void setBowRow(int bowRow)
 	{
-		this.bowRow = bowRow;
+		this.bowRow = validateCoordinate(bowRow);
 	}
 
 	/**
@@ -141,11 +156,16 @@ public abstract class Ship
 	 * Sets the horizontal coordinate of the bow.
 	 *
 	 * @param bowColumn
-	 *            value to set the vertical coordinate to.
+	 *            value to set the vertical coordinate to; must be within
+	 *            greater or equal to zero and less than the {@linkplain Ocean}
+	 *            Width.
+	 * @throws IllegalArgumentException
+	 *             if the coordinate falls outside the {@linkplain Ocean}
+	 *             borders
 	 */
 	public void setBowColumn(int bowColumn)
 	{
-		this.bowColumn = bowColumn;
+		this.bowColumn = validateCoordinate(bowColumn);
 	}
 
 	/**
@@ -203,6 +223,28 @@ public abstract class Ship
 	}
 
 	// ============== private methods ============= //
+
+	/**
+	 * Checks if the coordinate is within a valid range to be placed in the
+	 * Ocean.
+	 *
+	 * @param coordinate
+	 *            coordinate to be validated
+	 * @return the coordinate if it passes the validation, otherwise it throws
+	 *         an exception
+	 * @throws IllegalArgumentException
+	 *             if the coordinate falls outside the {@linkplain Ocean}
+	 *             borders
+	 */
+	private int validateCoordinate(int coordinate)
+	{
+		if (coordinate < 0 || coordinate > Ocean.OCEAN_HEIGHT || length > Ocean.OCEAN_HEIGHT)
+		{
+			throw new IllegalArgumentException("Illegal out of range value for bow coordinate: " + coordinate);
+		}
+
+		return coordinate;
+	}
 
 	/**
 	 * Establishes the offset from the bow of the shot fired at the location

@@ -13,7 +13,7 @@ public class Submarine extends Ship
 	public static final int SUBMARINE_LENGTH = 1;
 
 	/** submarine type. */
-	public static final String submarineType = "submarine";
+	public static final String SUBMARINE_TYPE = "submarine";
 
 
 	/**
@@ -28,6 +28,6 @@ public class Submarine extends Ship
 	@Override
 	public String getShipType()
 	{
-		return submarineType;
+		return SUBMARINE_TYPE;
 	}
 }

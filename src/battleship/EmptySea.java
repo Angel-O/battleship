@@ -13,7 +13,7 @@ public class EmptySea extends Ship
 	public static final int EMPTY_SEA_LENGTH = 1;
 
 	/** empty sea type. */
-	public static final String emptySeaType = "empty sea";
+	public static final String EMPTY_SEA_TYPE = "empty sea";
 
 
 	/**
@@ -27,12 +27,12 @@ public class EmptySea extends Ship
 
 	/**
 	 * {@inheritDoc} For an EmptySea it returns the string
-	 * {@value #emptySeaType}.
+	 * {@value #EMPTY_SEA_TYPE}.
 	 */
 	@Override
 	public String getShipType()
 	{
-		return emptySeaType;
+		return EMPTY_SEA_TYPE;
 	}
 
 	/** {@inheritDoc} */
