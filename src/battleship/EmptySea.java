@@ -55,7 +55,7 @@ public class EmptySea extends Ship
 	{
 		// go up to the super class to mark the hit array and return false (by
 		// default the superclass returns true only if the location hit contains
-		// a real ship, so for an empty sea will alway return false)
+		// a real ship, so for an empty sea will always return false)
 		return super.shootAt(row, col);
 	}
 }

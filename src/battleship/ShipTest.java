@@ -5,7 +5,6 @@ package battleship;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
@@ -162,7 +161,7 @@ public class ShipTest
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void test_setBowRow_shouldThrowAnExceptionForANegativeValue()
+	public void test_setBowRow_shouldThrowAnExceptionForNegativeValues()
 	{
 		Ship ship = new Battleship();
 
@@ -328,7 +327,6 @@ public class ShipTest
 		assertTrue("shooting a submarine will sink it", expectedSubmarineState);
 	}
 
-
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_isSunk_shipsShouldNotSinkIfNotAllPartsAreHit()
 	{
@@ -369,7 +367,7 @@ public class ShipTest
 		// we should expect it to be represented as a "." (dot)
 		String expectedRepresentation = ".";
 		String actualRepresentation = ship.toString();
-		assertSame("verifying representation of non hit sea spot", expectedRepresentation, actualRepresentation);
+		assertEquals("verifying representation of non hit sea spot", expectedRepresentation, actualRepresentation);
 
 		// if then we shoot at it
 		ship.shootAt(bowRow, bowColumn);
@@ -377,7 +375,7 @@ public class ShipTest
 		// we should expect its representation to change to "-" (dash)
 		expectedRepresentation = "-";
 		actualRepresentation = ship.toString();
-		assertSame("verifying representation of hit sea spot", expectedRepresentation, actualRepresentation);
+		assertEquals("verifying representation of hit sea spot", expectedRepresentation, actualRepresentation);
 
 	}
 
@@ -392,15 +390,15 @@ public class ShipTest
 		ship.setBowColumn(bowColumn);
 		ship.setHorizontal(true);
 
-		// we should not expect its represenatation to be equal to this
+		// we should expect its represenatation to be equal to this
 		String expectedRepresentation = "....";
 		String actualRepresentation = ship.toString();
 		assertEquals("verifying representation of real ship yet to be hit once", expectedRepresentation,
 				actualRepresentation);
 
 		// if then we shoot at it one shot at a time we should expect its
-		// representation to get an "S" for each part hit so if we shoot at the
-		// first part
+		// representation to get an "S" for each part hit.
+		// So if we shoot at the first part
 		ship.shootAt(bowRow, bowColumn);
 
 		// we should expect its representation to change to this
@@ -454,10 +452,10 @@ public class ShipTest
 		// if then we get the state of the ship we should expect only the last
 		// part of it to be equal to "S"
 		String shipState = ship.toString();
-		int expectedLastPartIndex = Destroyer.DESTROYER_LENGTH - 1;
+		int lastPartIndex = Destroyer.DESTROYER_LENGTH - 1;
 		int actualLastPartShipState = shipState.indexOf('S');
 
-		assertEquals("last part of the ship gets marked as hit", expectedLastPartIndex, actualLastPartShipState);
+		assertEquals("last part of the ship gets marked as hit", lastPartIndex, actualLastPartShipState);
 	}
 
 	@Test
@@ -516,7 +514,6 @@ public class ShipTest
 	}
 
 	// ========================== mock objects ========================= //
-
 
 	/**
 	 * Mock class to emulate the behaviour of a {@linkplain Ship}. In particular

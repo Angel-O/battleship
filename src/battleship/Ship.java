@@ -78,7 +78,13 @@ public abstract class Ship
 	{
 		if (!isSunk())
 		{
-			markHitArray(row, column);
+			// get the offset from the bow of the shot fired at the location
+			// provided, based on the orientation of the ship
+			int offsetFromTheBow = horizontal ? column - bowColumn : row - bowRow;
+
+			// mark the hit array accordingly to indicate what
+			// part of the ship (as a whole) was hit.
+			hit[offsetFromTheBow] = true;
 
 			return isRealShip();
 		}
@@ -139,7 +145,11 @@ public abstract class Ship
 	 */
 	public void setBowRow(int bowRow)
 	{
-		this.bowRow = validateCoordinate(bowRow);
+		if (bowRow < 0 || bowRow > Ocean.OCEAN_HEIGHT)
+		{
+			throw new IllegalArgumentException("Illegal out of range value for bowRow: " + bowRow);
+		}
+		this.bowRow = bowRow;
 	}
 
 	/**
@@ -165,7 +175,11 @@ public abstract class Ship
 	 */
 	public void setBowColumn(int bowColumn)
 	{
-		this.bowColumn = validateCoordinate(bowColumn);
+		if (bowColumn < 0 || bowColumn > Ocean.OCEAN_WIDTH)
+		{
+			throw new IllegalArgumentException("Illegal out of range value for bowColumn: " + bowColumn);
+		}
+		this.bowColumn = bowColumn;
 	}
 
 	/**
@@ -208,94 +222,20 @@ public abstract class Ship
 	 * Returns a string representing the current state of the ship. "S"
 	 * indicates a location that was fired upon and hit a ship; "-" indicates a
 	 * location that was fired upon without hitting any ship and "." to
-	 * indicates a location that is yet to be fired upon. If the ship is sunk it
-	 * will be marked with "x" by the {@linkplain Ocean} when displaying the
-	 * grid.
+	 * indicates a location that is yet to be fired upon. Note: if the ship is
+	 * sunk it will be marked with "x" by the {@linkplain Ocean} when displaying
+	 * the grid, regardless of the representation returned by this method.
 	 */
 	@Override
 	public String toString()
-	{
-		if (isRealShip())
-		{
-			return getShipStateToString();
-		}
-		return isHit() ? "-" : ".";
-	}
-
-	// ============== private methods ============= //
-
-	/**
-	 * Checks if the coordinate is within a valid range to be placed in the
-	 * Ocean.
-	 *
-	 * @param coordinate
-	 *            coordinate to be validated
-	 * @return the coordinate if it passes the validation, otherwise it throws
-	 *         an exception
-	 * @throws IllegalArgumentException
-	 *             if the coordinate falls outside the {@linkplain Ocean}
-	 *             borders
-	 */
-	private int validateCoordinate(int coordinate)
-	{
-		if (coordinate < 0 || coordinate > Ocean.OCEAN_HEIGHT || length > Ocean.OCEAN_HEIGHT)
-		{
-			throw new IllegalArgumentException("Illegal out of range value for bow coordinate: " + coordinate);
-		}
-
-		return coordinate;
-	}
-
-	/**
-	 * Establishes the offset from the bow of the shot fired at the location
-	 * provided and and marks the hit array accordingly to indicate what part of
-	 * the ship (as a whole) was hit.
-	 *
-	 * @param row
-	 *            horizontal coordinate being fired upon.
-	 * @param column
-	 *            vertical coordinate being fired upon.
-	 */
-	private void markHitArray(int row, int column)
-	{
-		int offsetFromTheBow = horizontal ? column - bowColumn : row - bowRow;
-
-		hit[offsetFromTheBow] = true;
-	}
-
-	/**
-	 * Indicates whether or not the ship was hit at least once.
-	 *
-	 * @return {@code} true if it was hit once at least, {@code false}
-	 *         otherwise.
-	 */
-	private boolean isHit()
-	{
-		for (boolean wasHitOnceAtLeast : hit)
-		{
-			if (wasHitOnceAtLeast)
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * Returns a string representing the current state of the ship as a whole
-	 * marking each part that was hit with an 'S'. If the part of the ship was
-	 * not fired upon a place holder will be added to preserve the position of
-	 * each ship part in relation to the whole ship.
-	 *
-	 * @return a string indicating what part of the ship was hit.
-	 */
-	private String getShipStateToString()
 	{
 		String state = "";
 
 		for (boolean shipPartWasHit : hit)
 		{
-			state += shipPartWasHit ? "S" : ".";
+			// if the ship part was hit add an "S" for real ships
+			// or a "-" for empty sea, otherwise add a "."
+			state += shipPartWasHit ? (isRealShip() ? "S" : "-") : ".";
 		}
 
 		return state;

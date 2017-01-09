@@ -444,11 +444,10 @@ public class OceanTest
 		int bowRow = 3;
 		int bowColumn = 4;
 		boolean isHorizontal = false;
+		placeShipTypeAt(Cruiser.class, bowRow, bowColumn, isHorizontal, ocean);
 
 		// knowing that the intial hit count will be set to zero
 		int initialNumberOfHits = 0;
-
-		placeShipTypeAt(Cruiser.class, bowRow, bowColumn, isHorizontal, ocean);
 
 		// and then we shoot at it once
 		boolean shipWasHit = ocean.shootAt(bowRow, bowColumn);
@@ -620,7 +619,8 @@ public class OceanTest
 
 		// knowing that the Battleship does not span across the whole length
 		// of the ocean's side
-		assertTrue(Battleship.BATTLESHIP_LENGTH < Ocean.OCEAN_HEIGHT);
+		assertTrue("the ship length is shorter than the ocean's height",
+				Battleship.BATTLESHIP_LENGTH < Ocean.OCEAN_HEIGHT);
 
 		// and it is placed at a distance greater than its length from teh
 		// ocean's border
@@ -652,7 +652,7 @@ public class OceanTest
 		int numberOfShotsToFire = Destroyer.DESTROYER_LENGTH;
 		fireShotsAcrossOceanLine(numberOfShotsToFire, row, column, isHorizontal);
 
-		// and then check if the locations across which the ships spans contains
+		// and then check if the locations across which the ship spans contains
 		// a sunk ship
 		Random random = new Random();
 		boolean locationHasASunkShip = ocean.hasSunkShipAt(row,
@@ -866,8 +866,9 @@ public class OceanTest
 
 					Class<? extends Ship> shipClass = ship.getClass();
 
-					// stop when an empty sea is found or the edge of the border
-					// is reached
+					// increment the total count of the "ship area" and stop
+					// when an empty sea is found or the edge of the border is
+					// reached
 					while (j + realShipAreaCounter < Ocean.OCEAN_WIDTH
 							&& ships[i][j + realShipAreaCounter].isRealShip())
 					{
