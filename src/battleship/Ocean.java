@@ -48,7 +48,8 @@ public class Ocean
 
 	/**
 	 * Constructs a new Ocean instance filling each position with an
-	 * {@linkplain EmptySea}.
+	 * {@linkplain EmptySea} and sets the hit, the shot and the ship sunk count
+	 * to {@code 0}.
 	 *
 	 */
 	public Ocean()
@@ -487,9 +488,9 @@ public class Ocean
 		int length = horizontal ? shipLength : 1;
 
 		// row above the area that would host the ship
-		int topRow;
+		int topRow = bowRow - 1;
 		// row below the area that would host the ship
-		int bottomRow;
+		int bottomRow = bowRow + height;
 		// iteration variable used to scan the area
 		int column;
 
@@ -499,11 +500,8 @@ public class Ocean
 		// ship
 		for (int i = 0; i < length; i++)
 		{
-			// row above(-1), row below(+height), iterate over the
-			// row( ==>column(+i) )
+			// iterate over the row
 			column = bowColumn + i;
-			topRow = bowRow - 1;
-			bottomRow = bowRow + height;
 
 			if (column < OCEAN_WIDTH && column >= 0)
 			{
@@ -541,9 +539,9 @@ public class Ocean
 		int length = horizontal ? shipLength : 1;
 
 		// column on the left of area that would host the ship
-		int leftColumn;
+		int leftColumn = bowColumn - 1;
 		// column on the right of the area that would host the ship
-		int rightColumn;
+		int rightColumn = bowColumn + length;
 		// iteration variable used to scan the area
 		int row;
 
@@ -552,11 +550,8 @@ public class Ocean
 		// we also need to check the diagonal area around the ship
 		for (int i = -1; i <= height; i++)
 		{
-			// left column(-1), right column(+length), iterate over the
-			// column( ==>row(+i) )
+			// iterate over the column
 			row = bowRow + i;
-			leftColumn = bowColumn - 1;
-			rightColumn = bowColumn + length;
 
 			if (row >= 0 && row < OCEAN_HEIGHT)
 			{

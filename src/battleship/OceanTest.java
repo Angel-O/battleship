@@ -64,11 +64,11 @@ public class OceanTest
 		ocean = new Ocean();
 		ocean.placeAllShipsRandomly();
 		ships = ocean.getShipArray();
-		System.out.println("==== sh ====");
-		print(ships);
+		// System.out.println("==== sh ====");
+		// print(ships);
 		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
-		System.out.println("==== ro ====");
-		print(rotatedShips);
+		// System.out.println("==== ro ====");
+		// print(rotatedShips);
 	}
 
 	/**
@@ -86,9 +86,147 @@ public class OceanTest
 
 	// ======================= constructor tests ======================== //
 
+	@Test
+	public void test_Ocean_allCellsShouldContainAnEmptySeaWhenOceanIsCreated()
+	{
+		// if we create an empty Ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		// the total amount of cells should be equal to
+		int totalCellAmount = Ocean.OCEAN_HEIGHT * Ocean.OCEAN_WIDTH;
+
+		// and each one of them should contain an Empty Sea instance
+		int actualAmountOfEmptySea = countTotalSeaArea();
+		assertEquals("counting empty sea on initialization", totalCellAmount, actualAmountOfEmptySea);
+	}
+
+	@Test
+	public void test_Ocean_totalShotsCountShouldBeSetToZeroWhenOceanIsCreated()
+	{
+		// initally the total amount of shots fired
+		int actualInitialAmountOfShots = ocean.getShotsFired();
+
+		// should be equal to zero
+		assertEquals(0, actualInitialAmountOfShots);
+	}
+
+	@Test
+	public void test_Ocean_totalHitsCountShouldBeSetToZeroWhenOceanIsCreated()
+	{
+		// initally the total amount of hits
+		int actualInitialAmountOfHits = ocean.getHitCount();
+
+		// should be equal to zero
+		assertEquals(0, actualInitialAmountOfHits);
+	}
+
+	@Test
+	public void test_Ocean_totalShipSunkCountShouldBeSetToZeroWhenOceanIsCreated()
+	{
+		// initally the total amount of ships sunk
+		int actualInitialAmountOfShipSunk = ocean.getShipsSunk();
+
+		// should be equal to zero
+		assertEquals(0, actualInitialAmountOfShipSunk);
+	}
+
 	// =================== getters and setters tests ==================== //
 
-	// ========= placing ships randomly in the ocean tests ============== //
+	@Test
+	public void test_getShotsFired_shouldReturnTheCorrectAmountOfShotsFired()
+	{
+		// if we shoot a random number of times
+		Random random = new Random();
+		int expectedTotalShots = random.nextInt(100);
+
+		// at random locations within the ocean's borders
+		for (int i = 0; i < expectedTotalShots; i++)
+		{
+			ocean.shootAt(random.nextInt(Ocean.OCEAN_HEIGHT), random.nextInt(Ocean.OCEAN_WIDTH));
+		}
+
+		// we should expect the number of shots registered by the ocean to be
+		// whatever it was fired
+		assertEquals(expectedTotalShots, ocean.getShotsFired());
+	}
+
+	@Test
+	public void test_getHitCount_shouldReturnTheCorrectNumberOfHits()
+	{
+		// if we place a ship onto a newly created ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		int bowRow = 0;
+		int bowColumn = 0;
+		boolean isHorizontal = true;
+
+		placeShipTypeAt(Battleship.class, bowRow, bowColumn, isHorizontal, ocean);
+
+		// and then we shoot at it once
+		int expectedNumberOfHits = 1;
+		boolean shipWasHit = ocean.shootAt(bowRow, bowColumn);
+
+		// knowing that we actually hit it
+		assertTrue("first hit was succesfull", shipWasHit);
+
+		// and the ship is still afloat
+		boolean stillAfloat = !ships[bowRow][bowColumn].isSunk();
+		assertTrue("ship is still afloat after first hit", stillAfloat);
+
+		// we should expect the number of hits registered by the ocean to be the
+		// same
+		int actualNumberOfHits = ocean.getHitCount();
+		assertEquals("number of hits correctly reported on first hit", expectedNumberOfHits, actualNumberOfHits);
+
+		// if we shoot one more time and we hit the ship again
+		expectedNumberOfHits++;
+		shipWasHit = ocean.shootAt(bowRow, bowColumn + 1);
+
+		// knowing that we asuccesfully hit it again
+		assertTrue("second hit was succesfull", shipWasHit);
+
+		// and the ship is not sunk yet
+		stillAfloat = !ships[bowRow][bowColumn].isSunk();
+		assertTrue("ship is still afloat after second hit", stillAfloat);
+
+		// we should still expect the number of hits registered by the ocean to
+		// be the same
+		actualNumberOfHits = ocean.getHitCount();
+		assertEquals("number of hits correctly reported on second hit", expectedNumberOfHits, actualNumberOfHits);
+
+	}
+
+	@Test
+	public void test_getShipsSunk_shouldReturnTheCorrectNumberOfShipsSunk()
+	{
+		// if have just started
+		int shipsSunkSoFar = ocean.getShipsSunk();
+
+		// we should expect no to have sunk any ship
+		int shipsToSink = 0;
+		assertEquals("getting ships sunk count at game start", shipsToSink, shipsSunkSoFar);
+
+		// if then we sink a ship
+		shipsToSink++;
+		shootUntilShipsAreSunk(shipsToSink);
+
+		// we should expect the values to be equal
+		shipsSunkSoFar = ocean.getShipsSunk();
+		assertEquals("getting ships sunk count after sinkin one ship", shipsToSink, shipsSunkSoFar);
+
+		// if we sink 3 more ships
+		shipsToSink += 3;
+		shootUntilShipsAreSunk(shipsToSink);
+
+		// we should still expect the figures to match
+		shipsSunkSoFar = ocean.getShipsSunk();
+		assertEquals("getting ships sunk count after sinking 4 ships in total", shipsToSink, shipsSunkSoFar);
+
+	}
+
+	// ======================== public methods tests ==================== //
 
 	@Test
 	public void test_placeAllShipsRandomly_exactNumberOfEmptySeaShouldBePlacedRandomlyOnTheOcean()
@@ -251,7 +389,7 @@ public class OceanTest
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_occupied_ocean_spots_should_be_flagged_accordingly()
+	public void test_isOccupied_occupiedOceanSpotsShouldBeFlaggedAccordingly()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
@@ -265,16 +403,21 @@ public class OceanTest
 
 		// then any random ocean spots from the bow till the ship length should
 		// be marked as occupied
-		boolean expected = true;
 		Random random = new Random();
-		assertEquals(expected, ocean.isOccupied(0, random.nextInt(Battleship.BATTLESHIP_LENGTH)));
-		assertEquals(expected, ocean.isOccupied(2, random.nextInt(Cruiser.CRUISER_LENGTH)));
-		assertEquals(expected, ocean.isOccupied(4, random.nextInt(Destroyer.DESTROYER_LENGTH)));
-		assertEquals(expected, ocean.isOccupied(6, random.nextInt(Submarine.SUBMARINE_LENGTH)));
+		boolean firstLocationIsOccupied = ocean.isOccupied(0, random.nextInt(Battleship.BATTLESHIP_LENGTH));
+		boolean secondLocationIsOccupied = ocean.isOccupied(2, random.nextInt(Cruiser.CRUISER_LENGTH));
+		boolean thirdLocationIsOccupied = ocean.isOccupied(4, random.nextInt(Destroyer.DESTROYER_LENGTH));
+		boolean fourthLocationIsOccupied = ocean.isOccupied(6, random.nextInt(Submarine.SUBMARINE_LENGTH));
+
+		boolean locationIsOccupied = true;
+		assertEquals("first location is occupied", locationIsOccupied, firstLocationIsOccupied);
+		assertEquals("second location is occupied", locationIsOccupied, secondLocationIsOccupied);
+		assertEquals("third location is occupied", locationIsOccupied, thirdLocationIsOccupied);
+		assertEquals("fourth location is occupied", locationIsOccupied, fourthLocationIsOccupied);
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
-	public void test_clear_ocean_spot_should_be_flagged_accordingly()
+	public void test_isOccupied_clearOceanSpotsShouldBeFlaggedAccordingly()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
@@ -284,15 +427,77 @@ public class OceanTest
 		int row = random.nextInt(Ocean.OCEAN_HEIGHT);
 		int column = random.nextInt(Ocean.OCEAN_WIDTH);
 
-		// it should not be flagged as occupied
-		boolean expected = false;
-		assertEquals(expected, ocean.isOccupied(row, column));
+		// they should not be flagged as occupied
+		boolean oceanLocationIsOccupied = false;
+		boolean locationIsOccupied = ocean.isOccupied(row, column);
+
+		assertEquals("clear ocean spots should be flagged as such", oceanLocationIsOccupied, locationIsOccupied);
 	}
 
-	// ================ shooting at ocean location test ============== //
+	@Test
+	public void test_shootAt_theNumberOfHitsShouldIncreaseWhenARealAfloatShipGetsHit()
+	{
+		// if we place a real ship onto a newly created ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		int bowRow = 3;
+		int bowColumn = 4;
+		boolean isHorizontal = false;
+
+		// knowing that the intial hit count will be set to zero
+		int initialNumberOfHits = 0;
+
+		placeShipTypeAt(Cruiser.class, bowRow, bowColumn, isHorizontal, ocean);
+
+		// and then we shoot at it once
+		boolean shipWasHit = ocean.shootAt(bowRow, bowColumn);
+
+		// knowing that we actually hit it
+		assertTrue("first hit was succesfull", shipWasHit);
+
+		// and the ship is still afloat
+		boolean stillAfloat = !ships[bowRow][bowColumn].isSunk();
+		assertTrue("ship is still afloat", stillAfloat);
+
+		// we should expect the number of hits registered by the ocean to
+		// increase by one
+		int numberOfHitsAfterFirstSuccessfulShot = ocean.getHitCount();
+
+		boolean numberOfHitsHasIncrementedAfterFirstSuccessfulShot = numberOfHitsAfterFirstSuccessfulShot
+				- initialNumberOfHits == 1;
+		assertTrue("number of hits has increased after a successful shot",
+				numberOfHitsHasIncrementedAfterFirstSuccessfulShot);
+	}
 
 	@Test
-	public void test_shooting_afloat_ship_should_be_successful()
+	public void test_shootAt_theNumberOfHitsShouldNotIncreaseWhenTheShotMissesTheTarget()
+	{
+		// if we create a new empty ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		// and then we shoot at a random location
+		Random random = new Random();
+		boolean shipWasHit = ocean.shootAt(random.nextInt(Ocean.OCEAN_HEIGHT), random.nextInt(Ocean.OCEAN_WIDTH));
+
+		// knowing that the intial hit count will be set to zero
+		int initialNumberOfHits = 0;
+
+		// and that the shot was actually unsuccesful
+		assertFalse("shot was a miss", shipWasHit);
+
+		// we should expect the number of hits registered by the ocean to
+		// stay unchanged
+		int numberOfHitsAfterFirstUnsuccessfulShot = ocean.getHitCount();
+
+		boolean numberOfHitsHasDidNotIncreaseAfterUnsuccesfulShot = numberOfHitsAfterFirstUnsuccessfulShot == initialNumberOfHits;
+		assertTrue("number of hits has increased after a successful shot",
+				numberOfHitsHasDidNotIncreaseAfterUnsuccesfulShot);
+	}
+
+	@Test
+	public void test_shootAt_shootingAfloatShipShouldBeSuccessful()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
@@ -306,14 +511,48 @@ public class OceanTest
 
 		// if we shoot once anywhere at the ship
 		Random random = new Random();
-		boolean hitAfloatShip = ocean.shootAt(random.nextInt(Battleship.BATTLESHIP_LENGTH), column);
+		boolean hitAfloatShipIsSuccessful = ocean.shootAt(random.nextInt(Battleship.BATTLESHIP_LENGTH), column);
 
 		// we should expect to catch an afloat ship
-		assertTrue("hitting an afloat ship", hitAfloatShip);
+		assertTrue("hitting an afloat ship", hitAfloatShipIsSuccessful);
 	}
 
 	@Test
-	public void test_shooting_sunk_ships_should_be_unsuccessful()
+	public void test_shootAt_repeatedlyShootingAfloatShipShouldBeSuccessful()
+	{
+		// if we create an empty ocean
+		ocean = new Ocean();
+		ships = ocean.getShipArray();
+
+		// and place a ship onto it
+		int row = 0;
+		int column = 0;
+		boolean isHorizontal = false;
+		placeShipTypeAt(Battleship.class, row, column, isHorizontal, ocean);
+
+		// if we shoot at it
+		boolean succesfulShot = ocean.shootAt(row, column);
+
+		// knowing that we didn't sink it
+		boolean shipIsSunk = ships[row][column].isSunk();
+		assertFalse("ship is afloat after first shot", shipIsSunk);
+
+		// we should expect the shot to be succesful
+		assertTrue("succesfully hitting an afloat ship once", succesfulShot);
+
+		// if then we shoot at it again
+		succesfulShot = ocean.shootAt(row, column);
+
+		// knowing that the ship is still afloat
+		shipIsSunk = ships[row][column].isSunk();
+		assertFalse("ship is afloat after second shot", shipIsSunk);
+
+		// we should expect the shot to be still successful
+		assertTrue("succesfully hitting an afloat ship twice", succesfulShot);
+	}
+
+	@Test
+	public void test_shootAt_shootingSunkShipsShouldBeUnsuccessful()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
@@ -342,60 +581,92 @@ public class OceanTest
 	}
 
 	@Test
-	public void test_number_of_shots_fired_should_be_updated_at_each_shot()
+	public void test_shootAt_theNumberOfShotsFiredShouldBeUpdatedAtEachShot()
 	{
 		// if we shoot a random number of times
 		Random random = new Random();
-		int expected = random.nextInt(100);
+		int expectedTotalShots = random.nextInt(100);
 
 		// at random locations within the ocean's borders
-		for (int i = 0; i < expected; i++)
+		for (int i = 0; i < expectedTotalShots; i++)
 		{
 			ocean.shootAt(random.nextInt(Ocean.OCEAN_HEIGHT), random.nextInt(Ocean.OCEAN_WIDTH));
 		}
 
 		// we should expect the number of shots registered by the ocean to be
 		// whatever it was fired
-		assertEquals(expected, ocean.getShotsFired());
+		int actualNumberOfShotsFired = ocean.getShotsFired();
+
+		assertEquals("verifying shooting at ocean's locations increases after each shot", expectedTotalShots,
+				actualNumberOfShotsFired);
 	}
 
 	@Test
-	public void test_number_of_hits_should_be_updated_when_ship_is_successfully_hit()
+	public void test_shootAt_numberOfHitsShouldBeUpdatedOnlyAfterSuccessfulShots()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
+		ships = ocean.getShipArray();
 
-		// and place a Battleship at location (0,0), vertically
+		// and place a real ship at location (0,0), vertically
 		int bowRow = 0;
 		int bowColumn = 0;
 		boolean isHorizontal = false;
 		placeShipTypeAt(Battleship.class, bowRow, bowColumn, isHorizontal, ocean);
 
-		int expected = Battleship.BATTLESHIP_LENGTH;
-
-		// if then we shoot 4 shots across its length at different locations
-		// each time and keep shooting till the end of the empty ocean' border
-		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
-		{
-			ocean.shootAt(bowRow + i, bowColumn);
-		}
+		// and then we shoot across its length till the end of the ocean's
+		// border
+		fireShotsAcrossOceanLine(Ocean.OCEAN_HEIGHT, bowRow, bowColumn, isHorizontal);
 
 		// knowing that the Battleship does not span across the whole length
 		// of the ocean's side
 		assertTrue(Battleship.BATTLESHIP_LENGTH < Ocean.OCEAN_HEIGHT);
 
-		// we should expect to only get 4 successful shots
-		assertEquals(expected, ocean.getHitCount());
+		// and it is placed at a distance greater than its length from teh
+		// ocean's border
+		int sternColumn = bowColumn + Battleship.BATTLESHIP_LENGTH - 1;
+		int distanceFromTheBorder = Ocean.OCEAN_HEIGHT - sternColumn;
+		assertTrue("the ship is not placed at a distance greater than its length from the ocean border",
+				distanceFromTheBorder > Battleship.BATTLESHIP_LENGTH);
+
+		// we should expect to only get 4 successful shots (one for each ship
+		// part across the ship length)
+		int expectedNumberOfHits = Battleship.BATTLESHIP_LENGTH;
+		int actualNumberOfHits = ocean.getHitCount();
+		assertEquals(expectedNumberOfHits, actualNumberOfHits);
 	}
 
-	// ===================== game status test ======================== //
-
 	@Test
-	public void test_sunk_ship_should_be_correctly_reported_when_requested()
+	public void test_hasSunkShipAt_shouldReturnTrueIfLocationContainsSunkShip()
 	{
 		// if we create an empty ocean
 		ocean = new Ocean();
-		ships = ocean.getShipArray();
+
+		// and place a ship onto it
+		int row = 0;
+		int column = 0;
+		boolean isHorizontal = true;
+		placeShipTypeAt(Destroyer.class, row, column, isHorizontal, ocean);
+
+		// if we shoot across its length without sinking it
+		int numberOfShotsToFire = Destroyer.DESTROYER_LENGTH;
+		fireShotsAcrossOceanLine(numberOfShotsToFire, row, column, isHorizontal);
+
+		// and then check if the locations across which the ships spans contains
+		// a sunk ship
+		Random random = new Random();
+		boolean locationHasASunkShip = ocean.hasSunkShipAt(row,
+				random.nextInt(column + Destroyer.DESTROYER_LENGTH - 1));
+
+		// we should expect it to actually have one
+		assertTrue("location contains a sunk ship", locationHasASunkShip);
+	}
+
+	@Test
+	public void test_hasSunkShipAt_shouldReturnFalseIfLocationContainsAfloatShip()
+	{
+		// if we create an empty ocean
+		ocean = new Ocean();
 
 		// and place a ship onto it
 		int row = 0;
@@ -403,16 +674,115 @@ public class OceanTest
 		boolean isHorizontal = true;
 		placeShipTypeAt(Battleship.class, row, column, isHorizontal, ocean);
 
-		for (int i = 0; i < ships[row][column].getLength(); i++)
-		{
-			ocean.shootAt(row, column + i);
-		}
+		// if we shoot across its length without sinking it
+		int numberOfShotsToFire = Battleship.BATTLESHIP_LENGTH - 1;
+		fireShotsAcrossOceanLine(numberOfShotsToFire, row, column, isHorizontal);
 
-		// then check if the location contains a sunk ship
-		boolean actual = ocean.hasSunkShipAt(row, column);
+		// and then check if the locations across which the ships spans contains
+		// a sunk ship
+		Random random = new Random();
+		boolean locationHasASunkShip = ocean.hasSunkShipAt(row,
+				random.nextInt(column + Battleship.BATTLESHIP_LENGTH - 1));
 
-		// we should expect it to be correctly reported
-		assertTrue("reporting sunk ship", actual);
+
+		// we should expect it not to have one
+		assertFalse("ocean location with partly damaged ship should not contain a sunk ship", locationHasASunkShip);
+	}
+
+	@Test
+	public void test_hasSunkShipAt_shouldReturnFalseIfLocationContainsEmptySea()
+	{
+		// if we create an empty ocean
+		ocean = new Ocean();
+
+		// then check a random location to see if it ontains a sunk ship
+		Random random = new Random();
+		boolean locationHasASunkShip = ocean.hasSunkShipAt(random.nextInt(Ocean.OCEAN_HEIGHT),
+				random.nextInt(Ocean.OCEAN_WIDTH));
+
+		// we should expect it not to have one
+		assertFalse("empty sea locations do not have sunk ships on them", locationHasASunkShip);
+	}
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_isGameOver_shouldReturnFalseIfNotAllShipsHaveBeenSunk()
+	{
+		// if we check the game status before sinking all the ships
+		// we should expect the game to be on
+		boolean gameStatus = ocean.isGameOver();
+
+		assertFalse("checking game status at game start", gameStatus);
+
+		// if then we fire shots unitl we sink a number of ships
+		// less than the total number of ships
+		Random random = new Random();
+		int numberOfShipsToSink = random.nextInt(4);
+
+		shootUntilShipsAreSunk(numberOfShipsToSink);
+
+		// and we check the game status again
+		gameStatus = ocean.isGameOver();
+
+		// we should expect it to be still on
+		assertFalse("checking game status after sinking a few ships", gameStatus);
+	}
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_isGameOver_shouldReturnTrueIfAllShipsHaveBeenSunk()
+	{
+		// if we check the game status before sinking all the ships
+		// we should expect the game to be on
+		boolean gameStatus = ocean.isGameOver();
+
+		assertFalse("checking game status at game start", gameStatus);
+
+		// if then we fire shots unitl we sink all the ships
+		int numberOfShipsToSink = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
+
+		shootUntilShipsAreSunk(numberOfShipsToSink);
+
+		// and we check the game status again
+		gameStatus = ocean.isGameOver();
+
+		// we should expect it to be over
+		assertTrue("checking game status after sinking every ship", gameStatus);
+	}
+
+	@Test
+	public void test_getShipsTypeAt_shouldReturnTheCorrectShipType()
+	{
+		// if we have an empty ocean
+		ocean = new Ocean();
+
+		// and we get the ship type anywhere at its location
+		Random random = new Random();
+		String emptySeaType = ocean.getShipTypeAt(random.nextInt(Ocean.OCEAN_HEIGHT),
+				random.nextInt(Ocean.OCEAN_WIDTH));
+
+		// we should expect them to be empty sea types
+		assertEquals(EmptySea.EMPTY_SEA_TYPE, emptySeaType);
+
+		// if then we place a few ships onto the ocean
+		int bowRow = 0;
+		int bowColumn = 0;
+		boolean isHorizontal = true;
+
+		placeShipTypeAt(Battleship.class, bowRow, bowColumn, isHorizontal, ocean);
+		placeShipTypeAt(Cruiser.class, bowRow + 1, bowColumn, isHorizontal, ocean);
+		placeShipTypeAt(Destroyer.class, bowRow + 2, bowColumn, isHorizontal, ocean);
+		placeShipTypeAt(Submarine.class, bowRow + 3, bowColumn, isHorizontal, ocean);
+
+		// and get their ship types
+		String battleshipType = ocean.getShipTypeAt(bowRow, bowColumn);
+		String cruiserType = ocean.getShipTypeAt(bowRow + 1, bowColumn);
+		String destroyerType = ocean.getShipTypeAt(bowRow + 2, bowColumn);
+		String submarineType = ocean.getShipTypeAt(bowRow + 3, bowColumn);
+
+		// we should expect to match their corrsepondent ship type
+		assertEquals(Battleship.BATTLESHIP_TYPE, battleshipType);
+		assertEquals(Cruiser.CRUISER_TYPE, cruiserType);
+		assertEquals(Destroyer.DESTROYER_TYPE, destroyerType);
+		assertEquals(Submarine.SUBMARINE_TYPE, submarineType);
 	}
 
 	// ======================= helper methods ======================== //
@@ -635,6 +1005,53 @@ public class OceanTest
 		}
 
 		return totalShips;
+	}
+
+	private void shootUntilShipsAreSunk(int numberOfShipsToSink)
+	{
+		if (numberOfShipsToSink == 0)
+		{
+			// do not attempt if you don't want to sink any ship
+			return;
+		}
+
+		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
+		{
+			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
+			{
+				if (ocean.shootAt(i, j))
+				{
+					if (ocean.getShipsSunk() == numberOfShipsToSink)
+					{
+						// stop shooting once the desired number of ships have
+						// been sunk
+						return;
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Helper method to shoot at a ship across its length, in a sequential way.
+	 * No shots will be fired twice at the samem location.
+	 *
+	 * @param ship
+	 *            target to shoot at
+	 * @param shots
+	 *            number of shots to be fired in sequence from the bow
+	 *            coordinates of the ship
+	 */
+	private void fireShotsAcrossOceanLine(int shots, int row, int column, boolean horizontal)
+	{
+		int start = horizontal ? column : row;
+
+		for (int i = start; i < start + shots; i++)
+		{
+			// if the ship is horizontal increment the column, otherwise
+			// increment the row
+			ocean.shootAt(horizontal ? row : i, horizontal ? i : column);
+		}
 	}
 
 	// ========================== debug =============================== //
