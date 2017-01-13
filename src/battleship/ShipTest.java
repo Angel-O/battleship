@@ -130,7 +130,7 @@ public class ShipTest
 	@Test
 	public void test_getShipType_shouldReturnCorrectShipType()
 	{
-		// for EachTestNotifier ship type we have
+		// for each ship type we have
 		Ship emptySea = new EmptySea();
 		String expectedEmptySeaType = EmptySea.EMPTY_SEA_TYPE;
 		String actualEmptySeaType = emptySea.getShipType();
@@ -151,8 +151,8 @@ public class ShipTest
 		String expectedSubmarineType = Submarine.SUBMARINE_TYPE;
 		String actualSubmarineType = submarine.getShipType();
 
-		// we should expect the correct ship type when calling the get ship type
-		// method
+		// we should expect to get the correct ship type when calling the get
+		// ship type method
 		assertEquals("verifying empty sea type", expectedEmptySeaType, actualEmptySeaType);
 		assertEquals("verifying battleship type", expectedEBattleshipType, actualBattleshipType);
 		assertEquals("verifying cruiser type", expectedCruiserType, actualCruiserType);
@@ -271,10 +271,10 @@ public class ShipTest
 		// if we create a new empty sea ship
 		Ship ship = new EmptySea();
 
-		// we shoiuld expect its orientation to be set to the default value
-		boolean expected = ship.isRealShip();
+		// we should expect its orientation to be set to the default value
+		boolean expectedShipType = ship.isRealShip();
 
-		assertFalse("verifying that empty sea ships are not a real ship", expected);
+		assertFalse("verifying that empty sea ships are not a real ship", expectedShipType);
 	}
 
 	@Test
@@ -293,7 +293,7 @@ public class ShipTest
 		Ship submarine = new Submarine();
 		boolean isSubmarinReal = submarine.isRealShip();
 
-		// we shoiuld expect them to be flagged as actual ships
+		// we should expect them to be flagged as actual ships
 		assertTrue("verifying that battleships are indeed real ship", isBattleshipReal);
 		assertTrue("verifying that cruisers are indeed real ship", isCruiserReal);
 		assertTrue("verifying that destroyers are indeed real ship", isDestroyerReal);
@@ -355,9 +355,9 @@ public class ShipTest
 	}
 
 	@Test
-	public void test_toString_shouldReturnCorrectCharForEmptySea()
+	public void test_toString_shouldReturnCorrectRepresentationForEmptySea()
 	{
-		// if we have a brand new empty sea at (0,0)
+		// if we have a brand new empty sea with bow coordinates set to (0,0)
 		int bowRow = 0;
 		int bowColumn = 0;
 		Ship ship = new EmptySea();
@@ -380,9 +380,10 @@ public class ShipTest
 	}
 
 	@Test
-	public void test_toString_shouldReturnCorrectStringForRealShip()
+	public void test_toString_shouldReturnCorrectRepresentationForRealShip()
 	{
-		// if we have a brand new real horizontal ship at (0,0)
+		// if we have a brand new real horizontal ship with bow coordinates set
+		// to (0,0)
 		int bowRow = 0;
 		int bowColumn = 0;
 		Ship ship = new Battleship();
@@ -438,7 +439,8 @@ public class ShipTest
 	@Test
 	public void test_shootAt_onlyShotShipPartsShouldBeMarkedInHitArray()
 	{
-		// if we have a brand new real horizontal ship at (0,0)
+		// if we have a brand new real horizontal ship with bow coordinates set
+		// to (0,0)
 		int bowRow = 0;
 		int bowColumn = 0;
 		Ship ship = new Destroyer();
@@ -461,7 +463,8 @@ public class ShipTest
 	@Test
 	public void test_shootAt_shouldReturnTrueEachTimeRealShipIsShotWhenStillAfloat()
 	{
-		// if we have a brand new real vertical ship at (0,0)
+		// if we have a brand new real vertical ship with bow coordinates set to
+		// (0,0)
 		int bowRow = 0;
 		int bowColumn = 0;
 		Ship ship = new Cruiser();
@@ -479,7 +482,8 @@ public class ShipTest
 	@Test
 	public void test_shootAt_shouldReturnFalseEachTimeRealShipIsShotAfterBeingSunk()
 	{
-		// if we have a brand new real vertical ship at (0,0)
+		// if we have a brand new real vertical ship with bow coordinates set to
+		// (0,0)
 		int bowRow = 0;
 		int bowColumn = 0;
 		Ship ship = new Cruiser();
@@ -497,7 +501,7 @@ public class ShipTest
 	@Test
 	public void test_shootAt_shouldReturnFalseWheneverEmptySeaIsHit()
 	{
-		// if we have an empty sea at (0,0)
+		// if we have an empty sea with bow coordinates set to (0,0)
 		int bowRow = 0;
 		int bowColumn = 0;
 		Ship ship = new EmptySea();

@@ -19,3 +19,6 @@
 19. move diagonal check to its own method to squash lateral and end check in a unique method
 20. remove initalize ocean method
 21. add comments to test methods
+22. double check edge cases are tested
+23. remove for loops from test methods
+

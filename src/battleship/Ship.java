@@ -234,7 +234,7 @@ public abstract class Ship
 		for (boolean shipPartWasHit : hit)
 		{
 			// if the ship part was hit add an "S" for real ships
-			// or a "-" for empty sea, otherwise add a "."
+			// or a "-" for empty sea spots, otherwise add a "."
 			state += shipPartWasHit ? (isRealShip() ? "S" : "-") : ".";
 		}
 
