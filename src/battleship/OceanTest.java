@@ -17,6 +17,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
+ * Test class to test the API of the {@linkplain Ocean} class.
+ *
  * @author Angelo Oparah
  *
  */
@@ -64,11 +66,7 @@ public class OceanTest
 		ocean = new Ocean();
 		ocean.placeAllShipsRandomly();
 		ships = ocean.getShipArray();
-		// System.out.println("==== sh ====");
-		// print(ships);
 		rotatedShips = rotateOceanNinetyDegreeAntiClockwise();
-		// System.out.println("==== ro ====");
-		// print(rotatedShips);
 	}
 
 	/**
@@ -146,9 +144,11 @@ public class OceanTest
 			ocean.shootAt(random.nextInt(Ocean.OCEAN_HEIGHT), random.nextInt(Ocean.OCEAN_WIDTH));
 		}
 
+		int actualShotCount = ocean.getShotsFired();
+
 		// we should expect the number of shots registered by the ocean to be
-		// whatever it was fired
-		assertEquals(expectedTotalShots, ocean.getShotsFired());
+		// whatever it was fired, regardless of the outcome of the shots
+		assertEquals("shot count should increase each time a shot is fired", expectedTotalShots, actualShotCount);
 	}
 
 	@Test
@@ -201,10 +201,10 @@ public class OceanTest
 	@Test
 	public void test_getShipsSunk_shouldReturnTheCorrectNumberOfShipsSunk()
 	{
-		// if have just started
+		// if have just started the game
 		int shipsSunkSoFar = ocean.getShipsSunk();
 
-		// we should expect no to have sunk any ship
+		// we shouldn't expect to have any sunk ship
 		int shipsToSink = 0;
 		assertEquals("getting ships sunk count at game start", shipsToSink, shipsSunkSoFar);
 
@@ -244,7 +244,7 @@ public class OceanTest
 		// we should get this amount of "empty sea" portions
 		int expected = totoalOceanSpace - totalShipSpace;
 
-		assertEquals(expected, totalSeaArea);
+		assertEquals("total sea area is correct", expected, totalSeaArea);
 	}
 
 	@Test
@@ -259,7 +259,7 @@ public class OceanTest
 		// we should have this amount of ships
 		int expected = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
 
-		assertEquals(expected, totalNumberOFShips);
+		assertEquals("the total number of ships is correct", expected, totalNumberOFShips);
 	}
 
 	@Test

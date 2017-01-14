@@ -100,7 +100,7 @@ public class Ocean
 	}
 
 	/**
-	 * Return a 2-dimensional array containing the ships in the ocean. Used for
+	 * Returns a 2-dimensional array containing the ships in the ocean. Used for
 	 * testing and debugging purposes.
 	 *
 	 * @return the array containing the ships in the ocean.
@@ -284,10 +284,14 @@ public class Ocean
 	}
 
 	/**
-	 * Returns a {@code char} representing the current state of the ship part,
-	 * where "x" indicates a sunk ship, "." a location that is yet to be fired
-	 * upon, "S" a location that was fired upon hitting a ship and "-" a
-	 * location that was fired upon without hitting any ship.
+	 * Returns a {@code char} representing the current state of the ship part.
+	 * If the location contains a sunk {@linkplain Ship} (considered as a whole)
+	 * the ship state will be overwritten with a "x" to indicate that the whole
+	 * ship was sunk. Otherwise the ship state will be returned. Note: the
+	 * {@linkplain Ship} class will mark a location that is yet to be fired upon
+	 * with a "." (dot) , a location that was fired upon hitting a ship with a
+	 * "S" and a location that was fired upon without hitting any ship with a
+	 * "-" (dash).
 	 *
 	 * @param row
 	 *            horizontal coordinate of the ship part to display.
@@ -330,9 +334,11 @@ public class Ocean
 	/**
 	 * Randomly places the given number of ships of the given type and the given
 	 * length on to the ocean, making sure that ships don't overlap, aren't
-	 * adjacent in any direction to any other ship and don't exceed the ocean's
-	 * borders.
+	 * adjacent in any direction to any other ship (horizontally, vertically or
+	 * diagonally) and don't exceed the ocean's borders.
 	 *
+	 * @param <T>
+	 *            type of the ships to place.
 	 * @param amount
 	 *            number of ships to place.
 	 * @param shipLength
@@ -396,7 +402,7 @@ public class Ocean
 	 * Factory method to generate (real) ship parts of the given type. It will
 	 * set the bow coordinates and orientation to the values passed as
 	 * arguments. It can return a null value if the class passed as parameter is
-	 * recognized.
+	 * recognized or the class refers to a ship type that is not a real ship.
 	 *
 	 * @param <T>
 	 *            subclass of the {@linkplain Ship} type.
@@ -406,6 +412,9 @@ public class Ocean
 	 *            horizontal coordinate of the bow.
 	 * @param bowColumn
 	 *            vertical coordinate of the bow.
+	 * @param horizontal
+	 *            orientation of the ship that the ship part to create will be
+	 *            part of.
 	 * @return a ship part of the requested type; can be {@code null}.
 	 */
 	private <T extends Ship> Ship createShip(Class<T> shipClass, int bowRow, int bowColumn, boolean horizontal)
@@ -439,9 +448,9 @@ public class Ocean
 
 		// can return null (rather than a ship of a default ship type): leave
 		// the door open for future extensibility. If we add a new ship type but
-		// forget to add it in this method, the assertion will fail and we will
-		// know exactly what happened, rather than wondering why we get extra
-		// ships of a given default type.
+		// forget to add it in this method, the assertion used after calling
+		// this method will fail and we will know exactly what happened, rather
+		// than wondering why we get extra ships of a given default type.
 		return ship;
 	}
 
@@ -478,12 +487,15 @@ public class Ocean
 		// conditions the only place where ships can overlap in the mid area is
 		// the location where the bow will be placed
 		return !isOccupied(bowRow, bowColumn)
-				&& areaAlongTheLengthIsClear(bowRow, bowColumn, length, height, horizontal)
-				&& areaAtEachEndIsClear(bowRow, bowColumn, length, height, horizontal);
+				&& areaAlongTheLengthIsClear(bowRow, bowColumn, length, height)
+				&& areaAtEachEndIsClear(bowRow, bowColumn, length, height);
 	}
 
 	/**
-	 * Determines whether the area along the length of the ship is clear.
+	 * Determines whether the area adjacent the ship along its length is clear.
+	 * Note horizontal ships have height equal to {@code 1} and length equal to
+	 * the ship length, while vertical ships are treated as horizontal ships
+	 * with length equal to {@code 1} and height equal to the ship length.
 	 *
 	 * @param bowRow
 	 *            horizontal coordinate of the bow.
@@ -491,13 +503,12 @@ public class Ocean
 	 *            vertical coordinate of the bow.
 	 * @param shipLength
 	 *            length of the ship.
-	 * @param horizontal
-	 *            orientation on the ocean's matrix (vertical or diagonal).
+	 * @param shipHeight
+	 *            height of the ship.
 	 * @return {@code true} if the ship can be placed in the area respecting the
 	 *         criteria.
 	 */
-	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight,
-			boolean horizontal)
+	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
 	{
 		// row above the area that would host the ship
 		int topRow = bowRow - 1;
@@ -528,8 +539,11 @@ public class Ocean
 	}
 
 	/**
-	 * Determines whether the area at both ends of the ship including the
-	 * diagonal areas are clear.
+	 * Determines whether the area adjacent the ship at both ends, including the
+	 * diagonal area, is clear. Note horizontal ships have height equal to
+	 * {@code 1} and length equal to the ship length, while vertical ships are
+	 * treated as horizontal ships with length equal to {@code 1} and height
+	 * equal to the ship length.
 	 *
 	 * @param bowRow
 	 *            horizontal coordinate of the bow.
@@ -537,12 +551,12 @@ public class Ocean
 	 *            vertical coordinate of the bow.
 	 * @param shipLength
 	 *            length of the ship.
-	 * @param horizontal
-	 *            orientation on the ocean's matrix (vertical or diagonal)
+	 * @param shipHeight
+	 *            height of the ship.
 	 * @return {@code true} if the ship can be placed in the area respecting the
 	 *         criteria.
 	 */
-	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight, boolean horizontal)
+	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
 	{
 		// column on the left of area that would host the ship
 		int leftColumn = bowColumn - 1;

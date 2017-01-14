@@ -14,6 +14,8 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
+ * Test class to test the API of the {@linkplain Ship} class.
+ *
  * @author Angelo Oparah
  *
  */
@@ -521,8 +523,8 @@ public class ShipTest
 
 	/**
 	 * Mock class to emulate the behaviour of a {@linkplain Ship}. In particular
-	 * it allows to pass a value to the constuctor without using a default
-	 * hardcoded one.
+	 * it allows to pass a length parameter to the constuctor without using a
+	 * default hardcoded one.
 	 *
 	 * @author Angelo Oparah
 	 *
@@ -551,7 +553,7 @@ public class ShipTest
 
 	/**
 	 * Helper method to shoot at a ship across its length, in a sequential way.
-	 * No shots will be fired twice at the samem location.
+	 * No shots will be fired twice at the same location.
 	 *
 	 * @param ship
 	 *            target to shoot at

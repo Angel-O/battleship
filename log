@@ -1,20 +1,11 @@
-1. provide validation for length fields
-2. check whether or not getters and setters are required for instance vars in ship class
-3. provide validation for bow row and bow col (in subclasses???)
 4. email Carsten about Ocean.hasSunkShipAt method specs
 5. Ocean.getShipArray return actual ships...what are they???
-6. add test to avoid ship overflow
 7. check nesting in print method
-8. add check whenever accessing the ship matrix
-9. establishshiplength by type method (test and ocean class..pick one)
+8. add check whenever accessing the ship matrix ==> shootAt method
 10. rotate matrix strategy: can I use it in the ocean class?
 11. remove unnecessary code from test classes, fix names...
 12. improve re-usability of tests method by scanning ocean by type
-13. add comments to .ctors
-14. ship name as static constant??
-15. try and fix matrix rotation issue (bow coordinates needs to be updated, but how????)
-16 is there limit to the number of attempt to place a ship?
-17. null check when creating ship part
+16. is there limit to the number of attempt to place a ship?
 18. add comments to instance and class variables in test classes
 19. move diagonal check to its own method to squash lateral and end check in a unique method
 20. remove initalize ocean method
