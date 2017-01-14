@@ -392,7 +392,6 @@ public class Ocean
 		}
 	}
 
-
 	/**
 	 * Factory method to generate (real) ship parts of the given type. It will
 	 * set the bow coordinates and orientation to the values passed as
@@ -467,16 +466,21 @@ public class Ocean
 	 */
 	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
+		// treating vertical ships as horizontal ships with length equal to 1
+		// and hight equal the length of the ship
+		int height = horizontal ? 1 : shipLength;
+		int length = horizontal ? shipLength : 1;
+
 		// there is no need to check the mid area, where the ship will
 		// actually be placed as long as we check the adjacent areas
 		// (overlapping is guaranteed not to occur in the mid area, bow
 		// excluded, since we are dropping the longest ships first). Under these
 		// conditions the only place where ships can overlap in the mid area is
 		// the location where the bow will be placed
-		return !isOccupied(bowRow, bowColumn) && areaAtEachEndIsClear(bowRow, bowColumn, shipLength, horizontal)
-				&& areaAlongTheLengthIsClear(bowRow, bowColumn, shipLength, horizontal);
+		return !isOccupied(bowRow, bowColumn)
+				&& areaAlongTheLengthIsClear(bowRow, bowColumn, length, height, horizontal)
+				&& areaAtEachEndIsClear(bowRow, bowColumn, length, height, horizontal);
 	}
-
 
 	/**
 	 * Determines whether the area along the length of the ship is clear.
@@ -492,17 +496,13 @@ public class Ocean
 	 * @return {@code true} if the ship can be placed in the area respecting the
 	 *         criteria.
 	 */
-	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
+	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight,
+			boolean horizontal)
 	{
-		// treating vertical ships as horizontal ships with length equal to 1
-		// and hight equal the length of the ship
-		int height = horizontal ? 1 : shipLength;
-		int length = horizontal ? shipLength : 1;
-
 		// row above the area that would host the ship
 		int topRow = bowRow - 1;
 		// row below the area that would host the ship
-		int bottomRow = bowRow + height;
+		int bottomRow = bowRow + shipHeight;
 		// iteration variable used to scan the area
 		int column;
 
@@ -510,7 +510,7 @@ public class Ocean
 		// that could potentially host the ship, looping from 0 to length
 		// (exclusive) as we do not need to check the diagonal area around the
 		// ship
-		for (int i = 0; i < length; i++)
+		for (int i = 0; i < shipLength; i++)
 		{
 			// iterate over the row
 			column = bowColumn + i;
@@ -527,7 +527,6 @@ public class Ocean
 		return true;
 	}
 
-
 	/**
 	 * Determines whether the area at both ends of the ship including the
 	 * diagonal areas are clear.
@@ -543,24 +542,19 @@ public class Ocean
 	 * @return {@code true} if the ship can be placed in the area respecting the
 	 *         criteria.
 	 */
-	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
+	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight, boolean horizontal)
 	{
-		// treating vertical ships as horizontal ships with length equal to 1
-		// and hight equal the length of the ship
-		int height = horizontal ? 1 : shipLength;
-		int length = horizontal ? shipLength : 1;
-
 		// column on the left of area that would host the ship
 		int leftColumn = bowColumn - 1;
 		// column on the right of the area that would host the ship
-		int rightColumn = bowColumn + length;
+		int rightColumn = bowColumn + shipLength;
 		// iteration variable used to scan the area
 		int row;
 
 		// checking both ends (left and right) of the area that could
 		// potentially host the ship, looping from -1 to height (inclusive) as
 		// we also need to check the diagonal area around the ship
-		for (int i = -1; i <= height; i++)
+		for (int i = -1; i <= shipHeight; i++)
 		{
 			// iterate over the column
 			row = bowRow + i;
