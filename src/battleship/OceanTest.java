@@ -1175,25 +1175,20 @@ public class OceanTest
 
 	private static <T extends Ship> String printShip(Class<T> shipClass, boolean horizontal)
 	{
-
 		if (shipClass.equals(Battleship.class))
 		{
-
 			return "4";
 		}
 		else if (shipClass.equals(Cruiser.class))
 		{
-
 			return "3";
 		}
 		else if (shipClass.equals(Destroyer.class))
 		{
-
 			return "2";
 		}
 		else if (shipClass.equals(Submarine.class))
 		{
-
 			return horizontal ? "H" : "V";
 		}
 		else

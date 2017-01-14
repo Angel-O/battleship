@@ -3,44 +3,47 @@ package battleship;
 
 /**
  * Represents a ship of variable length in the {@linkplain Ocean}. Each ship
- * holds information about the coordinates of the bow, the length of the ship
- * and its orientation, vertical or horizontal.
+ * holds information about the coordinates of the bow, the length of the ship,
+ * its orientation (vertical or horizontal) and the state of each part of the
+ * ship (hit or non-hit).
  *
  * @author Angelo Oparah
  */
 public abstract class Ship
 {
-	/** measures the length of the ship. */
+	/** measures the length of the (whole) ship. */
 	private int length;
 
-	/** indicates the vertical position of the front of the ship. */
+	/** indicates the vertical coordinate of the front of the ship. */
 	private int bowRow;
 
-	/** indicates the horizontal position of the front of the ship. */
+	/** indicates the horizontal coordinate of the front of the ship. */
 	private int bowColumn;
 
-	/** set to true to indicate that the ship occupies a single row. */
+	/** orientation of the ship: true means horizontal, false vertical. */
 	private boolean horizontal;
 
-	/** indicates what part of the ship has been hit. */
+	/** indicates what parts of the ship have been hit. */
 	private boolean[] hit;
 
 
 	/**
 	 * Builds a part of a ship that will be placed onto the {@linkplain Ocean}
-	 * and sets its initial state to 'no-hits', meaning no part of the ship has
-	 * suffered a shot. Note: the length of the ship instead refers to the whole
-	 * ship so each ship part should have the same length. The length must be
-	 * less than both the {@linkplain Ocean}'s height and width to ensure that
-	 * the ship can be placed anywhere in the ocean regardless of its
-	 * orientation.
+	 * and sets its initial state to 'no-hits', meaning no part of the ship
+	 * suffered any shot. Note: while this constructor builds a single ship
+	 * part, the length of the ship passed as parameter instead refers to the
+	 * whole ship, so each ship part belonging to the same ship should have the
+	 * same length. The length must be less than both the {@linkplain Ocean}'s
+	 * height and width to ensure that the ship can be placed anywhere in the
+	 * ocean regardless of what orientation: if that is not the case an
+	 * exception will be thrown.
 	 *
 	 *
 	 * @param length
 	 *            the length of the ship; must be greater than zero.
 	 * @throws IllegalArgumentException
-	 *             if the length provided is less or equal to zero or greater
-	 *             than the {@linkplain Ocean} boundaries.
+	 *             if the length provided is less or equal to zero or if it
+	 *             exceeds the {@linkplain Ocean} boundaries.
 	 */
 	public Ship(int length)
 	{
@@ -86,10 +89,11 @@ public abstract class Ship
 
 			if (offsetFromTheBow < 0 || offsetFromTheBow >= length)
 			{
-				// this shouldn't really happen, but give that the method is
+				// this shouldn't really happen, but given that the method is
 				// public it can be misused, so if somehow the offset from the
-				// bow is negative of greater than the ship length we will
-				// return false and avoid marking the hit array
+				// bow is negative or greater than the ship length (or equal) we
+				// will return false and avoid trying to mark the hit array and
+				// consequently an IndexOutOfBounds Exception
 				return false;
 			}
 
@@ -104,7 +108,8 @@ public abstract class Ship
 	}
 
 	/**
-	 * Indicates if the ship has been sunk.
+	 * Indicates if the (whole) ship, that the ship part belongs to has been
+	 * sunk.
 	 *
 	 * @return {@code true} if every part of the ship has been hit {@code false}
 	 *         otherwise.
@@ -120,6 +125,7 @@ public abstract class Ship
 				return false;
 			}
 		}
+
 		return true;
 	}
 
@@ -159,6 +165,7 @@ public abstract class Ship
 		{
 			throw new IllegalArgumentException("Illegal out of range value for bowRow: " + bowRow);
 		}
+
 		this.bowRow = bowRow;
 	}
 
@@ -188,15 +195,17 @@ public abstract class Ship
 		{
 			throw new IllegalArgumentException("Illegal out of range value for bowColumn: " + bowColumn);
 		}
+
 		this.bowColumn = bowColumn;
 	}
 
 	/**
-	 * Refers the orientation of the ship. A ship will be placed horizontally in
-	 * the {@linkplain Ocean} if this value is set to true.
+	 * Refers to the orientation of the ship. A ship will be placed horizontally
+	 * in the {@linkplain Ocean} if this value is set to {@code true},
+	 * vertically otherwise.
 	 *
 	 * @return {@code true} if the ship is positioned horizontally,
-	 *         {@code false} otherwise
+	 *         {@code false} otherwise.
 	 */
 	public boolean isHorizontal()
 	{
@@ -230,11 +239,11 @@ public abstract class Ship
 
 	/**
 	 * Returns a string representing the current state of the ship. "S"
-	 * indicates a location that was fired upon and hit a ship; "-" indicates a
-	 * location that was fired upon without hitting any ship and "." to
-	 * indicates a location that is yet to be fired upon. Note: if the ship is
-	 * sunk it will be marked with "x" by the {@linkplain Ocean} when displaying
-	 * the grid, regardless of the representation returned by this method.
+	 * indicates a (real) ship part that was fired upon; "-" indicates an non
+	 * real ship that was fired upon and "." indicates a ship part (real or not)
+	 * that is yet to be fired upon. Note: if the ship is sunk it will be marked
+	 * with "x" by the {@linkplain Ocean} when displaying the grid, regardless
+	 * of the representation returned by this method.
 	 */
 	@Override
 	public String toString()
@@ -243,8 +252,9 @@ public abstract class Ship
 
 		for (boolean shipPartWasHit : hit)
 		{
-			// if the ship part was hit add an "S" for real ships
-			// or a "-" for empty sea spots, otherwise add a "."
+			// if the ship part was hit add an "S" for real ships or a "-" for
+			// empty sea spots, otherwise add a "." to indicate that the ship
+			// part is yet to be fired upon
 			state += shipPartWasHit ? (isRealShip() ? "S" : "-") : ".";
 		}
 
