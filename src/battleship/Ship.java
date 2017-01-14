@@ -48,7 +48,7 @@ public abstract class Ship
 		{
 			throw new IllegalArgumentException("Illegal non positive value for ship length: " + length);
 		}
-		if (length > Ocean.OCEAN_HEIGHT || length > Ocean.OCEAN_HEIGHT)
+		if (length > Ocean.OCEAN_HEIGHT || length > Ocean.OCEAN_WIDTH)
 		{
 			throw new IllegalArgumentException("Illegal out of range value for ship length: " + length);
 		}

@@ -25,16 +25,16 @@ import org.junit.Test;
 public class OceanTest
 {
 	/** Instance of the class under test */
-	private static Ocean ocean;
+	private Ocean ocean;
 
 	/** Contains the shios in the ocean */
-	private static Ship[][] ships;
+	private Ship[][] ships;
 
 	/**
 	 * Contains the same ships in the ocean, rotated 90 degreess anticlockwise
 	 * to aid testing.
 	 */
-	private static Ship[][] rotatedShips;
+	private Ship[][] rotatedShips;
 
 	/** default timeout test duration in milliseconds */
 	private static final int DEFAULT_TIMEOUT = 2000;
@@ -810,7 +810,7 @@ public class OceanTest
 
 	// ======================= helper methods ======================== //
 
-	private static Ship[][] rotateOceanNinetyDegreeAntiClockwise()
+	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
 	{
 		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
 

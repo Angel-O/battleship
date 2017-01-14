@@ -18,7 +18,8 @@ public class EmptySea extends Ship
 
 	/**
 	 * Creates a dummy {@linkplain Ship} of length equal to
-	 * {@value #EMPTY_SEA_LENGTH}.
+	 * {@value #EMPTY_SEA_LENGTH}, representing an empty sea location in the
+	 * {@linkplain Ocean}.
 	 */
 	public EmptySea()
 	{
