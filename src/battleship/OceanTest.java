@@ -108,7 +108,7 @@ public class OceanTest
 		int actualInitialAmountOfShots = ocean.getShotsFired();
 
 		// should be equal to zero
-		assertEquals(0, actualInitialAmountOfShots);
+		assertEquals("initial amount of shots fired should be set to zero", 0, actualInitialAmountOfShots);
 	}
 
 	@Test
@@ -118,7 +118,7 @@ public class OceanTest
 		int actualInitialAmountOfHits = ocean.getHitCount();
 
 		// should be equal to zero
-		assertEquals(0, actualInitialAmountOfHits);
+		assertEquals("initial amount of hits should be set to zero", 0, actualInitialAmountOfHits);
 	}
 
 	@Test
@@ -128,7 +128,7 @@ public class OceanTest
 		int actualInitialAmountOfShipSunk = ocean.getShipsSunk();
 
 		// should be equal to zero
-		assertEquals(0, actualInitialAmountOfShipSunk);
+		assertEquals("initial amount of sunk ships should be zero", 0, actualInitialAmountOfShipSunk);
 	}
 
 	// =================== getters and setters tests ==================== //
@@ -184,7 +184,7 @@ public class OceanTest
 		expectedNumberOfHits++;
 		shipWasHit = ocean.shootAt(bowRow, bowColumn + 1);
 
-		// knowing that we asuccesfully hit it again
+		// knowing that we succesfully hit it again
 		assertTrue("second hit was succesfull", shipWasHit);
 
 		// and the ship is not sunk yet
@@ -239,27 +239,27 @@ public class OceanTest
 				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
 
 		// if we count the empty ocean areas
-		int actual = countTotalSeaArea();
+		int totalSeaArea = countTotalSeaArea();
 
 		// we should get this amount of "empty sea" portions
 		int expected = totoalOceanSpace - totalShipSpace;
 
-		assertEquals(expected, actual);
+		assertEquals(expected, totalSeaArea);
 	}
 
 	@Test
 	public void test_placeAllShipsRandomly_exactNumberOfShipsShouldBePlacedRandomlyOnTheOcean()
 	{
 		// if we count the total number of horizontal ships in the ocean
-		int actual = countShipsOnEachOceanRow(ships);
+		int totalNumberOFShips = countShipsOnEachOceanRow(ships);
 
 		// and then we add the count of the vertical ships
-		actual += countShipsOnEachOceanRow(rotatedShips);
+		totalNumberOFShips += countShipsOnEachOceanRow(rotatedShips);
 
 		// we should have this amount of ships
 		int expected = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
 
-		assertEquals(expected, actual);
+		assertEquals(expected, totalNumberOFShips);
 	}
 
 	@Test
@@ -285,32 +285,32 @@ public class OceanTest
 		// we would expect that the total number of ships and the total area
 		// covered by the ships is what we would have if there weren't any ship
 		// overlapping
-		boolean expected = totalShipArea == actualShipArea && totalShips == actualTotalShips;
+		boolean shipsAreNotOverlapping = totalShipArea == actualShipArea && totalShips == actualTotalShips;
 
-		assertTrue("no overlapping ships in the ocean", expected);
+		assertTrue("no overlapping ships in the ocean", shipsAreNotOverlapping);
 	}
 
 	@Test
 	public void test_placeAllShipsRandomly_shipsShouldNotBeAdjacentDiagonallyWhenPlacedRandomlyOnOcean()
 	{
-		boolean adjacent = false;
+		boolean shipsAreDiagonallyAdjacent = false;
 
 		// if you move along each row until you find a horizontal ship bow and
 		// there are ships in the ocean spots placed diagonally, there shouldn't
 		// be any other ship around
-		adjacent = checkDiagonalAdjacencyMovingHorizontally(ships);
+		shipsAreDiagonallyAdjacent = checkDiagonalAdjacencyMovingHorizontally(ships);
 
 		// we expect not to have any diagonal adjacency when moving horizontally
-		assertEquals("checking diagonal adjacency moving horizontally along each row", false, adjacent);
+		assertFalse("checking diagonal adjacency moving horizontally along each row", shipsAreDiagonallyAdjacent);
 
 		// then, if you move along each column in the same ocean until you find
 		// a vertical ship bow and there are ships in the ocean spots placed
 		// diagonally, there shouldn't be any other ship around
-		adjacent = checkDiagonalAdjacencyMovingHorizontally(rotatedShips);
+		shipsAreDiagonallyAdjacent = checkDiagonalAdjacencyMovingHorizontally(rotatedShips);
 
 
 		// we expect not to have any diagonal adjacency when moving vertically
-		assertEquals("checking diagonal adjacency moving vertically along each column", false, adjacent);
+		assertFalse("checking diagonal adjacency moving vertically along each column", shipsAreDiagonallyAdjacent);
 	}
 
 	@Test
@@ -346,12 +346,12 @@ public class OceanTest
 		// we should expect that the area covered by each ship type (in the
 		// given amount) is what it would be if there were not adjacent ships in
 		// the ocean on straight lines
-		boolean actual = shipTypeToAreaMapper.get(Battleship.class) == expectedBattleshipArea
+		boolean eachShipTypeCoversTheExpectedArea = shipTypeToAreaMapper.get(Battleship.class) == expectedBattleshipArea
 				&& shipTypeToAreaMapper.get(Cruiser.class) == expectedCruiserArea
 				&& shipTypeToAreaMapper.get(Destroyer.class) == expecteDestroyerArea
 				&& shipTypeToAreaMapper.get(Submarine.class) == expectedSubmarineArea;
 
-		assertTrue("checking horizontal and vertical adjecency", actual);
+		assertTrue("checking horizontal and vertical adjecency", eachShipTypeCoversTheExpectedArea);
 
 		// if instead we create an empty ocean and add adjacent ships on a
 		// straight line
@@ -382,10 +382,33 @@ public class OceanTest
 
 		// we should expect a mismatch between what we found and the expected
 		// values
-		actual = failMapper.get(Battleship.class) == expectedBattleshipSurface
+		eachShipTypeCoversTheExpectedArea = failMapper.get(Battleship.class) == expectedBattleshipSurface
 				&& failMapper.get(Submarine.class) == expectedSubmarineSurface;
 
-		assertFalse("checking failing horizontal and vertical adjecency", actual);
+		assertFalse("checking failing horizontal and vertical adjecency", eachShipTypeCoversTheExpectedArea);
+	}
+
+	@Test
+	public void test_placeAllShipsRandomly_shipsShouldNotExceedOceanBorders()
+	{
+		// if ships exceed the ocean's borders then the total area covered by
+		// the ships will be less than what it would normally be if every ship
+		// was within the borders
+		int totalShipArea = Ocean.BATTLESHIPS * Battleship.BATTLESHIP_LENGTH + Ocean.CRUISERS * Cruiser.CRUISER_LENGTH
+				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
+
+		// the total ocean area should be equal to this
+		int totoalOceanSpace = Ocean.OCEAN_WIDTH * Ocean.OCEAN_HEIGHT;
+
+		// if we count the area with real ships
+		int actualShipArea = totoalOceanSpace - countTotalSeaArea();
+
+		// then the total area covered by real ships should be equal to the sum
+		// of the number of each real ship type multiplied by the correspondent
+		// length
+		boolean shipsAreWithinOceanBorders = totalShipArea == actualShipArea;
+
+		assertTrue("all ships are within the ocean's borders", shipsAreWithinOceanBorders);
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
@@ -633,7 +656,7 @@ public class OceanTest
 		// part across the ship length)
 		int expectedNumberOfHits = Battleship.BATTLESHIP_LENGTH;
 		int actualNumberOfHits = ocean.getHitCount();
-		assertEquals(expectedNumberOfHits, actualNumberOfHits);
+		assertEquals("hit count gets updated after each successful shot", expectedNumberOfHits, actualNumberOfHits);
 	}
 
 	@Test
@@ -778,11 +801,11 @@ public class OceanTest
 		String destroyerType = ocean.getShipTypeAt(bowRow + 2, bowColumn);
 		String submarineType = ocean.getShipTypeAt(bowRow + 3, bowColumn);
 
-		// we should expect to match their corrsepondent ship type
-		assertEquals(Battleship.BATTLESHIP_TYPE, battleshipType);
-		assertEquals(Cruiser.CRUISER_TYPE, cruiserType);
-		assertEquals(Destroyer.DESTROYER_TYPE, destroyerType);
-		assertEquals(Submarine.SUBMARINE_TYPE, submarineType);
+		// we should expect to match their correspondent ship type
+		assertEquals("battleships return the correct ship type", Battleship.BATTLESHIP_TYPE, battleshipType);
+		assertEquals("cruiser return the correct ship type", Cruiser.CRUISER_TYPE, cruiserType);
+		assertEquals("destroyer return the correct ship type", Destroyer.DESTROYER_TYPE, destroyerType);
+		assertEquals("submarines return the correct ship type", Submarine.SUBMARINE_TYPE, submarineType);
 	}
 
 	// ======================= helper methods ======================== //

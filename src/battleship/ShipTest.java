@@ -244,7 +244,7 @@ public class ShipTest
 		// we should get that value back
 		int actualBowRowCoordinate = ship.getBowRow();
 
-		assertEquals(2, actualBowRowCoordinate);
+		assertEquals("bow row returned is what was originally set", 2, actualBowRowCoordinate);
 	}
 
 	@Test
@@ -260,7 +260,7 @@ public class ShipTest
 		// we should get that value back
 		int actualBowRowCoordinate = ship.getBowColumn();
 
-		assertEquals(5, actualBowRowCoordinate);
+		assertEquals("bow column returned is what was originally set", 5, actualBowRowCoordinate);
 	}
 
 	// ====================== public methods tests ====================== //
