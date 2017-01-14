@@ -959,8 +959,7 @@ public class OceanTest
 		return adjacent;
 	}
 
-	private static <T extends Ship> void placeShipTypeAt(Class<T> shipClass, int bowRow, int bowColumn,
-			boolean isHorizontal,
+	private <T extends Ship> void placeShipTypeAt(Class<T> shipClass, int bowRow, int bowColumn, boolean isHorizontal,
 			Ocean ocean)
 	{
 		int row;
@@ -983,7 +982,7 @@ public class OceanTest
 		}
 	}
 
-	private static <T extends Ship> Ship createShip(Class<T> shipClass)
+	private <T extends Ship> Ship createShip(Class<T> shipClass)
 	{
 		if (shipClass == Battleship.class)
 		{

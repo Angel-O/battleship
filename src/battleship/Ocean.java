@@ -264,11 +264,11 @@ public class Ocean
 	 */
 	private static final Ship[][] initialiseOcean()
 	{
-		Ship[][] ships = new Ship[OCEAN_WIDTH][OCEAN_HEIGHT];
+		Ship[][] ships = new Ship[OCEAN_HEIGHT][OCEAN_WIDTH];
 
-		for (int i = 0; i < OCEAN_WIDTH; i++)
+		for (int i = 0; i < OCEAN_HEIGHT; i++)
 		{
-			for (int j = 0; j < OCEAN_HEIGHT; j++)
+			for (int j = 0; j < OCEAN_WIDTH; j++)
 			{
 				// create an empty sea with "bow" at row "i" and column "j"
 				Ship emptySea = new EmptySea();
@@ -526,7 +526,7 @@ public class Ocean
 			// iterate over the row
 			column = bowColumn + i;
 
-			if (column < OCEAN_WIDTH && column >= 0)
+			if (column >= 0 && column < OCEAN_WIDTH)
 			{
 				if (topRow >= 0 && isOccupied(topRow, column)
 						|| bottomRow < OCEAN_HEIGHT && isOccupied(bottomRow, column))

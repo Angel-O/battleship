@@ -5,7 +5,7 @@
 10. rotate matrix strategy: can I use it in the ocean class?
 11. remove unnecessary code from test classes, fix names...
 12. improve re-usability of tests method by scanning ocean by type
-16. is there limit to the number of attempt to place a ship?
+16. is there a limit to the number of attempts to place a ship?
 18. add comments to instance and class variables in test classes
 19. move diagonal check to its own method to squash lateral and end check in a unique method
 20. remove initalize ocean method
