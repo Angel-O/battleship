@@ -66,7 +66,9 @@ public abstract class Ship
 
 	/**
 	 * Shoots at the part of the ship placed at the given location and marks
-	 * that part of the ship as hit.
+	 * that part of the ship as hit. If the ship receives a 'shootAt' message
+	 * that was not meant for it (for instance with coordinates pointing to
+	 * another location), the method will return {@code false}.
 	 *
 	 * @param row
 	 *            represents the vertical coordinate to be hit.
@@ -81,6 +83,15 @@ public abstract class Ship
 			// get the offset from the bow of the shot fired at the location
 			// provided, based on the orientation of the ship
 			int offsetFromTheBow = horizontal ? column - bowColumn : row - bowRow;
+
+			if (offsetFromTheBow < 0 || offsetFromTheBow >= length)
+			{
+				// this shouldn't really happen, but give that the method is
+				// public it can be misused, so if somehow the offset from the
+				// bow is negative of greater than the ship length we will
+				// return false and avoid marking the hit array
+				return false;
+			}
 
 			// mark the hit array accordingly to indicate what
 			// part of the ship (as a whole) was hit.

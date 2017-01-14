@@ -439,7 +439,7 @@ public class ShipTest
 	}
 
 	@Test
-	public void test_shootAt_onlyShotShipPartsShouldBeMarkedInHitArray()
+	public void test_shootAt_onlyShipPartsThatWereShotShouldBeMarkedInHitArray()
 	{
 		// if we have a brand new real horizontal ship with bow coordinates set
 		// to (0,0)
@@ -463,7 +463,7 @@ public class ShipTest
 	}
 
 	@Test
-	public void test_shootAt_shouldReturnTrueEachTimeRealShipIsShotWhenStillAfloat()
+	public void test_shootAt_shouldReturnTrueEachTimeRealShipStillAfloatGetsShot()
 	{
 		// if we have a brand new real vertical ship with bow coordinates set to
 		// (0,0)
@@ -517,6 +517,26 @@ public class ShipTest
 		// any subsequent shot on the same part should be unsuccesful
 		boolean expectedOutcome = ship.shootAt(bowRow, bowColumn);
 		assertFalse("repeatedly shooting sunk ship on the same part", expectedOutcome);
+	}
+
+	@Test
+	public void test_shootAt_shouldReturnFalseIfTheCoordinatesGivenAreNotTheCoordinatesTheShipWasPlacedAt()
+	{
+		// if we have a ship with bow coordinates set to (0,0)
+		int bowRow = 0;
+		int bowColumn = 0;
+		Ship ship = new Submarine();
+		ship.setBowRow(bowRow);
+		ship.setBowColumn(bowColumn);
+
+		// and we shoot at it with coordinates that surely are not its
+		// coordinates
+		int wrongRowCoordinate = bowRow + Submarine.SUBMARINE_LENGTH;
+		int wrongColumnCoordinate = bowColumn + Submarine.SUBMARINE_LENGTH;
+
+		// we should expect the shot to be unsuccessful
+		boolean expectedOutcome = ship.shootAt(wrongRowCoordinate, wrongColumnCoordinate);
+		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
 	}
 
 	// ========================== mock objects ========================= //

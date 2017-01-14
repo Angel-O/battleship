@@ -130,7 +130,8 @@ public class Ocean
 	/**
 	 * Checks whether or not the location specified contains a real ship. A real
 	 * ship is an actual ship, that is any ship in the ocean that is not a
-	 * {@linkplain EmptySea}.
+	 * {@linkplain EmptySea}. Note: if the coordinates given are out of range
+	 * the method returns {@code false}.
 	 *
 	 * @param row
 	 *            vertical coordinate of the ship.
@@ -142,25 +143,43 @@ public class Ocean
 	 */
 	public boolean isOccupied(int row, int column)
 	{
-		return ships[row][column].isRealShip();
+		if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
+		{
+			// check only if the coordinates are in range
+			return ships[row][column].isRealShip();
+		}
+		return false;
 	}
 
 	/**
-	 * Returns the ship type at the given location.
+	 * Returns the ship type at the given location. Will throw an exception if
+	 * the coordinates provided are out of range.
 	 *
 	 * @param row
 	 *            vertical coordinate of the ship.
 	 * @param column
 	 *            horizontal coordinate of the ship.
 	 * @return the type of the ship at the location specified.
+	 * @throws IllegalArgumentException
+	 *             if the coordinates provided fall outside the
+	 *             {@linkplain Ocean} boundaries.
 	 */
 	public String getShipTypeAt(int row, int column)
 	{
+		if (row < 0 || row >= OCEAN_HEIGHT)
+		{
+			throw new IllegalArgumentException("Illegal out of range value for row: " + row);
+		}
+		if (column < 0 && column >= OCEAN_WIDTH)
+		{
+			throw new IllegalArgumentException("Illegal out of range value for column: " + column);
+		}
 		return ships[row][column].getShipType();
 	}
 
 	/**
-	 * Indicates if the given location contains a sunken ship.
+	 * Indicates if the given location contains a sunken ship. Note: if the
+	 * coordinates given are out of range the method returns {@code false}.
 	 *
 	 * @param row
 	 *            horizontal coordinate.
@@ -171,7 +190,12 @@ public class Ocean
 	 */
 	public boolean hasSunkShipAt(int row, int column)
 	{
-		return ships[row][column].isSunk();
+		if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
+		{
+			// check only if the coordinates are in range
+			return ships[row][column].isSunk();
+		}
+		return false;
 	}
 
 	/**
@@ -216,10 +240,11 @@ public class Ocean
 
 	/**
 	 * Shoots at the location correspondent to the given coordinates and updates
-	 * the shot and the hit count. If a If a location contains a real ship, it
+	 * the shot and the hit count. If a location contains a real ship, it
 	 * returns true every time the user shoots at that same location. Once a
 	 * ship has been sunk, additional shots at the same location will return
-	 * false.
+	 * {@code false}. Note: the method will also return {@code false} if the
+	 * location falls outside the ocean borders.
 	 *
 	 * @param row
 	 *            horizontal coordinate to be fired upon.
@@ -230,22 +255,26 @@ public class Ocean
 	 */
 	public boolean shootAt(int row, int column)
 	{
-		// increment the total number of shots fired
+		// increment the total number of shots fired, regardless
 		shotsFired++;
 
-		if (ships[row][column].shootAt(row, column))
+		// try and hit ships only within the ocean's borders
+		if (row >= 0 && row < OCEAN_HEIGHT && column >= 0 && column < OCEAN_WIDTH)
 		{
-			// increment the hit count in case of a successful shot
-			hitCount++;
-
-			if (ships[row][column].isSunk())
+			if (ships[row][column].shootAt(row, column))
 			{
-				// increment the count of ship sunk if this shot
-				// sunk the ship
-				shipsSunk++;
-			}
+				// increment the hit count in case of a successful shot
+				hitCount++;
 
-			return true;
+				if (ships[row][column].isSunk())
+				{
+					// increment the count of ship sunk if this shot
+					// sunk the ship
+					shipsSunk++;
+				}
+
+				return true;
+			}
 		}
 
 		return false;
@@ -511,9 +540,9 @@ public class Ocean
 	private boolean areaAlongTheLengthIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
 	{
 		// row above the area that would host the ship
-		int topRow = bowRow - 1;
+		int rowAbove = bowRow - 1;
 		// row below the area that would host the ship
-		int bottomRow = bowRow + shipHeight;
+		int rowBelow = bowRow + shipHeight;
 		// iteration variable used to scan the area
 		int column;
 
@@ -523,16 +552,12 @@ public class Ocean
 		// ship
 		for (int i = 0; i < shipLength; i++)
 		{
-			// iterate over the row
+			// iterate over the column (horizontally)
 			column = bowColumn + i;
 
-			if (column >= 0 && column < OCEAN_WIDTH)
+			if (isOccupied(rowAbove, column) || isOccupied(rowBelow, column))
 			{
-				if (topRow >= 0 && isOccupied(topRow, column)
-						|| bottomRow < OCEAN_HEIGHT && isOccupied(bottomRow, column))
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 		return true;
@@ -559,9 +584,9 @@ public class Ocean
 	private boolean areaAtEachEndIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
 	{
 		// column on the left of area that would host the ship
-		int leftColumn = bowColumn - 1;
+		int columnOnTheLeft = bowColumn - 1;
 		// column on the right of the area that would host the ship
-		int rightColumn = bowColumn + shipLength;
+		int columnOnTheRight = bowColumn + shipLength;
 		// iteration variable used to scan the area
 		int row;
 
@@ -570,16 +595,12 @@ public class Ocean
 		// we also need to check the diagonal area around the ship
 		for (int i = -1; i <= shipHeight; i++)
 		{
-			// iterate over the column
+			// iterate over the row (vertically)
 			row = bowRow + i;
 
-			if (row >= 0 && row < OCEAN_HEIGHT)
+			if (isOccupied(row, columnOnTheLeft) || isOccupied(row, columnOnTheRight))
 			{
-				if (leftColumn >= 0 && isOccupied(row, leftColumn)
-						|| rightColumn < OCEAN_WIDTH && isOccupied(row, rightColumn))
-				{
-					return false;
-				}
+				return false;
 			}
 		}
 

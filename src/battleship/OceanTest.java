@@ -432,11 +432,10 @@ public class OceanTest
 		boolean thirdLocationIsOccupied = ocean.isOccupied(4, random.nextInt(Destroyer.DESTROYER_LENGTH));
 		boolean fourthLocationIsOccupied = ocean.isOccupied(6, random.nextInt(Submarine.SUBMARINE_LENGTH));
 
-		boolean locationIsOccupied = true;
-		assertEquals("first location is occupied", locationIsOccupied, firstLocationIsOccupied);
-		assertEquals("second location is occupied", locationIsOccupied, secondLocationIsOccupied);
-		assertEquals("third location is occupied", locationIsOccupied, thirdLocationIsOccupied);
-		assertEquals("fourth location is occupied", locationIsOccupied, fourthLocationIsOccupied);
+		assertTrue("first location is occupied", firstLocationIsOccupied);
+		assertTrue("second location is occupied", secondLocationIsOccupied);
+		assertTrue("third location is occupied", thirdLocationIsOccupied);
+		assertTrue("fourth location is occupied", fourthLocationIsOccupied);
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
@@ -451,10 +450,26 @@ public class OceanTest
 		int column = random.nextInt(Ocean.OCEAN_WIDTH);
 
 		// they should not be flagged as occupied
-		boolean oceanLocationIsOccupied = false;
 		boolean locationIsOccupied = ocean.isOccupied(row, column);
 
-		assertEquals("clear ocean spots should be flagged as such", oceanLocationIsOccupied, locationIsOccupied);
+		assertFalse("clear ocean spots should be flagged as such", locationIsOccupied);
+	}
+
+	@Test(timeout = DEFAULT_TIMEOUT)
+	public void test_isOccupied_outOfRangeOceanSpotsShouldBeFlaggedAsClear()
+	{
+		// if we create an empty ocean
+		ocean = new Ocean();
+
+		// whatever random area that we pick outside its borders
+		Random random = new Random();
+		int row = Ocean.OCEAN_HEIGHT + random.nextInt(100);
+		int column = Ocean.OCEAN_WIDTH + random.nextInt(100);
+
+		// they should not be flagged as occupied
+		boolean outOfRangeLocationIsOccupied = ocean.isOccupied(row, column);
+
+		assertFalse("out of range ocean spots should not be flagged as occupied", outOfRangeLocationIsOccupied);
 	}
 
 	@Test
@@ -609,10 +624,10 @@ public class OceanTest
 		Random random = new Random();
 		int expectedTotalShots = random.nextInt(100);
 
-		// at random locations within the ocean's borders
+		// at random locations, within or outside the ocean's borders
 		for (int i = 0; i < expectedTotalShots; i++)
 		{
-			ocean.shootAt(random.nextInt(Ocean.OCEAN_HEIGHT), random.nextInt(Ocean.OCEAN_WIDTH));
+			ocean.shootAt(random.nextInt(), random.nextInt());
 		}
 
 		// we should expect the number of shots registered by the ocean to be
@@ -657,6 +672,21 @@ public class OceanTest
 		int expectedNumberOfHits = Battleship.BATTLESHIP_LENGTH;
 		int actualNumberOfHits = ocean.getHitCount();
 		assertEquals("hit count gets updated after each successful shot", expectedNumberOfHits, actualNumberOfHits);
+	}
+
+	@Test
+	public void test_shootAt_shootingAtLocationsOutOfRangeShouldReturnFalse()
+	{
+		// if we shoot anywhere outside the ocean's borders
+		Random random = new Random();
+
+		int outOfRangeRowCoordinate = Ocean.OCEAN_HEIGHT + random.nextInt(100);
+		int outOfRangeColumnCoordinate = Ocean.OCEAN_WIDTH + random.nextInt(100);
+
+		// we should expect an unsuccesfull outcome
+		boolean outcome = ocean.shootAt(outOfRangeRowCoordinate, outOfRangeColumnCoordinate);
+
+		assertFalse("shooting at out of range locations", outcome);
 	}
 
 	@Test
@@ -718,13 +748,29 @@ public class OceanTest
 		// if we create an empty ocean
 		ocean = new Ocean();
 
-		// then check a random location to see if it ontains a sunk ship
+		// then check a random location to see if it contains a sunk ship
 		Random random = new Random();
 		boolean locationHasASunkShip = ocean.hasSunkShipAt(random.nextInt(Ocean.OCEAN_HEIGHT),
 				random.nextInt(Ocean.OCEAN_WIDTH));
 
 		// we should expect it not to have one
 		assertFalse("empty sea locations do not have sunk ships on them", locationHasASunkShip);
+	}
+
+	@Test
+	public void test_hasSunkShipAt_shouldReturnFalseIfLocationIsOutOfRange()
+	{
+		// if we try and see if a location placed anywhere out of
+		// the ocean's borders has a sunk ship
+		Random random = new Random();
+
+		int outOfRangeRowCoordinate = Ocean.OCEAN_HEIGHT + random.nextInt(100);
+		int outOfRangeColumnCoordinate = Ocean.OCEAN_WIDTH + random.nextInt(100);
+
+		boolean outOfRangeLocationHasASunkShip = ocean.hasSunkShipAt(outOfRangeRowCoordinate, outOfRangeColumnCoordinate);
+
+		// we should expect it not to have one
+		assertFalse("empty sea locations do not have sunk ships on them", outOfRangeLocationHasASunkShip);
 	}
 
 	@Test(timeout = DEFAULT_TIMEOUT)
@@ -806,6 +852,20 @@ public class OceanTest
 		assertEquals("cruiser return the correct ship type", Cruiser.CRUISER_TYPE, cruiserType);
 		assertEquals("destroyer return the correct ship type", Destroyer.DESTROYER_TYPE, destroyerType);
 		assertEquals("submarines return the correct ship type", Submarine.SUBMARINE_TYPE, submarineType);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void test_getShipsTypeAt_shouldThrowExceptionIfCoordinatesAreOutOfRange()
+	{
+		// if we try and get the ship type at locations placed anywhere out of
+		// the ocean's borders
+		Random random = new Random();
+
+		int outOfRangeRowCoordinate = Ocean.OCEAN_HEIGHT + random.nextInt(100);
+		int outOfRangeColumnCoordinate = Ocean.OCEAN_WIDTH + random.nextInt(100);
+
+		// we should expect an IAE to be thrown
+		ocean.getShipTypeAt(outOfRangeRowCoordinate, outOfRangeColumnCoordinate);
 	}
 
 	// ======================= helper methods ======================== //

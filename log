@@ -12,4 +12,5 @@
 21. add comments to test methods
 22. double check edge cases are tested
 23. remove for loops from test methods
+24. move out of range check in isOccupied method
 
