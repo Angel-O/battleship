@@ -14,3 +14,5 @@
 so that passing the wrong length value for a particular ship type is less likey to happen
 25. go through all assertion messages in test classes
 26. add comments on github
+27. remove random generator in test classes as it is not advisable unless strictly needed: what if we change the code
+due to some requiremnts change and some tests suddenly fail, but we don't know what values made them fail?

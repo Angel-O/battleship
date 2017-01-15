@@ -458,18 +458,39 @@ public class OceanTest
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_isOccupied_outOfRangeOceanSpotsShouldBeFlaggedAsClear()
 	{
-		// if we create an empty ocean
-		ocean = new Ocean();
-
-		// whatever random area that we pick outside its borders
-		Random random = new Random();
-		int row = Ocean.OCEAN_HEIGHT + random.nextInt(100);
-		int column = Ocean.OCEAN_WIDTH + random.nextInt(100);
-
-		// they should not be flagged as occupied
+		// if we pick a location with column coordinate greater than the ocean's
+		// width
+		int row = 5;
+		int column = Ocean.OCEAN_WIDTH + 1;
+		// it should not be flagged as occupied
 		boolean outOfRangeLocationIsOccupied = ocean.isOccupied(row, column);
+		assertFalse("locations with column greater than ocean's width should not be flagged as occupied",
+				outOfRangeLocationIsOccupied);
 
-		assertFalse("out of range ocean spots should not be flagged as occupied", outOfRangeLocationIsOccupied);
+		// and if we pick a location with row coordinate greater than the
+		// ocean's height
+		row = Ocean.OCEAN_HEIGHT + 4;
+		column = 0;
+		// it should not be flagged as occupied either
+		outOfRangeLocationIsOccupied = ocean.isOccupied(row, column);
+		assertFalse("locations with row greater than ocean's height should not be flagged as occupied",
+				outOfRangeLocationIsOccupied);
+
+		// if then we pick a location with a negative column coordinate
+		row = 2;
+		column = -4;
+		// it should not be flagged as occupied
+		outOfRangeLocationIsOccupied = ocean.isOccupied(row, column);
+		assertFalse("locations with negative column coordinate should not be flagged as occupied",
+				outOfRangeLocationIsOccupied);
+
+		// finally, if we pick a location with a negative row coordinate
+		row = -6;
+		column = 0;
+		// it should not be flagged as occupied
+		outOfRangeLocationIsOccupied = ocean.isOccupied(row, column);
+		assertFalse("locations with negative row coordinate should not be flagged as occupied",
+				outOfRangeLocationIsOccupied);
 	}
 
 	@Test
@@ -677,16 +698,35 @@ public class OceanTest
 	@Test
 	public void test_shootAt_shootingAtLocationsOutOfRangeShouldReturnFalse()
 	{
-		// if we shoot anywhere outside the ocean's borders
-		Random random = new Random();
-
-		int outOfRangeRowCoordinate = Ocean.OCEAN_HEIGHT + random.nextInt(100);
-		int outOfRangeColumnCoordinate = Ocean.OCEAN_WIDTH + random.nextInt(100);
-
+		// if we shoot at a location with row coordinate greater than the
+		// ocean's height
+		int row = Ocean.OCEAN_HEIGHT + 5;
+		int column = 0;
 		// we should expect an unsuccesfull outcome
-		boolean outcome = ocean.shootAt(outOfRangeRowCoordinate, outOfRangeColumnCoordinate);
+		boolean outcome = ocean.shootAt(row, column);
+		assertFalse("shooting at locations with row coordinate greater than ocean's height", outcome);
 
-		assertFalse("shooting at out of range locations", outcome);
+		// if then we shoot at a location with a negative row coordinate
+		row = -100;
+		column = 3;
+		// we should expect an unsuccesfull outcome
+		outcome = ocean.shootAt(row, column);
+		assertFalse("shooting at locations with negative row coordinate", outcome);
+
+		// and if we shoot at a location with a column coordinate greater than
+		// the ocean's width
+		row = 6;
+		column = Ocean.OCEAN_WIDTH + 77;
+		// we should expect an unsuccesfull outcome
+		outcome = ocean.shootAt(row, column);
+		assertFalse("shooting at locations with column coordinate greater than ocean's width", outcome);
+
+		// finally if we shoot at a location with negative column coordinate
+		row = 9;
+		column = -5;
+		// we should still expect an unsuccesfull outcome
+		outcome = ocean.shootAt(row, column);
+		assertFalse("shooting at locations with negative column coordinate", outcome);
 	}
 
 	@Test
@@ -855,24 +895,38 @@ public class OceanTest
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void test_getShipsTypeAt_shouldThrowExceptionIfRowCoordinateisOutOfRange()
+	public void test_getShipsTypeAt_shouldThrowExceptionIfRowCoordinateisExceedsOceanHeight()
 	{
 		// if we try and get the ship type at a location with row coordinate
-		// out of the ocean's border
+		// greater than the ocean's height
 		Random random = new Random();
 
 		int outOfRangeRowCoordinate = Ocean.OCEAN_HEIGHT + random.nextInt(100);
-		int inRangeColumnCoordinate = Ocean.OCEAN_WIDTH + random.nextInt(100);
+		int inRangeColumnCoordinate = random.nextInt(Ocean.OCEAN_WIDTH);
 
 		// we should expect an IAE to be thrown
 		ocean.getShipTypeAt(outOfRangeRowCoordinate, inRangeColumnCoordinate);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void test_getShipsTypeAt_shouldThrowExceptionIfColumnCoordinateisOutOfRange()
+	public void test_getShipsTypeAt_shouldThrowExceptionIfRowCoordinateisNegative()
+	{
+		// if we try and get the ship type at a location with a negative row
+		// coordinate
+		Random random = new Random();
+
+		int negativeRowCoordinate = 0 - random.nextInt(100);
+		int inRangeColumnCoordinate = random.nextInt(Ocean.OCEAN_WIDTH);
+
+		// we should expect an IAE to be thrown
+		ocean.getShipTypeAt(negativeRowCoordinate, inRangeColumnCoordinate);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void test_getShipsTypeAt_shouldThrowExceptionIfColumnCoordinateisExceedsOceanWidth()
 	{
 		// if we try and get the ship type at a location with column coordinate
-		// out of the ocean's border
+		// greater than the ocean's width
 		Random random = new Random();
 
 		int inRangeRowCoordinate = random.nextInt(Ocean.OCEAN_HEIGHT);
@@ -880,6 +934,20 @@ public class OceanTest
 
 		// we should expect an IAE to be thrown
 		ocean.getShipTypeAt(inRangeRowCoordinate, outOfRangeColumnCoordinate);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void test_getShipsTypeAt_shouldThrowExceptionIfColumnCoordinateisNegative()
+	{
+		// if we try and get the ship type at a location with a negative column
+		// coordinate
+		Random random = new Random();
+
+		int inRangeRowCoordinate = random.nextInt(Ocean.OCEAN_HEIGHT);
+		int negativeColumnCoordinate = 0 - random.nextInt(100);
+
+		// we should expect an IAE to be thrown
+		ocean.getShipTypeAt(inRangeRowCoordinate, negativeColumnCoordinate);
 	}
 
 	// ======================= helper methods ======================== //
