@@ -855,17 +855,31 @@ public class OceanTest
 	}
 
 	@Test(expected = IllegalArgumentException.class)
-	public void test_getShipsTypeAt_shouldThrowExceptionIfCoordinatesAreOutOfRange()
+	public void test_getShipsTypeAt_shouldThrowExceptionIfRowCoordinateisOutOfRange()
 	{
-		// if we try and get the ship type at locations placed anywhere out of
-		// the ocean's borders
+		// if we try and get the ship type at a location with row coordinate
+		// out of the ocean's border
 		Random random = new Random();
 
 		int outOfRangeRowCoordinate = Ocean.OCEAN_HEIGHT + random.nextInt(100);
+		int inRangeColumnCoordinate = Ocean.OCEAN_WIDTH + random.nextInt(100);
+
+		// we should expect an IAE to be thrown
+		ocean.getShipTypeAt(outOfRangeRowCoordinate, inRangeColumnCoordinate);
+	}
+
+	@Test(expected = IllegalArgumentException.class)
+	public void test_getShipsTypeAt_shouldThrowExceptionIfColumnCoordinateisOutOfRange()
+	{
+		// if we try and get the ship type at a location with column coordinate
+		// out of the ocean's border
+		Random random = new Random();
+
+		int inRangeRowCoordinate = random.nextInt(Ocean.OCEAN_HEIGHT);
 		int outOfRangeColumnCoordinate = Ocean.OCEAN_WIDTH + random.nextInt(100);
 
 		// we should expect an IAE to be thrown
-		ocean.getShipTypeAt(outOfRangeRowCoordinate, outOfRangeColumnCoordinate);
+		ocean.getShipTypeAt(inRangeRowCoordinate, outOfRangeColumnCoordinate);
 	}
 
 	// ======================= helper methods ======================== //
