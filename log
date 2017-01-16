@@ -17,3 +17,4 @@ so that passing the wrong length value for a particular ship type is less likey 
 27. remove random generator in test classes as it is not advisable unless strictly needed: what if we change the code
 due to some requiremnts change and some tests suddenly fail, but we don't know what values made them fail?
 28. try added padding strategy when checking adjecent areas
+29. private final methods ? do they make sense? ...they can't be overriden since they're private

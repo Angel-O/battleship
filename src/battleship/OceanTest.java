@@ -952,6 +952,129 @@ public class OceanTest
 
 	// ======================= helper methods ======================== //
 
+	/**
+	 * Determines whether or not a ship can be placed in the area starting from
+	 * the bow coordinates up to the ship length, moving in the specified
+	 * direction. The criteria to determine if the area is suitable are: ships
+	 * cannot overlap with any other ship, they cannot be adjacent to any other
+	 * ship (either vertically, horizontally or diagonally) and they cannot
+	 * exceed the ocean's borders.
+	 *
+	 * @param bowRow
+	 *            horizontal coordinate of the bow.
+	 * @param bowColumn
+	 *            vertical coordinate of the bow.
+	 * @param shipLength
+	 *            length of the ship.
+	 * @param horizontal
+	 *            orientation on the ocean's matrix (vertical or diagonal).
+	 * @return {@code true} if the ship can be placed in the area respecting the
+	 *         criteria, {@code false} otherwise.
+	 */
+	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
+	{
+		// treating vertical ships as horizontal ships with length equal to 1
+		// and hight equal the length of the ship
+		int height = horizontal ? 1 : shipLength;
+		int length = horizontal ? shipLength : 1;
+
+		// there is no need to check the mid area, where the ship will
+		// actually be placed as long as we check the adjacent areas
+		// (overlapping is guaranteed not to occur in the mid area, bow
+		// excluded, since we are dropping the longest ships first). Under these
+		// conditions the only place where ships can overlap in the mid area is
+		// the location where the bow will be placed
+		return ocean.isOccupied(bowRow, bowColumn) && areaOnBothSidesIsClear(bowRow, bowColumn, length, height)
+				&& areaAtBothEndsIsClear(bowRow, bowColumn, length, height);
+	}
+
+	/**
+	 * Determines whether the area adjacent the ship along its length is clear.
+	 * Note: horizontal ships have height equal to {@code 1} and length equal to
+	 * the ship length, while vertical ships are treated as horizontal ships
+	 * with length equal to {@code 1} and height equal to the ship length.
+	 *
+	 * @param bowRow
+	 *            horizontal coordinate of the bow.
+	 * @param bowColumn
+	 *            vertical coordinate of the bow.
+	 * @param shipLength
+	 *            length of the ship.
+	 * @param shipHeight
+	 *            height of the ship.
+	 * @return {@code true} if the area on both sides of the ship is not
+	 *         occupied, {@code false} otherwise.
+	 */
+	private boolean areaOnBothSidesIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
+	{
+		// row above the area that would host the ship
+		int rowAbove = bowRow - 1;
+		// row below the area that would host the ship
+		int rowBelow = bowRow + shipHeight;
+		// iteration variable used to scan the area
+		int column;
+
+		// checking both sides (top and bottom) along the length of the area
+		// that could potentially host the ship, looping from 0 to length
+		// (exclusive) as we are not checking the diagonal area around the ship
+		for (int i = 0; i < shipLength; i++)
+		{
+			// iterate over the column (horizontally)
+			column = bowColumn + i;
+
+			if (ocean.isOccupied(rowAbove, column) || ocean.isOccupied(rowBelow, column))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Determines whether the area adjacent the ship at both ends, including the
+	 * diagonal area, is clear. Note: horizontal ships have height equal to
+	 * {@code 1} and length equal to the ship length, while vertical ships are
+	 * treated as horizontal ships with length equal to {@code 1} and height
+	 * equal to the ship length.
+	 *
+	 * @param bowRow
+	 *            horizontal coordinate of the bow.
+	 * @param bowColumn
+	 *            vertical coordinate of the bow.
+	 * @param shipLength
+	 *            length of the ship.
+	 * @param shipHeight
+	 *            height of the ship.
+	 * @return {@code true} if the area at both ends of the ship is not
+	 *         occupied, {@code false} otherwise.
+	 */
+	private boolean areaAtBothEndsIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
+	{
+		// column on the left of area that would host the ship
+		int columnOnTheLeft = bowColumn - 1;
+		// column on the right of the area that would host the ship
+		int columnOnTheRight = bowColumn + shipLength;
+		// iteration variable used to scan the area
+		int row;
+
+		// checking both ends (left and right) of the area that could
+		// potentially host the ship, looping from -1 to height (inclusive) as
+		// we are also checking the diagonal area around the ship
+		for (int i = -1; i <= shipHeight; i++)
+		{
+			// iterate over the row (vertically)
+			row = bowRow + i;
+
+			if (ocean.isOccupied(row, columnOnTheLeft) || ocean.isOccupied(row, columnOnTheRight))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
 	{
 		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
