@@ -1,13 +1,9 @@
-4. email Carsten about Ocean.hasSunkShipAt method specs
-5. Ocean.getShipArray return actual ships...what are they???
 7. check nesting in print method
-10. rotate matrix strategy: can I use it in the ocean class?
+10. added padding strategy: can I use it in the test class?
 11. remove unnecessary code from test classes, fix names...
 12. improve re-usability of tests method by scanning ocean by type
 16. is there a limit to the number of attempts to place a ship?
 18. add comments to private mehods in test classes, what about actual test methods?
-19. move diagonal check to its own method to squash lateral and end check in a unique method
-20. remove initalize ocean method
 22. double check edge cases are tested
 23. remove for loops from test methods if possible
 24. placeShipsOntoOcean method: remove shipLength parameter and restore method to get ship length from ship type
@@ -16,5 +12,4 @@ so that passing the wrong length value for a particular ship type is less likey 
 26. add comments on github
 27. remove random generator in test classes as it is not advisable unless strictly needed: what if we change the code
 due to some requiremnts change and some tests suddenly fail, but we don't know what values made them fail?
-28. try added padding strategy when checking adjecent areas
-29. private final methods ? do they make sense? ...they can't be overriden since they're private
+30. remove setup test methods if not used

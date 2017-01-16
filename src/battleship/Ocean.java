@@ -54,7 +54,18 @@ public class Ocean
 	 */
 	public Ocean()
 	{
-		ships = initialiseOcean();
+		ships = new Ship[OCEAN_HEIGHT][OCEAN_WIDTH];
+
+		for (int i = 0; i < OCEAN_HEIGHT; i++)
+		{
+			for (int j = 0; j < OCEAN_WIDTH; j++)
+			{
+				// create an empty sea with bow at row "i" and column "j"
+				// and drop it onto the ocean, the orientation is irrelevant:
+				// we will set it to horizontal (true)
+				ships[i][j] = createShip(EmptySea.class, i, j, true);
+			}
+		}
 	}
 
 	/**
@@ -286,32 +297,62 @@ public class Ocean
 	// ============== private methods ============= //
 
 	/**
-	 * Places {@linkplain EmptySea} all over the ocean's surface.
+	 * Factory method to generate ship parts of the given type. It will set the
+	 * bow coordinates and orientation to the values passed as arguments. It can
+	 * return a null value if the class passed as parameter is not recognized.
 	 *
-	 * @return a matrix containing all EmptySea instances representing the
-	 *         initial state of the ocean before any real ship is placed onto
-	 *         it.
-	 *
+	 * @param <T>
+	 *            subclass of the {@linkplain Ship} type.
+	 * @param shipClass
+	 *            type of the ship part to be generated.
+	 * @param bowRow
+	 *            horizontal coordinate of the bow.
+	 * @param bowColumn
+	 *            vertical coordinate of the bow.
+	 * @param horizontal
+	 *            orientation of the ship that the ship part to create will be
+	 *            part of.
+	 * @return a ship part of the requested type; can be {@code null}.
 	 */
-	private static final Ship[][] initialiseOcean()
+	private static <T extends Ship> Ship createShip(Class<T> shipClass, int bowRow, int bowColumn, boolean horizontal)
 	{
-		Ship[][] ships = new Ship[OCEAN_HEIGHT][OCEAN_WIDTH];
+		Ship ship = null;
 
-		for (int i = 0; i < OCEAN_HEIGHT; i++)
+		if (shipClass == Battleship.class)
 		{
-			for (int j = 0; j < OCEAN_WIDTH; j++)
-			{
-				// create an empty sea with "bow" at row "i" and column "j"
-				Ship emptySea = new EmptySea();
-				emptySea.setBowRow(i);
-				emptySea.setBowColumn(j);
-
-				// drop it onto the ocean
-				ships[i][j] = emptySea;
-			}
+			ship = new Battleship();
+		}
+		else if (shipClass == Cruiser.class)
+		{
+			ship = new Cruiser();
+		}
+		else if (shipClass == Destroyer.class)
+		{
+			ship = new Destroyer();
+		}
+		else if (shipClass == Submarine.class)
+		{
+			ship = new Submarine();
+		}
+		else if (shipClass == EmptySea.class)
+		{
+			ship = new EmptySea();
 		}
 
-		return ships;
+		if (ship != null)
+		{
+			// set the bow coordinates and the orientation of the ship
+			ship.setBowRow(bowRow);
+			ship.setBowColumn(bowColumn);
+			ship.setHorizontal(horizontal);
+		}
+
+		// can return null (rather than a ship of a default ship type): think
+		// about future extensibility. If we add a new ship type but
+		// forget to add it in this method, the assertion used after calling
+		// this method will fail and we will know exactly what happened, rather
+		// than wondering why we get extra ships of a given default type.
+		return ship;
 	}
 
 	/**
@@ -333,36 +374,24 @@ public class Ocean
 	 */
 	private char getShipStateAt(int row, int column)
 	{
-		return hasSunkShipAt(row, column) ? 'x' : getShipPartState(row, column);
-	}
-
-	/**
-	 * Gets the current state of the (whole) ship in {@code string} format and
-	 * extracts a {@code char} representing the part of the ship at the given
-	 * location. If hit, the ship part will be marked by the {@linkplain Ship}
-	 * class with a "S" if it's a real ship or a "-" if it's a
-	 * {@linkplain EmptySea}, otherwise it will be marked with a "." to indicate
-	 * that the location in yet to be fired upon.
-	 *
-	 * @param row
-	 *            horizontal coordinate of the ship part to display.
-	 * @param column
-	 *            vertical coordinate of the ship part to display
-	 * @return a {@code char} representing the state of the part of the ship at
-	 *         the given location.
-	 */
-	private char getShipPartState(int row, int column)
-	{
 		assert row >= 0 && row < OCEAN_HEIGHT : "row coordinate out of range";
 		assert column >= 0 && column < OCEAN_WIDTH : "column coordinate out of range";
 
-		Ship ship = ships[row][column];
+		if (!hasSunkShipAt(row, column))
+		{
+			// if the ship is not sunk get the relevant char from the ship state
+			// based on orientation and offset from the bow
+			int bowRow = ships[row][column].getBowRow();
+			int bowColumn = ships[row][column].getBowColumn();
+			boolean horizontal = ships[row][column].isHorizontal();
 
-		String shipState = ship.toString();
+			String shipState = ships[row][column].toString();
 
-		// get the relevant char based on orientation and offset from the bow
-		return ship.isHorizontal() ? shipState.charAt(column - ship.getBowColumn())
-				: shipState.charAt(row - ship.getBowRow());
+			return shipState.charAt(horizontal ? column - bowColumn : row - bowRow);
+		}
+
+		// otherwise return an 'x', meaning the ship is sunk
+		return 'x';
 	}
 
 	/**
@@ -430,62 +459,6 @@ public class Ocean
 				shipPlaced++;
 			}
 		}
-	}
-
-	/**
-	 * Factory method to generate (real) ship parts of the given type. It will
-	 * set the bow coordinates and orientation to the values passed as
-	 * arguments. It can return a null value if the class passed as parameter is
-	 * not recognized or it refers to a ship type that is not a real ship.
-	 *
-	 * @param <T>
-	 *            subclass of the {@linkplain Ship} type.
-	 * @param shipClass
-	 *            type of the ship part to be generated.
-	 * @param bowRow
-	 *            horizontal coordinate of the bow.
-	 * @param bowColumn
-	 *            vertical coordinate of the bow.
-	 * @param horizontal
-	 *            orientation of the ship that the ship part to create will be
-	 *            part of.
-	 * @return a ship part of the requested type; can be {@code null}.
-	 */
-	private <T extends Ship> Ship createShip(Class<T> shipClass, int bowRow, int bowColumn, boolean horizontal)
-	{
-		Ship ship = null;
-
-		if (shipClass == Battleship.class)
-		{
-			ship = new Battleship();
-		}
-		else if (shipClass == Cruiser.class)
-		{
-			ship = new Cruiser();
-		}
-		else if (shipClass == Destroyer.class)
-		{
-			ship = new Destroyer();
-		}
-		else if (shipClass == Submarine.class)
-		{
-			ship = new Submarine();
-		}
-
-		if (ship != null)
-		{
-			// set the bow coordinates and the orientation of the ship
-			ship.setBowRow(bowRow);
-			ship.setBowColumn(bowColumn);
-			ship.setHorizontal(horizontal);
-		}
-
-		// can return null (rather than a ship of a default ship type): think
-		// about future extensibility. If we add a new ship type but
-		// forget to add it in this method, the assertion used after calling
-		// this method will fail and we will know exactly what happened, rather
-		// than wondering why we get extra ships of a given default type.
-		return ship;
 	}
 
 	/**
