@@ -407,7 +407,7 @@ public class Ocean
 			bowRow = random.nextInt(horizontal ? OCEAN_HEIGHT : OCEAN_HEIGHT - shipLength + 1);
 
 			// try and place the ship at the given location
-			if (areaIsSuitableToPlaceShip(bowRow, bowColumn, shipLength, horizontal))
+			if (areaIsClear(bowRow, bowColumn, shipLength, horizontal))
 			{
 				// create a ship representing a ship part to replicate
 				// across the length of the (whole) ship
@@ -520,9 +520,7 @@ public class Ocean
 		// excluded, since we are dropping the longest ships first). Under these
 		// conditions the only place where ships can overlap in the mid area is
 		// the location where the bow will be placed
-		return !isOccupied(bowRow, bowColumn)
-				&& areaOnBothSidesIsClear(bowRow, bowColumn, length, height)
-				&& areaAtBothEndsIsClear(bowRow, bowColumn, length, height);
+		return areaIsClear(bowRow, bowColumn, shipLength, horizontal);
 	}
 
 	/**
@@ -606,6 +604,27 @@ public class Ocean
 			if (isOccupied(row, columnOnTheLeft) || isOccupied(row, columnOnTheRight))
 			{
 				return false;
+			}
+		}
+
+		return true;
+	}
+
+	private boolean areaIsClear(int bowRow, int bowColumn, int shipLength, boolean horizontal)
+	{
+		// treating vertical ships as horizontal ships with length equal to 1
+		// and hight equal the length of the ship
+		int height = horizontal ? 1 : shipLength;
+		int length = horizontal ? shipLength : 1;
+
+		for (int i = bowRow - 1; i <= bowRow + height; i++)
+		{
+			for (int j = bowColumn - 1; j <= bowColumn + length; j++)
+			{
+				if (isOccupied(i, j))
+				{
+					return false;
+				}
 			}
 		}
 
