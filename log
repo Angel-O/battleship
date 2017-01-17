@@ -13,3 +13,6 @@ so that passing the wrong length value for a particular ship type is less likey 
 27. remove random generator in test classes as it is not advisable unless strictly needed: what if we change the code
 due to some requiremnts change and some tests suddenly fail, but we don't know what values made them fail?
 30. remove setup test methods if not used
+31. if any ship is adjecenct to another ship diagonally you will have at least an occupied location
+to the (top)right or to the (bottom)left of the ocean cell before the bow (or after the stern)
+of the ship...would this be a clearer way to test the diagonal adjecency?

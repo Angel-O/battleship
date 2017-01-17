@@ -123,14 +123,13 @@ public class Ocean
 
 	/**
 	 * Places all the ships randomly on the ocean in such a way that ships do
-	 * not overlap, or are adjacent to other ships (either vertically,
-	 * horizontally, or diagonally). Longer ships are placed first to increase
-	 * efficiency and the chances of dropping all the ships
+	 * not overlap and are not adjacent to other ships either vertically,
+	 * horizontally, or diagonally.
 	 */
 	public final void placeAllShipsRandomly()
 	{
-		// placing longer ships first so that we won't need to check if ships
-		// overlap as we move forward from the bow (except from the bow itself)
+		// Longer ones are placed first to increase the chances of dropping all
+		// the ships
 		this.<Battleship>placeShipsOntoOcean(BATTLESHIPS, Battleship.BATTLESHIP_LENGTH, Battleship.class);
 		this.<Cruiser>placeShipsOntoOcean(CRUISERS, Cruiser.CRUISER_LENGTH, Cruiser.class);
 		this.<Destroyer>placeShipsOntoOcean(DESTROYERS, Destroyer.DESTROYER_LENGTH, Destroyer.class);
@@ -226,21 +225,17 @@ public class Ocean
 		{
 			for (int j = 0; j <= OCEAN_WIDTH; j++)
 			{
-				// if it's the first row or first column
-				if (i == 0 || j == 0)
+				if (i == 0 && j < OCEAN_WIDTH)
 				{
-					if (i == 0 && j < OCEAN_WIDTH)
-					{
-						// print the first row of numbers
-						System.out.print(j == 0 ? " " + j : j);
-					}
-					else if (j == 0)
-					{
-						// print the first column of numbers
-						System.out.print(i - 1);
-					}
+					// print the first row of numbers
+					System.out.print(j == 0 ? " " + j : j);
 				}
-				else
+				else if (j == 0)
+				{
+					// print the first column of numbers
+					System.out.print(i - 1);
+				}
+				else if (i > 0)
 				{
 					// otherwise print whatever is in the ocean
 					System.out.print(getShipStateAt(i - 1, j - 1));
@@ -374,8 +369,8 @@ public class Ocean
 	 */
 	private char getShipStateAt(int row, int column)
 	{
-		assert row >= 0 && row < OCEAN_HEIGHT : "row coordinate out of range";
-		assert column >= 0 && column < OCEAN_WIDTH : "column coordinate out of range";
+		assert row >= 0 && row < OCEAN_HEIGHT : "row coordinate out of range: " + row;
+		assert column >= 0 && column < OCEAN_WIDTH : "column coordinate out of range: " + column;
 
 		if (!hasSunkShipAt(row, column))
 		{
@@ -489,7 +484,7 @@ public class Ocean
 
 		// loop from bowRow(bowColumn) - 1 up to the ship height(length),
 		// inclusively as we are checking the augmented virtual area sorrounding
-		// the ship
+		// the ocean locations where the (whole) ship will be placed
 		for (int i = bowRow - 1; i <= bowRow + height; i++)
 		{
 			for (int j = bowColumn - 1; j <= bowColumn + length; j++)
