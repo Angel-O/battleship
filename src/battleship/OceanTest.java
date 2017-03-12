@@ -36,6 +36,13 @@ public class OceanTest
 	 */
 	private Ship[][] rotatedShips;
 
+	/**
+	 * Whether or not the ocean matrix should be rotated: set to false when the
+	 * matrix containing the ships needs to be scanned horizontally, true
+	 * otherwise
+	 */
+	private boolean rotateOcean = true;
+
 	/** default timeout test duration in milliseconds */
 	private static final int DEFAULT_TIMEOUT = 2000;
 
@@ -122,7 +129,7 @@ public class OceanTest
 	@Test
 	public void test_Ocean_totalShipSunkCountShouldBeSetToZeroWhenOceanIsCreated()
 	{
-		// initally the total amount of ships sunk
+		// initially the total amount of ships sunk
 		int actualInitialAmountOfShipSunk = ocean.getShipsSunk();
 
 		// should be equal to zero
@@ -247,10 +254,10 @@ public class OceanTest
 	public void test_placeAllShipsRandomly_exactNumberOfShipsShouldBePlacedRandomlyOnTheOcean()
 	{
 		// if we count the total number of horizontal ships in the ocean
-		int totalNumberOFShips = countHorizontalShips(ships);
+		int totalNumberOFShips = countHorizontalShips(!rotateOcean);
 
 		// and then we add the count of the vertical ships
-		totalNumberOFShips += countHorizontalShips(rotatedShips);
+		totalNumberOFShips += countHorizontalShips(rotateOcean);
 
 		// we should have this amount of ships
 		int expected = Ocean.BATTLESHIPS + Ocean.CRUISERS + Ocean.DESTROYERS + Ocean.SUBMARINES;
@@ -280,7 +287,7 @@ public class OceanTest
 		int actualShipArea = totoalOceanSpace - countTotalSeaArea();
 
 		// and also the total number of ships in the ocean
-		int actualTotalShips = countHorizontalShips(ships) + countHorizontalShips(rotatedShips);
+		int actualTotalShips = countHorizontalShips(!rotateOcean) + countHorizontalShips(rotateOcean);
 
 		// if ships don't overlap we would expect that the actual total number
 		// of ships and the actual total area covered by the ships to match
@@ -302,13 +309,13 @@ public class OceanTest
 
 		// if for every horizontal ship we check if there are any ship which are
 		// adjacent to it diagoanlly
-		shipsAreDiagonallyAdjacent = checkDiagonalAdjacencyMovingHorizontally(ships);
+		shipsAreDiagonallyAdjacent = checkDiagonalAdjacencyMovingHorizontally(!rotateOcean);
 
 		// we expect not to have any diagonal adjacency
 		assertFalse("found diagonally adjacenct ships moving horizontally along each row", shipsAreDiagonallyAdjacent);
 
 		// then if we do the same thing vertically
-		shipsAreDiagonallyAdjacent = checkDiagonalAdjacencyMovingHorizontally(rotatedShips);
+		shipsAreDiagonallyAdjacent = checkDiagonalAdjacencyMovingHorizontally(rotateOcean);
 
 		// we should still expect the same outcome
 		assertFalse("found diagonally adjacenct ships moving vertically along each column", shipsAreDiagonallyAdjacent);
@@ -343,10 +350,10 @@ public class OceanTest
 
 		// and then we scan the ocean horizontally and increment the ship area
 		// for each horizontal ship we encounter
-		countShipAreaByShipTypeOnEachOceanRow(shipTypeToAreaMapper, ships);
+		countShipAreaByShipTypeHorizontally(shipTypeToAreaMapper, !rotateOcean);
 
 		// and then do the same vertically
-		countShipAreaByShipTypeOnEachOceanRow(shipTypeToAreaMapper, rotatedShips);
+		countShipAreaByShipTypeHorizontally(shipTypeToAreaMapper, rotateOcean);
 
 		// we should expect that the area covered by each ship type (in the
 		// given amount) is what it would be if there wasn't any adjacent ships
@@ -371,10 +378,10 @@ public class OceanTest
 				+ Ocean.DESTROYERS * Destroyer.DESTROYER_LENGTH + Ocean.SUBMARINES * Submarine.SUBMARINE_LENGTH;
 
 		// the total ocean area should be equal to this
-		int totoalOceanSpace = Ocean.OCEAN_WIDTH * Ocean.OCEAN_HEIGHT;
+		int totalOceanSpace = Ocean.OCEAN_WIDTH * Ocean.OCEAN_HEIGHT;
 
 		// if we count the area with real ships
-		int actualShipArea = totoalOceanSpace - countTotalSeaArea();
+		int actualShipArea = totalOceanSpace - countTotalSeaArea();
 
 		// then the total area covered by real ships should be equal to the sum
 		// of the number of each real ship type multiplied by the correspondent
@@ -384,7 +391,17 @@ public class OceanTest
 		assertTrue("Found ships which aren't within the ocean's borders", shipsAreWithinOceanBorders);
 	}
 
-	@Test(timeout = DEFAULT_TIMEOUT)
+	@Test(timeout = DEFAULT_TIMEOUT * 5)
+	public void test_Ocean_shipsShouldBePlacedOnTheOceanWithinTenSeconds()
+	{
+		// if we have a brand new ocean
+		Ocean ocean = new Ocean();
+
+		// and we place the ships onto it, the operation should not timeout
+		ocean.placeAllShipsRandomly();
+	}
+
+	@Test
 	public void test_isOccupied_occupiedOceanSpotsShouldBeFlaggedAccordingly()
 	{
 		// if we create an empty ocean
@@ -409,7 +426,7 @@ public class OceanTest
 		assertTrue("fourth location is not occupied", fourthLocationIsOccupied);
 	}
 
-	@Test(timeout = DEFAULT_TIMEOUT)
+	@Test
 	public void test_isOccupied_clearOceanSpotsShouldBeFlaggedAccordingly()
 	{
 		// if we create an empty ocean
@@ -426,7 +443,7 @@ public class OceanTest
 		assertFalse("clear ocean spots was flagged as occupied", locationIsOccupied);
 	}
 
-	@Test(timeout = DEFAULT_TIMEOUT)
+	@Test
 	public void test_isOccupied_outOfRangeOceanSpotsShouldBeFlaggedAsClear()
 	{
 		// if we pick a location with column coordinate greater than the ocean's
@@ -751,9 +768,20 @@ public class OceanTest
 		// if we create an empty ocean
 		ocean = new Ocean();
 
-		// then check any location to see if it contains a sunk ship
-		boolean locationHasASunkShip = ocean.hasSunkShipAt(0, 0) && ocean.hasSunkShipAt(4, 5)
-				&& ocean.hasSunkShipAt(5, 7);
+		// then check a random location to see if it contains a sunk ship
+		boolean locationHasASunkShip = ocean.hasSunkShipAt(3, 0);
+
+		// we should expect it not to have one
+		assertFalse("empty sea locations do not have sunk ships on them", locationHasASunkShip);
+
+		// if we get another location
+		locationHasASunkShip = ocean.hasSunkShipAt(4, 5);
+
+		// we should still expect it not to have one
+		assertFalse("empty sea locations do not have sunk ships on them", locationHasASunkShip);
+
+		// and if we pick one more, the outcome should be the same
+		locationHasASunkShip = ocean.hasSunkShipAt(5, 7);
 
 		// we should expect them not to have one
 		assertFalse("empty sea locations do not have sunk ships on them", locationHasASunkShip);
@@ -921,129 +949,6 @@ public class OceanTest
 
 	// ======================= helper methods ======================== //
 
-	/**
-	 * Determines whether or not a ship can be placed in the area starting from
-	 * the bow coordinates up to the ship length, moving in the specified
-	 * direction. The criteria to determine if the area is suitable are: ships
-	 * cannot overlap with any other ship, they cannot be adjacent to any other
-	 * ship (either vertically, horizontally or diagonally) and they cannot
-	 * exceed the ocean's borders.
-	 *
-	 * @param bowRow
-	 *            horizontal coordinate of the bow.
-	 * @param bowColumn
-	 *            vertical coordinate of the bow.
-	 * @param shipLength
-	 *            length of the ship.
-	 * @param horizontal
-	 *            orientation on the ocean's matrix (vertical or diagonal).
-	 * @return {@code true} if the ship can be placed in the area respecting the
-	 *         criteria, {@code false} otherwise.
-	 */
-	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
-	{
-		// treating vertical ships as horizontal ships with length equal to 1
-		// and hight equal the length of the ship
-		int height = horizontal ? 1 : shipLength;
-		int length = horizontal ? shipLength : 1;
-
-		// there is no need to check the mid area, where the ship will
-		// actually be placed as long as we check the adjacent areas
-		// (overlapping is guaranteed not to occur in the mid area, bow
-		// excluded, since we are dropping the longest ships first). Under these
-		// conditions the only place where ships can overlap in the mid area is
-		// the location where the bow will be placed
-		return ocean.isOccupied(bowRow, bowColumn) && areaOnBothSidesIsClear(bowRow, bowColumn, length, height)
-				&& areaAtBothEndsIsClear(bowRow, bowColumn, length, height);
-	}
-
-	/**
-	 * Determines whether the area adjacent the ship along its length is clear.
-	 * Note: horizontal ships have height equal to {@code 1} and length equal to
-	 * the ship length, while vertical ships are treated as horizontal ships
-	 * with length equal to {@code 1} and height equal to the ship length.
-	 *
-	 * @param bowRow
-	 *            horizontal coordinate of the bow.
-	 * @param bowColumn
-	 *            vertical coordinate of the bow.
-	 * @param shipLength
-	 *            length of the ship.
-	 * @param shipHeight
-	 *            height of the ship.
-	 * @return {@code true} if the area on both sides of the ship is not
-	 *         occupied, {@code false} otherwise.
-	 */
-	private boolean areaOnBothSidesIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
-	{
-		// row above the area that would host the ship
-		int rowAbove = bowRow - 1;
-		// row below the area that would host the ship
-		int rowBelow = bowRow + shipHeight;
-		// iteration variable used to scan the area
-		int column;
-
-		// checking both sides (top and bottom) along the length of the area
-		// that could potentially host the ship, looping from 0 to length
-		// (exclusive) as we are not checking the diagonal area around the ship
-		for (int i = 0; i < shipLength; i++)
-		{
-			// iterate over the column (horizontally)
-			column = bowColumn + i;
-
-			if (ocean.isOccupied(rowAbove, column) || ocean.isOccupied(rowBelow, column))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	/**
-	 * Determines whether the area adjacent the ship at both ends, including the
-	 * diagonal area, is clear. Note: horizontal ships have height equal to
-	 * {@code 1} and length equal to the ship length, while vertical ships are
-	 * treated as horizontal ships with length equal to {@code 1} and height
-	 * equal to the ship length.
-	 *
-	 * @param bowRow
-	 *            horizontal coordinate of the bow.
-	 * @param bowColumn
-	 *            vertical coordinate of the bow.
-	 * @param shipLength
-	 *            length of the ship.
-	 * @param shipHeight
-	 *            height of the ship.
-	 * @return {@code true} if the area at both ends of the ship is not
-	 *         occupied, {@code false} otherwise.
-	 */
-	private boolean areaAtBothEndsIsClear(int bowRow, int bowColumn, int shipLength, int shipHeight)
-	{
-		// column on the left of area that would host the ship
-		int columnOnTheLeft = bowColumn - 1;
-		// column on the right of the area that would host the ship
-		int columnOnTheRight = bowColumn + shipLength;
-		// iteration variable used to scan the area
-		int row;
-
-		// checking both ends (left and right) of the area that could
-		// potentially host the ship, looping from -1 to height (inclusive) as
-		// we are also checking the diagonal area around the ship
-		for (int i = -1; i <= shipHeight; i++)
-		{
-			// iterate over the row (vertically)
-			row = bowRow + i;
-
-			if (ocean.isOccupied(row, columnOnTheLeft) || ocean.isOccupied(row, columnOnTheRight))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
 	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
 	{
 		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
@@ -1109,24 +1014,33 @@ public class OceanTest
 		return totalSeaArea;
 	}
 
-	private void countShipAreaByShipTypeOnEachOceanRow(HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper, Ship[][] ships)
+	/**
+	 * For each ship type it counts the total area covered in the ocean
+	 *
+	 * @param shipTypeToAreaMapper
+	 *            maps a ship type to the area
+	 * @param rotate
+	 *            whether or not the matrix should be rotated
+	 */
+	private void countShipAreaByShipTypeHorizontally(HashMap<Class<? extends Ship>, Integer> shipTypeToAreaMapper,
+			boolean rotate)
 	{
+		// get the right matrix depending on orientation
+		ships = rotate ? rotatedShips : ships;
+
 		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
 		{
 			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
 			{
-				// get the current ship
-				Ship ship = ships[i][j];
-
 				// if it's a real horizontal ship count the area occupied
 				// by the ship
-				if (ship.isRealShip() && ship.isHorizontal())
+				if (ships[i][j].isRealShip() && ships[i][j].isHorizontal())
 				{
+					// get the current ship
+					Ship ship = ships[i][j];
+
 					// the bow is already included in the count
 					int realShipAreaCounter = 1;
-					int shipLength = ship.getLength();
-
-					Class<? extends Ship> shipClass = ship.getClass();
 
 					// increment the total count of the "ship area" and stop
 					// when an empty sea is found or the edge of the border is
@@ -1137,65 +1051,81 @@ public class OceanTest
 						realShipAreaCounter++;
 					}
 
+					// update the area for the ship type found
+					Class<? extends Ship> shipClass = ship.getClass();
 					shipTypeToAreaMapper.put(shipClass, shipTypeToAreaMapper.get(shipClass) + realShipAreaCounter);
 
 					// move past the current ship
-					j += shipLength - 1;
+					j += ship.getLength() - 1;
 				}
 			}
 		}
 	}
 
-	private boolean checkDiagonalAdjacencyMovingHorizontally(Ship[][] ships)
+	/**
+	 * Check if the area around the bow and the stern in diagonal directions is
+	 * clear
+	 *
+	 * @param rotate
+	 *            whether or not to rotate the matrix
+	 * @return true if there are real ships in the diagonal areas
+	 */
+	private boolean checkDiagonalAdjacencyMovingHorizontally(boolean rotate)
 	{
 		boolean adjacent = false;
 
-		// Keep moving along the ocean row until a
-		// horizontal ship bow is found
+		// get the right matrix depending on orientation
+		ships = rotate ? rotatedShips : ships;
+
+		// keep moving along the ocean row until a horizontal ship bow is found
 		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
 		{
 			for (int j = 0; j < Ocean.OCEAN_WIDTH; j++)
 			{
-				if (ships[i][j].isRealShip() && ships[i][j].isHorizontal())
+				// if we have found an horizontal ship we will chek if there is
+				// anything in the diagonal area
+				if (cellHasShip(i, j, ships) && ships[i][j].isHorizontal())
 				{
-					Ship ship = ships[i][j];
+					int sternColumn = j + ships[i][j].getLength() - 1;
 
-					// there is no possible diagonal adjacency on the left
-					// border, but we still want to enter the for loop as at
-					// column == 1 there could be a real ship part belonging to
-					// a ship with the bow adjacent to the left border: we need
-					// to skip that as we are only checking bows and sterns
-					if (j > 0)
-					{
-						// if the ocean spot on the diagonal is a real ship, we
-						// have found two ships that are adjacent diagonally
-						if (i > 0 && ships[i - 1][j - 1].isRealShip()
-								|| i < Ocean.OCEAN_HEIGHT - 1 && ships[i + 1][j - 1].isRealShip())
-						{
-							adjacent = true;
-							break;
-						}
-					}
+					// check the diagonal cells at the bow and the stern
+					// location
+					adjacent = cellHasShip(i - 1, j - 1, ships) && cellHasShip(i + 1, j - 1, ships)
+							&& cellHasShip(i - 1, sternColumn + 1, ships) && cellHasShip(i + 1, sternColumn + 1, ships);
 
-					// move to the stern column coordinate of the horizontal
-					// ship found
-					j = j + ship.getLength() - 1;
-
-					// check that the column is still within the range
-					if (j < Ocean.OCEAN_WIDTH - 1)
-					{
-						if (i > 0 && ships[i - 1][j + 1].isRealShip()
-								|| i < Ocean.OCEAN_HEIGHT - 1 && ships[i + 1][j + 1].isRealShip())
-						{
-							adjacent = true;
-							break;
-						}
-					}
+					// move past the current ship
+					j = sternColumn;
 				}
 			}
 		}
 
 		return adjacent;
+	}
+
+	/**
+	 * Checks wether or not the cell at the location indicated by row and column
+	 * in the matrix paased as prameter is occupied. Since arrays are passed by
+	 * value and not by reference it is not possible to change the ships in the
+	 * original ocean and any call to ocean.isOccupied will always operate on
+	 * the original matrix.
+	 *
+	 * @param row
+	 *            horizontal coordinate
+	 * @param column
+	 *            vertical coordinate
+	 * @param matrix
+	 *            the matrix to scan
+	 * @return
+	 */
+	private boolean cellHasShip(int row, int column, Ship[][] matrix)
+	{
+		if (row >= 0 && row < Ocean.OCEAN_HEIGHT && column >= 0 && column < Ocean.OCEAN_WIDTH)
+		{
+			// check only if the coordinates are in range
+			return ships[row][column].isRealShip();
+		}
+
+		return false;
 	}
 
 	/**
@@ -1272,8 +1202,11 @@ public class OceanTest
 	 *            matrix to be scanned
 	 * @return count of horizontal ships in the ocean
 	 */
-	private int countHorizontalShips(Ship[][] ships)
+	private int countHorizontalShips(boolean rotate)
 	{
+		// set the matrix based on orientation
+		ships = rotate ? rotatedShips : ships;
+
 		int totalShips = 0;
 
 		for (int i = 0; i < Ocean.OCEAN_HEIGHT; i++)
@@ -1350,8 +1283,10 @@ public class OceanTest
 
 	// ========================== debug =============================== //
 
-	private static void print(Ship[][] matrix)
+	private void print(Ocean ocean)
 	{
+		Ship[][] matrix = ocean.getShipArray();
+
 		for (int i = 0; i <= Ocean.OCEAN_HEIGHT; i++)
 		{
 			for (int j = 0; j <= Ocean.OCEAN_WIDTH; j++)

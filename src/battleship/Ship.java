@@ -85,17 +85,26 @@ public abstract class Ship
 		{
 			// get the offset from the bow of the shot fired at the location
 			// provided, based on the orientation of the ship
-			int offsetFromTheBow = horizontal ? column - bowColumn : row - bowRow;
+			int horizontalOffset = column - bowColumn;
+			int verticalOffset = row - bowRow;
 
-			if (offsetFromTheBow < 0 || offsetFromTheBow >= length)
+			if (horizontalOffset < 0 || verticalOffset < 0 || horizontalOffset >= length || verticalOffset >= length)
 			{
 				// this shouldn't really happen, but given that the method is
 				// public it can be misused, so if somehow the offset from the
 				// bow is negative or greater than the ship length (or equal) we
 				// will return false and avoid trying to mark the hit array and
-				// consequently an IndexOutOfBounds Exception
+				// consequently an IndexOutOfBounds Exception. NOTE: we need to
+				// differentiate between vertical offset and horizontal offset
+				// since if the shot was not meant to be received by the ship
+				// we don't really know what direction the shot was meant to
+				// follow and therefore we have to check both ranges.
 				return false;
 			}
+
+			// at this point we are 100% hat the shot was meant for us and we
+			// can safely mark the hit array based on the correct offset
+			int offsetFromTheBow = horizontal ? horizontalOffset : verticalOffset;
 
 			// mark the hit array accordingly to indicate what
 			// part of the ship (as a whole) was hit.

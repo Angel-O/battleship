@@ -7,8 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Random;
-
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -23,9 +21,6 @@ import org.junit.Test;
  */
 public class ShipTest
 {
-	/** default timeout test duration in milliseconds */
-	private static final int DEFAULT_TIMEOUT = 2000;
-
 	/**
 	 * @throws java.lang.Exception
 	 */
@@ -98,7 +93,6 @@ public class ShipTest
 
 	// =================== getters and setters tests ==================== //
 
-	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_getLength_shouldReturnCorrectShipLength()
 	{
 		// for each ship type we have
@@ -123,11 +117,11 @@ public class ShipTest
 		int actualSubmarineLength = submarine.getLength();
 
 		// we should expect the correct length when calling the getLength method
-		assertEquals("verifying empty sea length", expectedEmptySeaLength, actualEmptySeaLength);
-		assertEquals("verifying battleship type", expectedEBattleshipLength, actualBattleshipLength);
-		assertEquals("verifying cruiser type", expectedCruiserLength, actualCruiserLength);
-		assertEquals("verifying destroyer type", expectedDestroyerLength, actualDestroyerLength);
-		assertEquals("verifying submarine type", expectedSubmarineLength, actualSubmarineLength);
+		assertEquals("returned incorrect empty sea length", expectedEmptySeaLength, actualEmptySeaLength);
+		assertEquals("returned incorrect battleship length", expectedEBattleshipLength, actualBattleshipLength);
+		assertEquals("returned incorrect cruiser length", expectedCruiserLength, actualCruiserLength);
+		assertEquals("returned incorrect destroyer length", expectedDestroyerLength, actualDestroyerLength);
+		assertEquals("returned incorrect submarine length", expectedSubmarineLength, actualSubmarineLength);
 	}
 
 	@Test
@@ -156,11 +150,11 @@ public class ShipTest
 
 		// we should expect to get the correct ship type when calling the get
 		// ship type method
-		assertEquals("verifying empty sea type", expectedEmptySeaType, actualEmptySeaType);
-		assertEquals("verifying battleship type", expectedEBattleshipType, actualBattleshipType);
-		assertEquals("verifying cruiser type", expectedCruiserType, actualCruiserType);
-		assertEquals("verifying destroyer type", expectedDestroyerType, actualDestroyerType);
-		assertEquals("verifying submarine type", expectedSubmarineType, actualSubmarineType);
+		assertEquals("returned incorrect type for empty sea", expectedEmptySeaType, actualEmptySeaType);
+		assertEquals("returned incorrect type for battleship", expectedEBattleshipType, actualBattleshipType);
+		assertEquals("returned incorrect type for cruiser", expectedCruiserType, actualCruiserType);
+		assertEquals("returned incorrect type for destroyer", expectedDestroyerType, actualDestroyerType);
+		assertEquals("returned incorrect type for submarine", expectedSubmarineType, actualSubmarineType);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -187,7 +181,7 @@ public class ShipTest
 		Ship ship = new Cruiser();
 
 		// a negative value should cause an IAE exception
-		ship.setBowRow(-45);
+		ship.setBowColumn(-45);
 	}
 
 	@Test(expected = IllegalArgumentException.class)
@@ -196,7 +190,7 @@ public class ShipTest
 		Ship ship = new Submarine();
 
 		// a value greater than the ocean's width should cause an IAE exception
-		ship.setBowRow(Ocean.OCEAN_WIDTH + 1);
+		ship.setBowColumn(Ocean.OCEAN_WIDTH + 1);
 	}
 
 	@Test
@@ -208,14 +202,14 @@ public class ShipTest
 		// we should expect its orientation to be set to the default value
 		boolean expectedDefaultOrientation = ship.isHorizontal();
 
-		assertFalse("verifying default vertical ship orientation", expectedDefaultOrientation);
+		assertFalse("incorect default vertical ship orientation", expectedDefaultOrientation);
 
 		// if we set it to true
 		ship.setHorizontal(true);
 
 		// we should expect its value to change
 		boolean expectedOrientation = ship.isHorizontal();
-		assertTrue("verifiying horizontal ship orientation", expectedOrientation);
+		assertTrue("incorrect ship orientation returned", expectedOrientation);
 	}
 
 	@Test
@@ -232,7 +226,7 @@ public class ShipTest
 
 		// we should expect its value to remain unchanged
 		boolean orientation = ship.isHorizontal();
-		assertEquals("ship orientation does not change", defaultOrientation, orientation);
+		assertEquals("ship orientation has changed", defaultOrientation, orientation);
 	}
 
 	@Test
@@ -243,14 +237,13 @@ public class ShipTest
 
 		// whatever value we set the horizontal coordinate of the bow to
 		// within the Ocean's range
-		Random random = new Random();
-		int bowRow = random.nextInt(Ocean.OCEAN_HEIGHT);
+		int bowRow = 5;
 		ship.setBowRow(bowRow);
 
 		// we should get that value back
 		int actualBowRowCoordinate = ship.getBowRow();
 
-		assertEquals("bow row returned what was originally set", bowRow, actualBowRowCoordinate);
+		assertEquals("bow row  did not have value originally set", bowRow, actualBowRowCoordinate);
 	}
 
 	@Test
@@ -261,14 +254,13 @@ public class ShipTest
 
 		// whatever value we set the vertical coordinate of the bow to
 		// within the Ocean's range
-		Random random = new Random();
-		int bowColumn = random.nextInt(Ocean.OCEAN_WIDTH);
+		int bowColumn = 3;
 		ship.setBowColumn(bowColumn);
 
 		// we should get that value back
 		int actualBowRowCoordinate = ship.getBowColumn();
 
-		assertEquals("bow column returned is what was originally set", bowColumn, actualBowRowCoordinate);
+		assertEquals("bow column did not have value originally set", bowColumn, actualBowRowCoordinate);
 	}
 
 	// ====================== public methods tests ====================== //
@@ -282,7 +274,7 @@ public class ShipTest
 		// we should expect it not to be flagged as a real ship
 		boolean isEmptySeaReal = ship.isRealShip();
 
-		assertFalse("verifying that empty sea ships are not a real ship", isEmptySeaReal);
+		assertFalse("empty sea ship flagged as a real ship", isEmptySeaReal);
 	}
 
 	@Test
@@ -302,13 +294,12 @@ public class ShipTest
 		boolean isSubmarinReal = submarine.isRealShip();
 
 		// we should expect them to be flagged as actual ships
-		assertTrue("verifying that battleships are indeed real ship", isBattleshipReal);
-		assertTrue("verifying that cruisers are indeed real ship", isCruiserReal);
-		assertTrue("verifying that destroyers are indeed real ship", isDestroyerReal);
-		assertTrue("verifying that submarines are indeed real ship", isSubmarinReal);
+		assertTrue("battleships not flagged as real ship", isBattleshipReal);
+		assertTrue("cruisers not flagged as real ship", isCruiserReal);
+		assertTrue("destroyers not flagged as real ship", isDestroyerReal);
+		assertTrue("submarines not flagged as real ship", isSubmarinReal);
 	}
 
-	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_isSunk_shipsShouldSinkWhenShotsAreFiredAcrossTheirLength()
 	{
 		// if we have any type of ship
@@ -329,14 +320,13 @@ public class ShipTest
 		boolean expectedSubmarineState = submarine.isSunk();
 
 		// we should expect them to sink
-		assertTrue("shooting a battleship until it sinks", expectedBattleshipState);
-		assertTrue("shooting a destroyer until it sinks", expectedDestroyerState);
-		assertTrue("shooting a cruiser until it sinks", expectedCruiserState);
+		assertTrue("shooting a battleship until it sinks failed to sink it", expectedBattleshipState);
+		assertTrue("shooting a destroyer until it sinks failed to sink it", expectedDestroyerState);
+		assertTrue("shooting a cruiser until it sinks failed to sink it", expectedCruiserState);
 		// submarines have length equal to 1, so we only need a shot to sink one
-		assertTrue("shooting a submarine will sink it", expectedSubmarineState);
+		assertTrue("shooting a submarine failed to sink it", expectedSubmarineState);
 	}
 
-	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_isSunk_shipsShouldNotSinkIfNotAllPartsAreHit()
 	{
 		// if we have any type of ship
@@ -344,6 +334,10 @@ public class ShipTest
 		Ship destroyer = new Destroyer();
 		Ship cruiser = new Cruiser();
 		Ship submarine = new Submarine();
+
+		// with any orientation
+		battleship.setHorizontal(true);
+		submarine.setHorizontal(true);
 
 		// and shoot along the length of the ship without hitting all parts
 		fireShotsAcrossShipLength(battleship, Battleship.BATTLESHIP_LENGTH - 1);
@@ -357,11 +351,11 @@ public class ShipTest
 		boolean expectedSubmarineState = submarine.isSunk();
 
 		// we should not expect them to sink
-		assertFalse("shooting a battleship without sinking it", expectedBattleshipState);
-		assertFalse("shooting a destroyer without sinking it", expectedDestroyerState);
-		assertFalse("shooting a cruiser without sinking it", expectedCruiserState);
+		assertFalse("shooting a battleship without sinking it did actually sink it", expectedBattleshipState);
+		assertFalse("shooting a destroyer without sinking it did actually sink it", expectedDestroyerState);
+		assertFalse("shooting a cruiser without sinking it did actually sink it", expectedCruiserState);
 		// submarines have length equal to 1, so we aren't actually hitting them
-		assertFalse("not shooting at submarine will not sink it", expectedSubmarineState);
+		assertFalse("submarine was missed", expectedSubmarineState);
 	}
 
 	@Test
@@ -377,7 +371,7 @@ public class ShipTest
 		// we should expect it to be represented as a "." (dot)
 		String expectedRepresentation = ".";
 		String actualRepresentation = ship.toString();
-		assertEquals("verifying representation of non hit sea spot", expectedRepresentation, actualRepresentation);
+		assertEquals("representation of non hit sea spot was incorrect", expectedRepresentation, actualRepresentation);
 
 		// if then we shoot at it
 		ship.shootAt(bowRow, bowColumn);
@@ -385,7 +379,7 @@ public class ShipTest
 		// we should expect its representation to change to "-" (dash)
 		expectedRepresentation = "-";
 		actualRepresentation = ship.toString();
-		assertEquals("verifying representation of hit sea spot", expectedRepresentation, actualRepresentation);
+		assertEquals("representation of hit sea spot was incorrect", expectedRepresentation, actualRepresentation);
 
 	}
 
@@ -404,7 +398,7 @@ public class ShipTest
 		// we should expect its represenatation to be equal to this
 		String expectedRepresentation = "....";
 		String actualRepresentation = ship.toString();
-		assertEquals("verifying representation of real ship yet to be hit once", expectedRepresentation,
+		assertEquals("representation of real ship yet to be hit once was incorrect", expectedRepresentation,
 				actualRepresentation);
 
 		// if then we shoot at it one shot at a time we should expect its
@@ -415,7 +409,7 @@ public class ShipTest
 		// we should expect its representation to change to this
 		expectedRepresentation = "S...";
 		actualRepresentation = ship.toString();
-		assertEquals("verifying representation of a real ship hit on one part", expectedRepresentation,
+		assertEquals("representation of a real ship hit on one part was incorrect", expectedRepresentation,
 				actualRepresentation);
 
 		// and if we shoot at the second part
@@ -424,7 +418,7 @@ public class ShipTest
 		// we should expect its representation to change to this
 		expectedRepresentation = "SS..";
 		actualRepresentation = ship.toString();
-		assertEquals("verifying representation of a real ship hit on two parts", expectedRepresentation,
+		assertEquals("representation of a real ship hit on two parts was incorrect", expectedRepresentation,
 				actualRepresentation);
 
 		// then if we shoot at the third part
@@ -433,7 +427,7 @@ public class ShipTest
 		// we should expect its representation to change to this
 		expectedRepresentation = "SSS.";
 		actualRepresentation = ship.toString();
-		assertEquals("verifying representation of a real ship hit on three parts", expectedRepresentation,
+		assertEquals("representation of a real ship hit on three parts was incorrect", expectedRepresentation,
 				actualRepresentation);
 
 		// lastly if we shoot at the fourth part
@@ -442,7 +436,7 @@ public class ShipTest
 		// we should expect its representation to change to this
 		expectedRepresentation = "SSSS";
 		actualRepresentation = ship.toString();
-		assertEquals("verifying representation of a real ship hit on every part", expectedRepresentation,
+		assertEquals("representation of a real ship hit on every part was incorrect", expectedRepresentation,
 				actualRepresentation);
 	}
 
@@ -467,7 +461,7 @@ public class ShipTest
 		int lastPartIndex = Destroyer.DESTROYER_LENGTH - 1;
 		int actualLastPartShipState = shipState.indexOf('S');
 
-		assertEquals("last part of the ship gets marked as hit", lastPartIndex, actualLastPartShipState);
+		assertEquals("part of the ship that was shot wasn't marked as hit", lastPartIndex, actualLastPartShipState);
 	}
 
 	@Test
@@ -486,7 +480,7 @@ public class ShipTest
 
 		// any subsequent shot on the same part should be still succesful
 		boolean expectedOutcome = ship.shootAt(bowRow, bowColumn);
-		assertTrue("repeatedly shooting afloat ship on the same part", expectedOutcome);
+		assertTrue("repeatedly shooting afloat ship on the same part was marked as a miss", expectedOutcome);
 	}
 
 	@Test
@@ -505,7 +499,7 @@ public class ShipTest
 
 		// any subsequent shot on the same part should be unsuccesful
 		boolean expectedOutcome = ship.shootAt(bowRow, bowColumn);
-		assertFalse("repeatedly shooting sunk ship on the same part", expectedOutcome);
+		assertFalse("repeatedly shooting sunk ship on the same part was marked as a hit", expectedOutcome);
 	}
 
 	@Test
@@ -524,7 +518,7 @@ public class ShipTest
 
 		// any subsequent shot on the same part should be unsuccesful
 		boolean expectedOutcome = ship.shootAt(bowRow, bowColumn);
-		assertFalse("repeatedly shooting sunk ship on the same part", expectedOutcome);
+		assertFalse("repeatedly shooting empty sea was marked as a hit", expectedOutcome);
 	}
 
 	@Test
@@ -537,8 +531,6 @@ public class ShipTest
 		ship.setBowRow(bowRow);
 		ship.setBowColumn(bowColumn);
 
-		// differentiate between horizontal and vertical ships!!!
-
 		// and we shoot at it with coordinates that surely are not its
 		// coordinates
 		int wrongRowCoordinate = bowRow + Submarine.SUBMARINE_LENGTH;
@@ -546,21 +538,21 @@ public class ShipTest
 
 		// we should expect the shot to be unsuccessful
 		boolean expectedOutcome = ship.shootAt(wrongRowCoordinate, bowColumn);
-		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
+		assertFalse("shooting at ship with wrong coordinates was succesful", expectedOutcome);
 
 		// we should expect the shot to be unsuccessful
 		expectedOutcome = ship.shootAt(bowRow, wrongColumnCoordinate);
-		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
+		assertFalse("shooting at ship with wrong coordinates was succesful", expectedOutcome);
 
 		// we should expect the shot to be unsuccessful
 		wrongRowCoordinate = bowRow - 1;
 		expectedOutcome = ship.shootAt(wrongRowCoordinate, bowColumn);
-		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
+		assertFalse("shooting at ship with wrong coordinates was succesful", expectedOutcome);
 
 		// we should expect the shot to be unsuccessful
 		wrongColumnCoordinate = bowColumn - 1;
 		expectedOutcome = ship.shootAt(bowRow, wrongColumnCoordinate);
-		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
+		assertFalse("shooting at ship with wrong coordinates was succesful", expectedOutcome);
 	}
 
 	// ========================== mock objects ========================= //
