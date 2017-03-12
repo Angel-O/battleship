@@ -537,13 +537,29 @@ public class ShipTest
 		ship.setBowRow(bowRow);
 		ship.setBowColumn(bowColumn);
 
+		// differentiate between horizontal and vertical ships!!!
+
 		// and we shoot at it with coordinates that surely are not its
 		// coordinates
 		int wrongRowCoordinate = bowRow + Submarine.SUBMARINE_LENGTH;
 		int wrongColumnCoordinate = bowColumn + Submarine.SUBMARINE_LENGTH;
 
 		// we should expect the shot to be unsuccessful
-		boolean expectedOutcome = ship.shootAt(wrongRowCoordinate, wrongColumnCoordinate);
+		boolean expectedOutcome = ship.shootAt(wrongRowCoordinate, bowColumn);
+		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
+
+		// we should expect the shot to be unsuccessful
+		expectedOutcome = ship.shootAt(bowRow, wrongColumnCoordinate);
+		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
+
+		// we should expect the shot to be unsuccessful
+		wrongRowCoordinate = bowRow - 1;
+		expectedOutcome = ship.shootAt(wrongRowCoordinate, bowColumn);
+		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
+
+		// we should expect the shot to be unsuccessful
+		wrongColumnCoordinate = bowColumn - 1;
+		expectedOutcome = ship.shootAt(bowRow, wrongColumnCoordinate);
 		assertFalse("shooting at ship with wrong coordinates", expectedOutcome);
 	}
 

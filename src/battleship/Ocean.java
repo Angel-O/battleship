@@ -415,20 +415,15 @@ public class Ocean
 		// successfully placed in the ocean
 		int shipPlaced = 0;
 
-		// coordinates and orientation will be set at random
-		int bowRow;
-		int bowColumn;
-		boolean horizontal;
-
 		while (shipPlaced < amount)
 		{
 			// get a random orientation for the current ship
-			horizontal = random.nextBoolean();
+			boolean horizontal = random.nextBoolean();
 
 			// get random coordinates for the bow within the ocean's boundaries,
 			// with the upper bound depending on the orientation of the ship
-			bowColumn = random.nextInt(horizontal ? OCEAN_WIDTH - shipLength + 1 : OCEAN_WIDTH);
-			bowRow = random.nextInt(horizontal ? OCEAN_HEIGHT : OCEAN_HEIGHT - shipLength + 1);
+			int bowColumn = random.nextInt(horizontal ? OCEAN_WIDTH - shipLength + 1 : OCEAN_WIDTH);
+			int bowRow = random.nextInt(horizontal ? OCEAN_HEIGHT : OCEAN_HEIGHT - shipLength + 1);
 
 			// try and place the (whole) ship onto the ocean
 			if (areaIsSuitableToPlaceShip(bowRow, bowColumn, shipLength, horizontal))
@@ -478,7 +473,7 @@ public class Ocean
 	private boolean areaIsSuitableToPlaceShip(int bowRow, int bowColumn, int shipLength, boolean horizontal)
 	{
 		// treating vertical ships as horizontal ships with length equal to 1
-		// and hight equal the length of the ship
+		// and height equal the length of the ship
 		int height = horizontal ? 1 : shipLength;
 		int length = horizontal ? shipLength : 1;
 
