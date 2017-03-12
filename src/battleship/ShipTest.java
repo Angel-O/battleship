@@ -7,10 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -21,36 +17,11 @@ import org.junit.Test;
  */
 public class ShipTest
 {
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception
-	{}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception
-	{}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@Before
-	public void setUp() throws Exception
-	{}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@After
-	public void tearDown() throws Exception
-	{}
-
 	// ======================= constructor tests ======================== //
 
+	/**
+	 * Expect a IAE for non-sense negative length
+	 */
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void test_Ship_shouldThrowExceptionIfLengthIsNegative()
@@ -61,6 +32,9 @@ public class ShipTest
 		Ship ship = new MockShip(invalidLength);
 	}
 
+	/**
+	 * Expect a IAE for a non-sense zero length
+	 */
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void test_Ship_shouldThrowExceptionIfLengthIsZero()
@@ -71,6 +45,10 @@ public class ShipTest
 		Ship ship = new MockShip(invalidLength);
 	}
 
+	/**
+	 * Expect a IAE for coordinates that would fall out of the ocean's
+	 * boundaries
+	 */
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void test_Ship_shouldThrowExceptionIfLengthExceedsOceanHeight()
@@ -81,6 +59,10 @@ public class ShipTest
 		Ship ship = new MockShip(invalidLength);
 	}
 
+	/**
+	 * Expect a IAE for coordinates that would fall out of the ocean's
+	 * boundaries
+	 */
 	@SuppressWarnings("unused")
 	@Test(expected = IllegalArgumentException.class)
 	public void test_Ship_shouldThrowExceptionIfLengthExceedsOceanWidth()
@@ -93,6 +75,9 @@ public class ShipTest
 
 	// =================== getters and setters tests ==================== //
 
+	/**
+	 * Getter should return correct length
+	 */
 	public void test_getLength_shouldReturnCorrectShipLength()
 	{
 		// for each ship type we have
@@ -124,6 +109,9 @@ public class ShipTest
 		assertEquals("returned incorrect submarine length", expectedSubmarineLength, actualSubmarineLength);
 	}
 
+	/**
+	 * Getter should return correct ship type (string)
+	 */
 	@Test
 	public void test_getShipType_shouldReturnCorrectShipType()
 	{
@@ -157,6 +145,9 @@ public class ShipTest
 		assertEquals("returned incorrect type for submarine", expectedSubmarineType, actualSubmarineType);
 	}
 
+	/**
+	 * Expect a IAE for negative values
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_setBowRow_shouldThrowAnExceptionForNegativeValues()
 	{
@@ -166,6 +157,9 @@ public class ShipTest
 		ship.setBowRow(-99);
 	}
 
+	/**
+	 * Expect a IAE for out of range values
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_setBowRow_shouldThrowAnExceptionForValueGreaterThanOceanHeight()
 	{
@@ -175,6 +169,9 @@ public class ShipTest
 		ship.setBowRow(Ocean.OCEAN_HEIGHT + 1);
 	}
 
+	/**
+	 * Expect a IAE for negative values
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_setBowColumn_shouldThrowAnExceptionForNegativeValue()
 	{
@@ -184,6 +181,9 @@ public class ShipTest
 		ship.setBowColumn(-45);
 	}
 
+	/**
+	 * Expect a IAE for out of range values
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_setBowColumn_shouldThrowAnExceptionForValueGreaterThanOceanWidth()
 	{
@@ -193,6 +193,9 @@ public class ShipTest
 		ship.setBowColumn(Ocean.OCEAN_WIDTH + 1);
 	}
 
+	/**
+	 * Getter should return correct orientation value
+	 */
 	@Test
 	public void test_isHorizontal_shouldReturnCorrectShipOrientation()
 	{
@@ -212,6 +215,9 @@ public class ShipTest
 		assertTrue("incorrect ship orientation returned", expectedOrientation);
 	}
 
+	/**
+	 * Default orientation should not change by setting it to false
+	 */
 	@Test
 	public void test_setHorizontal_shouldNotAlterTheDefaultValueWhenSetToFalse()
 	{
@@ -229,6 +235,9 @@ public class ShipTest
 		assertEquals("ship orientation has changed", defaultOrientation, orientation);
 	}
 
+	/**
+	 * Getter should return correct coordinate value
+	 */
 	@Test
 	public void test_getBowRow_shouldReturnTheCorrectValue()
 	{
@@ -246,6 +255,9 @@ public class ShipTest
 		assertEquals("bow row  did not have value originally set", bowRow, actualBowRowCoordinate);
 	}
 
+	/**
+	 * Getter should return correct coordinate value
+	 */
 	@Test
 	public void test_getBowColumn_shouldReturnTheCorrectValue()
 	{
@@ -265,6 +277,9 @@ public class ShipTest
 
 	// ====================== public methods tests ====================== //
 
+	/**
+	 * Empty sea ships are not real ships
+	 */
 	@Test
 	public void test_isRealShip_shouldReturnFalseForAnEmptySea()
 	{
@@ -277,6 +292,9 @@ public class ShipTest
 		assertFalse("empty sea ship flagged as a real ship", isEmptySeaReal);
 	}
 
+	/**
+	 * Real ships should be flagged as such
+	 */
 	@Test
 	public void test_isRealShip_shouldReturnTrueForRealShips()
 	{
@@ -300,6 +318,9 @@ public class ShipTest
 		assertTrue("submarines not flagged as real ship", isSubmarinReal);
 	}
 
+	/**
+	 * Ships should sink when each part got shot
+	 */
 	public void test_isSunk_shipsShouldSinkWhenShotsAreFiredAcrossTheirLength()
 	{
 		// if we have any type of ship
@@ -327,6 +348,9 @@ public class ShipTest
 		assertTrue("shooting a submarine failed to sink it", expectedSubmarineState);
 	}
 
+	/**
+	 * Ships shouldn't sink if not all parts were shot
+	 */
 	public void test_isSunk_shipsShouldNotSinkIfNotAllPartsAreHit()
 	{
 		// if we have any type of ship
@@ -358,6 +382,9 @@ public class ShipTest
 		assertFalse("submarine was missed", expectedSubmarineState);
 	}
 
+	/**
+	 * The internal state of the empty ship should be correctly represented
+	 */
 	@Test
 	public void test_toString_shouldReturnCorrectRepresentationForEmptySea()
 	{
@@ -383,6 +410,9 @@ public class ShipTest
 
 	}
 
+	/**
+	 * The internal state of the real ships should be correctly represented
+	 */
 	@Test
 	public void test_toString_shouldReturnCorrectRepresentationForRealShip()
 	{
@@ -440,6 +470,9 @@ public class ShipTest
 				actualRepresentation);
 	}
 
+	/**
+	 * Only parts of the ships that are shot should be marked in the hit array
+	 */
 	@Test
 	public void test_shootAt_onlyShipPartsThatWereShotShouldBeMarkedInHitArray()
 	{
@@ -464,6 +497,9 @@ public class ShipTest
 		assertEquals("part of the ship that was shot wasn't marked as hit", lastPartIndex, actualLastPartShipState);
 	}
 
+	/**
+	 * Hitting afloat ship should return true
+	 */
 	@Test
 	public void test_shootAt_shouldReturnTrueEachTimeRealShipStillAfloatGetsShot()
 	{
@@ -483,6 +519,9 @@ public class ShipTest
 		assertTrue("repeatedly shooting afloat ship on the same part was marked as a miss", expectedOutcome);
 	}
 
+	/**
+	 * After being sunk hitting a ship should return false
+	 */
 	@Test
 	public void test_shootAt_shouldReturnFalseEachTimeRealShipIsShotAfterBeingSunk()
 	{
@@ -502,6 +541,9 @@ public class ShipTest
 		assertFalse("repeatedly shooting sunk ship on the same part was marked as a hit", expectedOutcome);
 	}
 
+	/**
+	 * Hitting an empty sea should always considered a miss
+	 */
 	@Test
 	public void test_shootAt_shouldReturnFalseWheneverEmptySeaIsHit()
 	{
@@ -521,6 +563,10 @@ public class ShipTest
 		assertFalse("repeatedly shooting empty sea was marked as a hit", expectedOutcome);
 	}
 
+	/**
+	 * If the coordinates passed to the method are not meant to hit the ship the
+	 * shot should be unsuccesfull
+	 */
 	@Test
 	public void test_shootAt_shouldReturnFalseIfTheCoordinatesGivenAreNotTheCoordinatesTheShipWasPlacedAt()
 	{

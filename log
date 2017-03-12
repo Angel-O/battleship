@@ -1,15 +1,1 @@
-10. added padding strategy: can I use it in the test class?
-11. remove unnecessary code from test classes, fix names...
-12. improve re-usability of tests method by scanning ocean by type
-16. is there a limit to the number of attempts to place a ship?
-18. add comments to private mehods in test classes, what about actual test methods?
-22. double check edge cases are tested
-24. placeShipsOntoOcean method: remove shipLength parameter and restore method to get ship length from ship type
-so that passing the wrong length value for a particular ship type is less likey to happen
-26. add comments on github
-30. remove setup test methods if not used
-31. if any ship is adjecenct to another ship diagonally you will have at least an occupied location
-to the (top)right or to the (bottom)left of the ocean cell before the bow (or after the stern)
-of the ship...would this be a clearer way to test the diagonal adjecency?
-32. have another think about the emptysea being created in cretaeship method
-33. add edge cases to ship.shootAt method
+

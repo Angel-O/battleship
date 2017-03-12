@@ -10,9 +10,7 @@ import static org.junit.Assert.assertTrue;
 import java.util.HashMap;
 
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -47,23 +45,10 @@ public class OceanTest
 	private static final int DEFAULT_TIMEOUT = 2000;
 
 	/**
-	 * @throws java.lang.Exception
-	 */
-	@BeforeClass
-	public static void setUpBeforeClass() throws Exception
-	{}
-
-	/**
-	 * @throws java.lang.Exception
-	 */
-	@AfterClass
-	public static void tearDownAfterClass() throws Exception
-	{}
-
-	/**
-	 * Initializes a new instance of the {@linkplain Ocean} class; gets the
-	 * {@linkplain Ship} 2-dimentional array, creates a matrix of the same ships
-	 * rotated 90 degrees anti-clockwise to aid testing.
+	 * Initializes a new instance of the {@linkplain Ocean} class and places all
+	 * the ships randomly; gets the {@linkplain Ship} 2-dimentional array,
+	 * creates a matrix of the same ships rotated 90 degrees anti-clockwise to
+	 * aid testing.
 	 *
 	 * @throws java.lang.Exception
 	 */
@@ -91,6 +76,9 @@ public class OceanTest
 
 	// ======================= constructor tests ======================== //
 
+	/**
+	 * When the ocean is created all the cells contain an empty sea
+	 */
 	@Test
 	public void test_Ocean_allCellsShouldContainAnEmptySeaWhenOceanIsCreated()
 	{
@@ -106,6 +94,9 @@ public class OceanTest
 		assertEquals("counting empty sea on initialization", totalCellAmount, actualAmountOfEmptySea);
 	}
 
+	/**
+	 * When the ocean is created the count of shots fired should be set to zero
+	 */
 	@Test
 	public void test_Ocean_totalShotsCountShouldBeSetToZeroWhenOceanIsCreated()
 	{
@@ -116,6 +107,10 @@ public class OceanTest
 		assertEquals("initial amount of shots fired should be set to zero", 0, actualInitialAmountOfShots);
 	}
 
+	/**
+	 * When the ocean is created the count of succesful hits should be set to
+	 * zero
+	 */
 	@Test
 	public void test_Ocean_totalHitsCountShouldBeSetToZeroWhenOceanIsCreated()
 	{
@@ -126,6 +121,9 @@ public class OceanTest
 		assertEquals("initial amount of hits should be set to zero", 0, actualInitialAmountOfHits);
 	}
 
+	/**
+	 * When the ocean is created the count of ship sunk should be set to zero
+	 */
 	@Test
 	public void test_Ocean_totalShipSunkCountShouldBeSetToZeroWhenOceanIsCreated()
 	{
@@ -138,6 +136,9 @@ public class OceanTest
 
 	// =================== getters and setters tests ==================== //
 
+	/**
+	 * Getter should return correct value
+	 */
 	@Test
 	public void test_getShotsFired_shouldReturnTheCorrectAmountOfShotsFired()
 	{
@@ -157,6 +158,9 @@ public class OceanTest
 		assertEquals("shot count should increase each time a shot is fired", expectedTotalShots, actualShotCount);
 	}
 
+	/**
+	 * Getter should return correct value
+	 */
 	@Test
 	public void test_getHitCount_shouldReturnTheCorrectNumberOfHits()
 	{
@@ -203,6 +207,9 @@ public class OceanTest
 		assertEquals("number of hits correctly reported on second hit", expectedNumberOfHits, actualNumberOfHits);
 	}
 
+	/**
+	 * Getter should return correct value
+	 */
 	@Test
 	public void test_getShipsSunk_shouldReturnTheCorrectNumberOfShipsSunk()
 	{
@@ -231,6 +238,9 @@ public class OceanTest
 
 	// ======================== public methods tests ==================== //
 
+	/**
+	 * The number of empty sea ships placed on the ocean should be correct
+	 */
 	@Test
 	public void test_placeAllShipsRandomly_exactNumberOfEmptySeaShouldBePlacedRandomlyOnTheOcean()
 	{
@@ -250,6 +260,9 @@ public class OceanTest
 		assertEquals("incorrect total empty sea area", expected, totalSeaArea);
 	}
 
+	/**
+	 * The number of real ships placed on the ocean should be correct
+	 */
 	@Test
 	public void test_placeAllShipsRandomly_exactNumberOfShipsShouldBePlacedRandomlyOnTheOcean()
 	{
@@ -266,9 +279,9 @@ public class OceanTest
 	}
 
 	/**
-	 * If ships overlap the total area covered by the ships will be less than
-	 * what it would normally be (for the same amount of ships, having a
-	 * specific length)
+	 * Ships should not overlap. If that is not the case the total area covered
+	 * by the ships will be less than what it would normally be (for the same
+	 * amount of ships, having a specific length)
 	 */
 	@Test
 	public void test_placeAllShipsRandomly_shipsShouldNotOverlapWhenPlacedRandomlyOnTheOcean()
@@ -298,9 +311,10 @@ public class OceanTest
 	}
 
 	/**
-	 * If by moving along each row until you find a horizontal ship bow there
-	 * are ships in the ocean spots placed diagonally, then that means ther are
-	 * adjacent ships diagonally. By moving vertically the smae logic applies
+	 * Ships should no t be adjacent diagonally. If by moving along each row
+	 * until you find a horizontal ship bow there are ships in the ocean spots
+	 * placed diagonally, then that means ther are adjacent ships diagonally. By
+	 * moving vertically the smae logic applies
 	 */
 	@Test
 	public void test_placeAllShipsRandomly_shipsShouldNotBeAdjacentDiagonallyWhenPlacedRandomlyOnOcean()
@@ -322,15 +336,16 @@ public class OceanTest
 	}
 
 	/**
-	 * If there are any adjacent ship horizontally or vertically then there will
-	 * be a mismatch between the total area covered by a certain ship type and
-	 * what we would normally expect, at least for one ship type. So for
-	 * instance if a battleship is adjacent to another ship (vertically or
-	 * horizontally) its length will be longer than what it would normally be if
-	 * it wasn't: therefore rather than 1 * 4 squared occupied by the
-	 * battleship, but we would get 5. The error could compensate for a
-	 * particular type of ship, but overall at least one would be different,
-	 * therefore we have to check all the ships and every ship type
+	 * Ships should not be adjacent vertically or horizontally. If there are any
+	 * adjacent ship horizontally or vertically then there will be a mismatch
+	 * between the total area covered by a certain ship type and what we would
+	 * normally expect, at least for one ship type. So for instance if a
+	 * battleship is adjacent to another ship (vertically or horizontally) its
+	 * length will be longer than what it would normally be if it wasn't:
+	 * therefore rather than 1 * 4 squared occupied by the battleship, but we
+	 * would get 5. The error could compensate for a particular type of ship,
+	 * but overall at least one would be different, therefore we have to check
+	 * all the ships and every ship type
 	 */
 	@Test
 	public void test_placeAllShipsRandomly_shipsShouldNotBeAdjacentOnAStraightLineWhenPlacedRandomlyOnOcean()
@@ -367,9 +382,9 @@ public class OceanTest
 	}
 
 	/**
-	 * If ships exceed the ocean's borders then the total area covered by the
-	 * ships will be less than what it would normally be if every ship was
-	 * within the borders
+	 * Ships should not exceed the ocean's borders. If ships exceed the ocean's
+	 * borders then the total area covered by the ships will be less than what
+	 * it would normally be if every ship was within the borders
 	 */
 	@Test
 	public void test_placeAllShipsRandomly_shipsShouldNotExceedOceanBorders()
@@ -391,6 +406,11 @@ public class OceanTest
 		assertTrue("Found ships which aren't within the ocean's borders", shipsAreWithinOceanBorders);
 	}
 
+	/**
+	 * Since the amount of ships and their length are not enogh to justify a
+	 * painful process to place the ships these should be placed within 10
+	 * seconds. If that is not the case the algorithm could be wrong
+	 */
 	@Test(timeout = DEFAULT_TIMEOUT * 5)
 	public void test_Ocean_shipsShouldBePlacedOnTheOceanWithinTenSeconds()
 	{
@@ -401,6 +421,9 @@ public class OceanTest
 		ocean.placeAllShipsRandomly();
 	}
 
+	/**
+	 * If an ocean spot is occupied it should be marked as such
+	 */
 	@Test
 	public void test_isOccupied_occupiedOceanSpotsShouldBeFlaggedAccordingly()
 	{
@@ -426,6 +449,9 @@ public class OceanTest
 		assertTrue("fourth location is not occupied", fourthLocationIsOccupied);
 	}
 
+	/**
+	 * If an ocean spot is not occupied it should be marked as such
+	 */
 	@Test
 	public void test_isOccupied_clearOceanSpotsShouldBeFlaggedAccordingly()
 	{
@@ -443,6 +469,10 @@ public class OceanTest
 		assertFalse("clear ocean spots was flagged as occupied", locationIsOccupied);
 	}
 
+	/**
+	 * Asking the ocean if a location out of its range contains a ship should
+	 * return false
+	 */
 	@Test
 	public void test_isOccupied_outOfRangeOceanSpotsShouldBeFlaggedAsClear()
 	{
@@ -481,6 +511,9 @@ public class OceanTest
 				outOfRangeLocationIsOccupied);
 	}
 
+	/**
+	 * Each time the shot hits a an afloat ship the hit count should grow
+	 */
 	@Test
 	public void test_shootAt_theNumberOfHitsShouldIncreaseWhenRealAfloatShipGetsHit()
 	{
@@ -516,6 +549,9 @@ public class OceanTest
 				numberOfHitsHasIncrementedAfterFirstSuccessfulShot);
 	}
 
+	/**
+	 * If the shot is a miss the hit count should not change
+	 */
 	@Test
 	public void test_shootAt_theNumberOfHitsShouldNotIncreaseWhenTheShotMissesTheTarget()
 	{
@@ -542,6 +578,9 @@ public class OceanTest
 				numberOfHitsHasDidNotIncreaseAfterUnsuccesfulShot);
 	}
 
+	/**
+	 * Shooting afloat ships should return true
+	 */
 	@Test
 	public void test_shootAt_shootingAfloatShipShouldBeSuccessful()
 	{
@@ -562,6 +601,10 @@ public class OceanTest
 		assertTrue("hitting an afloat ship was unsuccefull", hitAfloatShipIsSuccessful);
 	}
 
+	/**
+	 * Repeatedly shooting afloat ships should return true as long as is did not
+	 * sink in the meantime
+	 */
 	@Test
 	public void test_shootAt_shootingAfloatShipWithoutSinkingItShouldBeSuccessful()
 	{
@@ -596,6 +639,9 @@ public class OceanTest
 		assertTrue("hitting an afloat ship twice was not succesfull", succesfulShot);
 	}
 
+	/**
+	 * Shooting already sunk ships should return false
+	 */
 	@Test
 	public void test_shootAt_shootingSunkShipsShouldBeUnsuccessful()
 	{
@@ -620,6 +666,10 @@ public class OceanTest
 		assertFalse("hitting an already sunk ship had a succesfull outcome", hitSunkShip);
 	}
 
+	/**
+	 * The number of shots fired should increase at each attempt regarless of
+	 * the outcome
+	 */
 	@Test
 	public void test_shootAt_theNumberOfShotsFiredShouldBeUpdatedAtEachShot()
 	{
@@ -642,6 +692,9 @@ public class OceanTest
 				actualNumberOfShotsFired);
 	}
 
+	/**
+	 * The number of hits should increase at each time the shot is succesful
+	 */
 	@Test
 	public void test_shootAt_numberOfHitsShouldBeUpdatedOnlyAfterSuccessfulShots()
 	{
@@ -677,6 +730,9 @@ public class OceanTest
 		assertEquals("hit count was not updated after each successful shot", expectedNumberOfHits, actualNumberOfHits);
 	}
 
+	/**
+	 * Shooting out of range locations should return false
+	 */
 	@Test
 	public void test_shootAt_shootingAtLocationsOutOfRangeShouldReturnFalse()
 	{
@@ -713,6 +769,9 @@ public class OceanTest
 		assertFalse("shooting at locations with negative column coordinate was succesful", shotWasSuccesful);
 	}
 
+	/**
+	 * If the location contains a sunk ship it should be reported correctly
+	 */
 	@Test
 	public void test_hasSunkShipAt_shouldReturnTrueIfLocationContainsSunkShip()
 	{
@@ -737,6 +796,9 @@ public class OceanTest
 		assertTrue("location did not contain a sunk ship", locationHasASunkShip);
 	}
 
+	/**
+	 * If the location contains an afloat ship it should be reported correctly
+	 */
 	@Test
 	public void test_hasSunkShipAt_shouldReturnFalseIfLocationContainsAfloatShip()
 	{
@@ -762,6 +824,9 @@ public class OceanTest
 		assertFalse("ocean location with partly damaged ship flagged as containing a sunk ship", locationHasASunkShip);
 	}
 
+	/**
+	 * If the location contains a sunk ship it should be reported correctly
+	 */
 	@Test
 	public void test_hasSunkShipAt_shouldReturnFalseIfLocationContainsEmptySea()
 	{
@@ -787,6 +852,9 @@ public class OceanTest
 		assertFalse("empty sea locations do not have sunk ships on them", locationHasASunkShip);
 	}
 
+	/**
+	 * If the location is out of range it should not have a sunk ship
+	 */
 	@Test
 	public void test_hasSunkShipAt_shouldReturnFalseIfLocationIsOutOfRange()
 	{
@@ -824,6 +892,9 @@ public class OceanTest
 				outOfRangeLocationHasASunkShip);
 	}
 
+	/**
+	 * The game is not over if not all ships have been sunk
+	 */
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_isGameOver_shouldReturnFalseIfNotAllShipsHaveBeenSunk()
 	{
@@ -844,6 +915,9 @@ public class OceanTest
 		assertFalse("game was akready over without sinking all ships", gameIsOver);
 	}
 
+	/**
+	 * If all ships have been sunk the game is over
+	 */
 	@Test(timeout = DEFAULT_TIMEOUT)
 	public void test_isGameOver_shouldReturnTrueIfAllShipsHaveBeenSunk()
 	{
@@ -864,6 +938,9 @@ public class OceanTest
 		assertTrue("game was still on after sinking every ship", gameIsOver);
 	}
 
+	/**
+	 * Asking the ocean for the ship type should return the correct result
+	 */
 	@Test
 	public void test_getShipsTypeAt_shouldReturnTheCorrectShipType()
 	{
@@ -899,6 +976,9 @@ public class OceanTest
 		assertEquals("submarines did not return the submarines type", Submarine.SUBMARINE_TYPE, submarineType);
 	}
 
+	/**
+	 * Expect a IAE for out of range coordinates
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_getShipsTypeAt_shouldThrowExceptionIfRowCoordinateisExceedsOceanHeight()
 	{
@@ -911,6 +991,9 @@ public class OceanTest
 		ocean.getShipTypeAt(outOfRangeRowCoordinate, inRangeColumnCoordinate);
 	}
 
+	/**
+	 * Expect a IAE for out of range coordinates
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_getShipsTypeAt_shouldThrowExceptionIfRowCoordinateisNegative()
 	{
@@ -923,6 +1006,9 @@ public class OceanTest
 		ocean.getShipTypeAt(negativeRowCoordinate, inRangeColumnCoordinate);
 	}
 
+	/**
+	 * Expect a IAE for out of range coordinates
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_getShipsTypeAt_shouldThrowExceptionIfColumnCoordinateisExceedsOceanWidth()
 	{
@@ -935,6 +1021,9 @@ public class OceanTest
 		ocean.getShipTypeAt(inRangeRowCoordinate, outOfRangeColumnCoordinate);
 	}
 
+	/**
+	 * Expect a IAE for out of range coordinates
+	 */
 	@Test(expected = IllegalArgumentException.class)
 	public void test_getShipsTypeAt_shouldThrowExceptionIfColumnCoordinateisNegative()
 	{
@@ -949,6 +1038,13 @@ public class OceanTest
 
 	// ======================= helper methods ======================== //
 
+	/**
+	 * Creates a matrix containing the same ships in the original ocean but
+	 * rotated 90 degree anticlockwise. The method is useful to reduce branching
+	 * when performing operations that are orientation-based
+	 *
+	 * @return a new matrix rotated 90 degrees anticlockwise
+	 */
 	private Ship[][] rotateOceanNinetyDegreeAntiClockwise()
 	{
 		Ship[][] rotatedOcean = new Ship[Ocean.OCEAN_WIDTH][Ocean.OCEAN_HEIGHT];
@@ -1278,68 +1374,6 @@ public class OceanTest
 			// if the ship is horizontal increment the column, otherwise
 			// increment the row
 			ocean.shootAt(horizontal ? row : i, horizontal ? i : column);
-		}
-	}
-
-	// ========================== debug =============================== //
-
-	private void print(Ocean ocean)
-	{
-		Ship[][] matrix = ocean.getShipArray();
-
-		for (int i = 0; i <= Ocean.OCEAN_HEIGHT; i++)
-		{
-			for (int j = 0; j <= Ocean.OCEAN_WIDTH; j++)
-			{
-				// if it's the first row or first column
-				if (i == 0 || j == 0)
-				{
-					if (i == 0 && j < Ocean.OCEAN_WIDTH)
-					{
-						// print the first row of numbers
-						System.out.print(j == 0 ? " " + j : j);
-					}
-					else if (j == 0)
-					{
-						// print the first column of numbers
-						System.out.print(i - 1);
-					}
-				}
-				else
-				{
-					Ship ship = matrix[i - 1][j - 1];
-					boolean horizontal = ship.isHorizontal();
-					Class<? extends Ship> shipClass = ship.getClass();
-					// otherwise print whatever is in the ocean
-					System.out.print(printShip(shipClass, horizontal));
-				}
-			}
-			// print the next row on a separate line
-			System.out.println();
-		}
-	}
-
-	private static <T extends Ship> String printShip(Class<T> shipClass, boolean horizontal)
-	{
-		if (shipClass.equals(Battleship.class))
-		{
-			return "4";
-		}
-		else if (shipClass.equals(Cruiser.class))
-		{
-			return "3";
-		}
-		else if (shipClass.equals(Destroyer.class))
-		{
-			return "2";
-		}
-		else if (shipClass.equals(Submarine.class))
-		{
-			return horizontal ? "H" : "V";
-		}
-		else
-		{
-			return ".";
 		}
 	}
 }
